@@ -121,18 +121,16 @@ What **is** implemented and tested (`src/lib/scoring.ts`,
 - **Shift and area/team assignment source** (currently just fields on the
   demo member records).
 - **Real member photos, with confirmation there's permission to display
-  them.** Two separate demo image sets exist, and neither is a real Safia
-  employee: the small circular avatar (`Member.avatarPhoto`) uses 12
-  AI-generated synthetic faces (nobody real — see
-  `public/portraits/README.md`), and the full-length photo used by the
-  podium cards and the Career Card hero (`Member.fullBodyPhoto`) uses 12
-  unrelated stock-photo models under the Pexels License (see
-  `public/fullbody/README.md`) — deliberately a *different* person than the
-  avatar face, since no tool here can extend one into the other without
-  either fabricating an identity match or misattributing a real person's
-  body. The UI falls back to an illustrated placeholder whenever either
-  field is `null`, so swapping in real, approved staff photos (ideally the
-  same photo shoot for both fields) is a data change, not a code change.
+  them.** Neither demo image is a real Safia employee: the small circular
+  avatar (`Member.avatarPhoto`) and the full-length photo used by the
+  podium cards and the Career Card hero (`Member.fullBodyPhoto`) are two
+  crops of the *same* Pexels stock photo per person (bakery/kitchen-context
+  models, Pexels License — see `public/portraits/README.md` and
+  `public/fullbody/README.md`), so the two images always show one
+  consistent person. The UI falls back to an illustrated placeholder
+  whenever either field is `null`, so swapping in real, approved staff
+  photos (ideally the same photo shoot for both fields, exactly as this
+  demo set already does) is a data change, not a code change.
 - **Authentication** — this build has none; it assumes the real deployment
   sits behind whatever the host IMS already uses, and that access control to
   employee performance data is enforced there.

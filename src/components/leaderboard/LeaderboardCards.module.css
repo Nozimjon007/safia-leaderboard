@@ -84,8 +84,35 @@
 }
 
 .rankNum {
-  font-weight: 700;
-  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 27px;
+  padding: 0 9px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  box-shadow: inset 0 0 0 1px var(--border);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  color: var(--ink-secondary);
+}
+
+.rankNum[data-medal='gold'] {
+  background: var(--medal-gold);
+  color: var(--on-accent);
+  box-shadow: none;
+}
+.rankNum[data-medal='silver'] {
+  background: var(--medal-silver);
+  color: var(--on-accent);
+  box-shadow: none;
+}
+.rankNum[data-medal='bronze'] {
+  background: var(--medal-bronze);
+  color: var(--on-accent);
+  box-shadow: none;
 }
 
 .score {
@@ -96,8 +123,9 @@
 }
 
 .score b {
-  font-size: 25px;
-  font-weight: 700;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 .scoreUnit {

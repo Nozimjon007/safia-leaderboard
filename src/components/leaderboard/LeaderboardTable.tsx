@@ -5,7 +5,7 @@ import { categoryLabel, roleLabel, useI18n } from '../../i18n';
 import { trendDirection, zoneOf, type LeaderboardRow, type TeamStats } from '../../lib/scoring';
 import { formatPercent, formatScore } from '../../lib/format';
 import { useScoringConfig } from '../../state/ScoringConfigProvider';
-import { zoneColorVar, zoneGlyph } from '../../lib/zoneStyle';
+import { medalFor, zoneColorVar, zoneGlyph } from '../../lib/zoneStyle';
 import { Avatar } from '../common/Avatar';
 import { MoveBadge } from '../common/MoveBadge';
 import { ZoneBadge } from '../common/ZoneBadge';
@@ -127,7 +127,9 @@ function TableRow({ row, team, isOpen, onToggle, compareSelected, onToggleCompar
             </span>
           ) : (
             <div className={styles.rankCell}>
-              <span className={`${styles.rankNum} tabular`}>{row.rank}</span>
+              <span className={`${styles.rankNum} tabular`} data-medal={medalFor(row.rank)}>
+                {row.rank}
+              </span>
               <MoveBadge move={row.move} />
             </div>
           )}

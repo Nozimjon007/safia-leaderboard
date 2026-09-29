@@ -99,17 +99,43 @@
 
 .rankScoreZone {
   display: flex;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
   padding: 40px 18px 10px;
   justify-content: flex-start;
 }
 
 .rankNum {
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--ink-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 30px;
+  padding: 0 9px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  box-shadow: inset 0 0 0 1px var(--border);
+  color: var(--ink-secondary);
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: -0.01em;
   flex: none;
+}
+
+.card[data-place='1'] .rankNum {
+  background: var(--medal-gold);
+  color: var(--on-accent);
+  box-shadow: none;
+}
+.card[data-place='2'] .rankNum {
+  background: var(--medal-silver);
+  color: var(--on-accent);
+  box-shadow: none;
+}
+.card[data-place='3'] .rankNum {
+  background: var(--medal-bronze);
+  color: var(--on-accent);
+  box-shadow: none;
 }
 
 .scoreBlock {

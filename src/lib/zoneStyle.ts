@@ -37,3 +37,11 @@ export function zoneGlyph(zone: Zone): string {
       return '?';
   }
 }
+
+/** Rank -> medal color key, for the badge shown in ranked lists outside the podium itself. */
+export function medalFor(rank: number | null): 'gold' | 'silver' | 'bronze' | undefined {
+  if (rank === 1) return 'gold';
+  if (rank === 2) return 'silver';
+  if (rank === 3) return 'bronze';
+  return undefined;
+}

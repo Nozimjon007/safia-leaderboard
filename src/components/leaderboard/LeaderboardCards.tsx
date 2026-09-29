@@ -6,7 +6,7 @@ import { computeHighlight, trendDirection, zoneOf, type LeaderboardRow, type Tea
 import { formatPercent, formatScore, formatSigned } from '../../lib/format';
 import { ACHIEVEMENT_GLYPHS, countOf, earnedAchievementTypes } from '../../lib/achievements';
 import { useScoringConfig } from '../../state/ScoringConfigProvider';
-import { zoneColorVar } from '../../lib/zoneStyle';
+import { medalFor, zoneColorVar } from '../../lib/zoneStyle';
 import { Avatar } from '../common/Avatar';
 import { MoveBadge } from '../common/MoveBadge';
 import { ZoneBadge } from '../common/ZoneBadge';
@@ -86,7 +86,7 @@ function MemberCard({ row, team, compareSelected, onToggleCompare, earned }: Mem
               –
             </span>
           ) : (
-            <span className={`${styles.rankNum} tabular`}>
+            <span className={`${styles.rankNum} tabular`} data-medal={medalFor(row.rank)}>
               <span className="visually-hidden">{t('rank_label')} </span>
               {row.rank}
             </span>

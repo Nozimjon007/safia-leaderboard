@@ -66,9 +66,27 @@
   padding: 0 6px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
-  font-weight: 700;
-  font-size: 13.5px;
+  background: var(--surface-sunken);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: -0.01em;
   color: var(--ink-secondary);
+}
+
+.rankNum[data-medal='gold'] {
+  background: var(--medal-gold);
+  border-color: var(--medal-gold);
+  color: var(--on-accent);
+}
+.rankNum[data-medal='silver'] {
+  background: var(--medal-silver);
+  border-color: var(--medal-silver);
+  color: var(--on-accent);
+}
+.rankNum[data-medal='bronze'] {
+  background: var(--medal-bronze);
+  border-color: var(--medal-bronze);
+  color: var(--on-accent);
 }
 
 .rankCell {
@@ -128,8 +146,9 @@
 }
 
 .overallValue b {
-  font-size: 17px;
-  font-weight: 700;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 .overallValue span {
