@@ -27,28 +27,31 @@ no attribution required (credited below anyway as good practice), may be
 modified (each was resized, nothing else). The Pexels license explicitly
 prohibits implying the person shown endorses a product or is affiliated with
 one — consistent with why every page here carries a "Demo data" banner and
-these are never labeled with a real Safia claim. Downloaded 2026-09-29.
+these are never labeled with a real Safia claim. Downloaded 2026-09-29,
+revised 2026-09-29 (swapped for more dynamic athletic action poses).
 
 | Member | Pexels photo |
 |---|---|
-| madina | https://www.pexels.com/photo/30246174/ |
+| madina | https://www.pexels.com/photo/17476809/ |
 | otabek | https://www.pexels.com/photo/6250986/ |
-| zarina | https://www.pexels.com/photo/7240198/ |
-| jahongir | https://www.pexels.com/photo/9499151/ |
-| kamronbek | https://www.pexels.com/photo/6311316/ |
-| aziz | https://www.pexels.com/photo/12738118/ |
-| nodira | https://www.pexels.com/photo/4498516/ |
-| gulbahor | https://www.pexels.com/photo/3852172/ |
-| shahnoza | https://www.pexels.com/photo/16122061/ |
+| zarina | https://www.pexels.com/photo/17656445/ |
+| jahongir | https://www.pexels.com/photo/33037087/ |
+| kamronbek | https://www.pexels.com/photo/20615432/ |
+| aziz | https://www.pexels.com/photo/9499151/ |
+| nodira | https://www.pexels.com/photo/30246174/ |
+| gulbahor | https://www.pexels.com/photo/6311322/ |
+| shahnoza | https://www.pexels.com/photo/31381383/ |
 | dilnoza | https://www.pexels.com/photo/7240207/ |
-| sardor | https://www.pexels.com/photo/6740104/ |
-| feruza | https://www.pexels.com/photo/29138812/ |
+| sardor | https://www.pexels.com/photo/2216610/ |
+| feruza | https://www.pexels.com/photo/4498516/ |
 
 ## Selection
 
-Chosen for a plain/studio background (nothing to cut out), a standing
-full-length pose with the whole figure — head to shoes — in frame, and a
-professional, dignified look appropriate for a workplace roster. Poses with
-a busy background, a seated/kneeling pose, or a crop that cut off the head
-or feet were excluded, since this project has no background-removal or
-image-generation tool to fix that after the fact.
+Chosen for a standing or dynamic athletic-action full-length pose with the
+whole figure — head to shoes — in frame, a plain or reasonably uniform
+background (nothing to cut out), and a professional, dignified look
+appropriate for a workplace roster. Poses with a genuinely cluttered
+background, a seated/kneeling pose, a crop that cut off the head or feet, a
+faceless silhouette, or more than one person in frame were excluded, since
+this project has no background-removal or image-generation tool to fix any
+of that after the fact.
