@@ -104,3 +104,11 @@ export function seasonCountdownText(t: TFunction, countdown: { isComplete: boole
   if (countdown.hours > 0 || countdown.minutes > 0) return t('season_countdown_hours_only', { h: countdown.hours, m: countdown.minutes });
   return t('season_countdown_ending_today');
 }
+
+/** Same "Xd Yh remaining" shape as seasonCountdownText, but for an upcoming season's time-to-start. */
+export function seasonStartCountdownText(t: TFunction, countdown: { hasStarted: boolean; days: number; hours: number; minutes: number }): string {
+  if (countdown.hasStarted) return t('season_countdown_starting_today');
+  if (countdown.days > 0) return t('season_countdown_days_hours', { d: countdown.days, h: countdown.hours });
+  if (countdown.hours > 0 || countdown.minutes > 0) return t('season_countdown_hours_only', { h: countdown.hours, m: countdown.minutes });
+  return t('season_countdown_starting_today');
+}

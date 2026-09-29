@@ -1,0 +1,126 @@
+.crumbs {
+  margin-bottom: 14px;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.head h1 {
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  color: var(--ink-secondary);
+  margin-top: 6px;
+  max-width: 75ch;
+}
+
+.pickers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  margin: 20px 0;
+}
+
+.pickerField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1 1 200px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+}
+
+.panel h2 {
+  font-size: 17px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.memberAvatar {
+  flex: none;
+}
+
+.memberTitleLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.memberTitleLink:hover {
+  text-decoration: underline;
+}
+
+.sub {
+  color: var(--ink-secondary);
+  font-size: 13.5px;
+  margin-top: 4px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr repeat(3, minmax(90px, auto));
+  gap: 4px 12px;
+  margin-top: 14px;
+  align-items: center;
+}
+
+.colHead {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink-muted);
+  text-align: right;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.rowLabel {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  padding: 6px 0;
+}
+
+.grid > div:not(.rowLabel):not(.colHead):not(.col) {
+  text-align: right;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 6px 0;
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr repeat(3, minmax(64px, auto));
+    font-size: 12.5px;
+  }
+}

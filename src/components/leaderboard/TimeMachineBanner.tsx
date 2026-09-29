@@ -28,7 +28,7 @@ export function TimeMachineBanner({ tm, members }: TimeMachineBannerProps) {
         <span aria-hidden="true">🕐</span> {t('time_machine_open')}
       </b>
       <span>
-        {t('time_machine_banner_note', { n: tm.seasonOffset + 1 })} {formatTimeMachineCaption(tm, members, t, locale)}
+        {t('time_machine_banner_note', { n: tm.seasonOffset + 1 })} {formatTimeMachineCaption(tm.caption, members, t, locale)}
       </span>
       <Link className={styles.link} to={{ pathname: '/', search: location.search }}>
         {t('nav_leaderboard')} →

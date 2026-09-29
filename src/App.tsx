@@ -8,6 +8,8 @@ import { LeaderboardPage } from './pages/LeaderboardPage';
 import { MemberProfilePage } from './pages/MemberProfilePage';
 import { ComparePage } from './pages/ComparePage';
 import { SeasonsPage } from './pages/SeasonsPage';
+import { SeasonDetailPage } from './pages/SeasonDetailPage';
+import { SeasonComparePage } from './pages/SeasonComparePage';
 import { RewardsPage } from './pages/RewardsPage';
 import { ScoringPage } from './pages/ScoringPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -29,6 +31,8 @@ function AppRoutes() {
       <Route path="/member/:id" element={<MemberProfilePage />} />
       <Route path="/compare" element={<ComparePage />} />
       <Route path="/seasons" element={<SeasonsPage />} />
+      <Route path="/seasons/compare" element={<SeasonComparePage />} />
+      <Route path="/seasons/:id" element={<SeasonDetailPage />} />
       <Route path="/rewards" element={<RewardsPage />} />
       <Route path="/scoring" element={<ScoringPage />} />
       <Route path="*" element={<NotFoundPage />} />

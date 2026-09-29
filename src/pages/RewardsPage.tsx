@@ -5,7 +5,7 @@ import { useDatasetContext } from '../state/DatasetProvider';
 import { useSeasons } from '../hooks/useSeasons';
 import { useScoringConfig } from '../state/ScoringConfigProvider';
 import { computeAllSeasonRewards, REWARD_IDS } from '../lib/rewards';
-import { isSeasonComplete } from '../lib/seasons';
+import { isSeasonApproved } from '../lib/seasons';
 import type { RewardId } from '../data/types';
 import { DemoBanner } from '../components/common/DemoBanner';
 import { StateMessage } from '../components/common/StateMessage';
@@ -66,7 +66,7 @@ export function RewardsPage() {
     );
   }
 
-  const completedSeasonsNewestFirst = [...seasonsInfo.seasons].filter((s) => isSeasonComplete(s)).reverse();
+  const completedSeasonsNewestFirst = [...seasonsInfo.seasons].filter((s) => isSeasonApproved(s)).reverse();
 
   return (
     <>

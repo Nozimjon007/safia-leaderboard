@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildDemoDataset } from '../data/demoData';
 import { DEFAULT_SCORING_CONFIG } from '../data/types';
-import { listSeasons } from './seasons';
+import { listSeasons, seasonCloseMs, SEASON_APPROVAL_GRACE_MS } from './seasons';
 import { computeAllSeasonRewards, rewardsForMember } from './rewards';
 
 describe('computeAllSeasonRewards (against the real demo dataset)', () => {
@@ -37,5 +37,19 @@ describe('computeAllSeasonRewards (against the real demo dataset)', () => {
 
   it('never rewards the member with no data at all', () => {
     expect(rewardsForMember(rewards, 'aziz')).toEqual([]);
+  });
+
+  it('excludes a season still inside its approval grace window, even though its numbers are frozen', () => {
+    const pastSeason = seasons[seasons.length - 2]; // the one right before "current" — genuinely closed
+    const justClosed = seasonCloseMs(pastSeason) + 1000;
+    const stillPending = computeAllSeasonRewards(dataset, DEFAULT_SCORING_CONFIG, seasons, justClosed);
+    expect(stillPending.some((r) => r.seasonId === pastSeason.id)).toBe(false);
+  });
+
+  it('includes that same season once its approval grace window has elapsed', () => {
+    const pastSeason = seasons[seasons.length - 2];
+    const approved = seasonCloseMs(pastSeason) + SEASON_APPROVAL_GRACE_MS;
+    const nowRewarded = computeAllSeasonRewards(dataset, DEFAULT_SCORING_CONFIG, seasons, approved);
+    expect(nowRewarded.some((r) => r.seasonId === pastSeason.id)).toBe(true);
   });
 });

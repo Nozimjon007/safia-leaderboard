@@ -59,6 +59,15 @@ export function seasonOf(year: number, quarter: Quarter): Season {
   return { id: seasonId(year, quarter), year, quarter, ...seasonBounds(year, quarter) };
 }
 
+const SEASON_ID_RE = /^(\d{4})-q([1-4])$/;
+
+/** The inverse of seasonId() / a season's own `id` — null for anything not in the "YYYY-qN" shape. */
+export function parseSeasonId(id: string): Season | null {
+  const m = SEASON_ID_RE.exec(id);
+  if (!m) return null;
+  return seasonOf(Number(m[1]), Number(m[2]) as Quarter);
+}
+
 function nextQuarter(year: number, quarter: Quarter): { year: number; quarter: Quarter } {
   return quarter === 4 ? { year: year + 1, quarter: 1 } : { year, quarter: (quarter + 1) as Quarter };
 }
@@ -94,6 +103,42 @@ export function isSeasonComplete(season: Pick<Season, 'endISO'>, nowMs: number =
   return nowMs >= seasonCloseMs(season);
 }
 
+export type SeasonStatus = 'upcoming' | 'current' | 'awaiting_approval' | 'approved';
+
+/**
+ * How long after a season closes its standings sit "awaiting approval" before
+ * becoming official — no real Safia approval workflow exists, so this is a
+ * clearly-labeled demo assumption (a plausible admin-review window), not a
+ * business rule. Change it in this one place.
+ */
+export const SEASON_APPROVAL_GRACE_MS = 3 * 86_400_000; // 3 days
+
+/**
+ * The four states a season can be in, per the corrected time model:
+ *  - `upcoming`: hasn't started — show dates/countdown only, never standings.
+ *  - `current`: in progress — standings are real but provisional, never
+ *    "final winners".
+ *  - `awaiting_approval`: the time window closed, so the numbers are frozen
+ *    (same as `isSeasonComplete`), but no winners are declared and no
+ *    rewards are issued yet.
+ *  - `approved`: frozen standings + awarded rewards are official (within
+ *    this demo's own model — still labeled demo/proposed everywhere, since
+ *    no real Safia data source exists).
+ */
+export function seasonStatus(season: Pick<Season, 'startISO' | 'endISO'>, nowMs: number = Date.now()): SeasonStatus {
+  const startMs = seasonStartMs(season);
+  const closeMs = seasonCloseMs(season);
+  if (nowMs < startMs) return 'upcoming';
+  if (nowMs < closeMs) return 'current';
+  if (nowMs < closeMs + SEASON_APPROVAL_GRACE_MS) return 'awaiting_approval';
+  return 'approved';
+}
+
+/** Standings are frozen AND the approval grace period has elapsed — the only state allowed to declare winners or issue rewards. */
+export function isSeasonApproved(season: Pick<Season, 'startISO' | 'endISO'>, nowMs: number = Date.now()): boolean {
+  return seasonStatus(season, nowMs) === 'approved';
+}
+
 export function currentSeasonIndex(seasons: readonly Season[], nowMs: number = Date.now()): number {
   const idx = seasons.findIndex((s) => nowMs >= seasonStartMs(s) && nowMs < seasonCloseMs(s));
   if (idx >= 0) return idx;
@@ -109,6 +154,26 @@ export interface SeasonCountdown {
   /** 0..1 through the season, clamped. */
   progress: number;
   isComplete: boolean;
+}
+
+export interface StartCountdown {
+  totalMs: number;
+  days: number;
+  hours: number;
+  minutes: number;
+  hasStarted: boolean;
+}
+
+/** Time remaining until an upcoming season starts. */
+export function seasonStartCountdown(season: Pick<Season, 'startISO'>, nowMs: number = Date.now()): StartCountdown {
+  const remaining = Math.max(0, seasonStartMs(season) - nowMs);
+  return {
+    totalMs: remaining,
+    days: Math.floor(remaining / 86_400_000),
+    hours: Math.floor((remaining % 86_400_000) / 3_600_000),
+    minutes: Math.floor((remaining % 3_600_000) / 60_000),
+    hasStarted: remaining === 0,
+  };
 }
 
 export function seasonCountdown(season: Pick<Season, 'startISO' | 'endISO'>, nowMs: number = Date.now()): SeasonCountdown {

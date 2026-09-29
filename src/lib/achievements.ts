@@ -5,9 +5,11 @@
  * set of **rule-based** badges computed from real scoring data (never a
  * fabricated per-member flag). Every rule below is deterministic and
  * documented; the UI labels these as demo/illustrative wherever they're
- * shown. Only *completed* seasons are eligible — a season's badges are
- * computed from its finalized standings and never change once the season
- * has closed, exactly like the standings themselves.
+ * shown. Only *approved* seasons are eligible (see lib/seasons.ts) — every
+ * rule here declares a "winner" of some kind (#1, category leader, biggest
+ * improvement), so none of them fire until a season's approval grace window
+ * has elapsed, exactly like its rewards. A season's badges are computed
+ * from its frozen standings and never change once computed.
  *
  * Rules:
  * - `champion`        — finished a completed season ranked #1 overall.
@@ -23,7 +25,7 @@
  */
 import { CATEGORY_KEYS, type AchievementId, type CategoryKey, type EarnedAchievement, type LeaderboardDataset, type ScoringConfig } from '../data/types';
 import type { Season } from './seasons';
-import { isSeasonComplete } from './seasons';
+import { isSeasonApproved } from './seasons';
 import { buildLeaderboard, weekOverall } from './scoring';
 import { weekIndexesInRange } from './dates';
 
@@ -54,18 +56,19 @@ export function earnedAchievementTypes(earned: readonly EarnedAchievement[]): Ac
 
 const GREEN_STREAK_MIN_WEEKS = 4;
 
-/** All members' earned achievements, across every completed season — computed once per (dataset, config, seasons) triple. */
+/** All members' earned achievements, across every approved season — computed once per (dataset, config, seasons) triple. */
 export function computeAllAchievements(
   dataset: LeaderboardDataset,
   config: ScoringConfig,
   seasons: readonly Season[],
+  nowMs: number = Date.now(),
 ): Record<string, EarnedAchievement[]> {
   const byMember: Record<string, EarnedAchievement[]> = {};
   dataset.members.forEach((m) => (byMember[m.id] = []));
 
-  const completedSeasons = seasons.filter((s) => isSeasonComplete(s));
+  const approvedSeasons = seasons.filter((s) => isSeasonApproved(s, nowMs));
 
-  for (const season of completedSeasons) {
+  for (const season of approvedSeasons) {
     const weekIndexes = weekIndexesInRange(dataset.firstWeekStart, dataset.weekCount, season.startISO, season.endISO);
     if (!weekIndexes.length) continue;
 

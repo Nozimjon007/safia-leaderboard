@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Member } from '../../data/types';
 import type { TimeMachineState } from '../../hooks/useTimeMachine';
+import type { TimeMachineCaption } from '../../lib/timeMachine';
 import { categoryLabel, useI18n } from '../../i18n';
 import { formatShortDate } from '../../lib/dates';
 import { formatSigned } from '../../lib/format';
@@ -14,23 +15,23 @@ interface TimeMachineControlProps {
 }
 
 /** Turns a TimeMachineCaption into translated, ready-to-render text — reused by the small read-only
- * banner shown on the profile/compare pages when the Time Machine is active but not rendered there. */
+ * banner shown on the profile/compare pages, and by the season detail page's own timeline, wherever
+ * the Time Machine's slider itself isn't rendered. */
 export function formatTimeMachineCaption(
-  tm: TimeMachineState,
+  caption: TimeMachineCaption,
   members: readonly Member[],
   t: ReturnType<typeof useI18n>['t'],
   locale: string,
 ): string {
-  const c = tm.caption;
-  if (c.kind === 'first_week') return t('time_machine_caption_first_week');
-  if (c.kind === 'no_notable_change') return t('time_machine_caption_no_change');
-  const name = members.find((m) => m.id === c.memberId)?.name ?? c.memberId;
-  const base = t('time_machine_caption_move', { name, from: c.fromRank, to: c.toRank });
-  if (c.category && c.categoryDelta != null) {
+  if (caption.kind === 'first_week') return t('time_machine_caption_first_week');
+  if (caption.kind === 'no_notable_change') return t('time_machine_caption_no_change');
+  const name = members.find((m) => m.id === caption.memberId)?.name ?? caption.memberId;
+  const base = t('time_machine_caption_move', { name, from: caption.fromRank, to: caption.toRank });
+  if (caption.category && caption.categoryDelta != null) {
     return t('time_machine_caption_move_category', {
       base,
-      category: categoryLabel(t, c.category),
-      delta: formatSigned(c.categoryDelta, locale),
+      category: categoryLabel(t, caption.category),
+      delta: formatSigned(caption.categoryDelta, locale),
     });
   }
   return base;
@@ -111,7 +112,7 @@ export function TimeMachineControl({ tm, members }: TimeMachineControlProps) {
       </div>
 
       <p key={tm.seasonOffset} className={styles.caption} data-kind={tm.caption.kind} aria-live="polite">
-        {formatTimeMachineCaption(tm, members, t, locale)}
+        {formatTimeMachineCaption(tm.caption, members, t, locale)}
       </p>
     </section>
   );

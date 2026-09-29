@@ -3,7 +3,7 @@ import type { EarnedAchievement, LeaderboardDataset, MetricKey, RewardId, Scorin
 import type { LeaderboardRow } from '../../lib/scoring';
 import { bestAchievement } from '../../lib/achievements';
 import { computeSeasonRewards } from '../../lib/rewards';
-import { isSeasonComplete, seasonCountdown, seasonWeekRange, type Season } from '../../lib/seasons';
+import { seasonCountdown, seasonStatus, seasonWeekRange, type Season } from '../../lib/seasons';
 import { formatDateRange } from '../../lib/dates';
 import { seasonCountdownText, seasonQuarterLabel, useI18n } from '../../i18n';
 import { PodiumCard, type PodiumEmblem } from './PodiumCard';
@@ -47,7 +47,9 @@ export function Podium({
     const r = seasonWeekRange(dataset, s);
     return r && r.from === periodFromISO && r.to === periodToISO;
   });
-  const complete = matchedSeason ? isSeasonComplete(matchedSeason, now) : false;
+  const status = matchedSeason ? seasonStatus(matchedSeason, now) : null;
+  const complete = status === 'awaiting_approval' || status === 'approved';
+  const approved = status === 'approved';
 
   useEffect(() => {
     if (!matchedSeason || complete) return;
@@ -57,10 +59,11 @@ export function Podium({
 
   if (!rows.length) return null;
 
-  // Rewards only exist for a completed season that this exact period matches — a live/in-progress
-  // season or an arbitrary custom range never claims a finalized prize. See lib/rewards.ts.
+  // Rewards only exist for an *approved* season that this exact period matches — a live/in-progress
+  // season, one still awaiting its approval grace window, or an arbitrary custom range never claims
+  // a finalized prize. See lib/rewards.ts and lib/seasons.ts's seasonStatus.
   const rewardByMember: Record<string, RewardId> = {};
-  if (matchedSeason && complete) {
+  if (matchedSeason && approved) {
     const rewards = computeSeasonRewards(dataset, config, matchedSeason);
     for (const id of REWARD_PRIORITY) {
       for (const r of rewards) {
@@ -85,8 +88,12 @@ export function Podium({
 
       {matchedSeason ? (
         <div className={styles.seasonStrip}>
-          <span className={styles.seasonBadge} data-complete={complete || undefined}>
-            {complete ? t('season_complete_badge') : t('season_current_badge')}
+          <span className={styles.seasonBadge} data-status={status ?? undefined}>
+            {status === 'approved'
+              ? t('season_complete_badge')
+              : status === 'awaiting_approval'
+                ? t('season_awaiting_approval_badge')
+                : t('season_current_badge')}
           </span>
           <span className={styles.seasonName}>
             {seasonQuarterLabel(t, matchedSeason)} · {formatDateRange(matchedSeason.startISO, matchedSeason.endISO, locale)}

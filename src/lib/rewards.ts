@@ -6,14 +6,17 @@
  * achievement-based category). The UI must always present these as
  * **proposed, not a promise from Safia** — never as confirmed prizes.
  *
- * Winners are computed from each completed season's *finalized* standings
- * (the same `buildLeaderboard` call the achievements engine and the
- * leaderboard itself use) — a season's winners never change once it has
- * closed, and the in-progress season never appears here.
+ * Winners are computed from each *approved* season's frozen standings (the
+ * same `buildLeaderboard` call the achievements engine and the leaderboard
+ * itself use). Gated on `isSeasonApproved`, not just `isSeasonComplete`: a
+ * season that has closed but is still within its approval grace window
+ * (see lib/seasons.ts) is intentionally excluded here too, so this list
+ * never disagrees with the Seasons page about whether a season's winners
+ * are official yet.
  */
 import type { LeaderboardDataset, RewardId, ScoringConfig, SeasonReward } from '../data/types';
 import type { Season } from './seasons';
-import { isSeasonComplete } from './seasons';
+import { isSeasonApproved } from './seasons';
 import { buildLeaderboard } from './scoring';
 import { weekIndexesInRange } from './dates';
 
@@ -44,9 +47,14 @@ export function computeSeasonRewards(dataset: LeaderboardDataset, config: Scorin
   return rewards;
 }
 
-/** Every reward from every *completed* season, oldest first. The current season is never included. */
-export function computeAllSeasonRewards(dataset: LeaderboardDataset, config: ScoringConfig, seasons: readonly Season[]): SeasonReward[] {
-  return seasons.filter((s) => isSeasonComplete(s)).flatMap((s) => computeSeasonRewards(dataset, config, s));
+/** Every reward from every *approved* season, oldest first. Current and awaiting-approval seasons are never included. */
+export function computeAllSeasonRewards(
+  dataset: LeaderboardDataset,
+  config: ScoringConfig,
+  seasons: readonly Season[],
+  nowMs: number = Date.now(),
+): SeasonReward[] {
+  return seasons.filter((s) => isSeasonApproved(s, nowMs)).flatMap((s) => computeSeasonRewards(dataset, config, s));
 }
 
 export function rewardsForMember(all: readonly SeasonReward[], memberId: string): SeasonReward[] {

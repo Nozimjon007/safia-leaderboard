@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildDemoDataset } from '../data/demoData';
 import { DEFAULT_SCORING_CONFIG } from '../data/types';
-import { listSeasons } from './seasons';
+import { listSeasons, seasonCloseMs, SEASON_APPROVAL_GRACE_MS } from './seasons';
 import { ACHIEVEMENT_IDS, categoryLeaderDetails, computeAllAchievements, countOf } from './achievements';
 
 describe('computeAllAchievements (against the real demo dataset)', () => {
@@ -46,5 +46,21 @@ describe('computeAllAchievements (against the real demo dataset)', () => {
     if (withCategoryBadge) {
       expect(categoryLeaderDetails(byMember[withCategoryBadge.id]).length).toBeGreaterThan(0);
     }
+  });
+
+  it('awards nothing for a season still inside its approval grace window, despite frozen numbers', () => {
+    const pastSeason = seasons[seasons.length - 2];
+    const justClosed = seasonCloseMs(pastSeason) + 1000;
+    const pending = computeAllAchievements(dataset, DEFAULT_SCORING_CONFIG, seasons, justClosed);
+    for (const m of dataset.members) {
+      expect(pending[m.id].some((e) => e.seasonId === pastSeason.id)).toBe(false);
+    }
+  });
+
+  it('awards that season once its approval grace window has elapsed', () => {
+    const pastSeason = seasons[seasons.length - 2];
+    const approvedAt = seasonCloseMs(pastSeason) + SEASON_APPROVAL_GRACE_MS;
+    const settled = computeAllAchievements(dataset, DEFAULT_SCORING_CONFIG, seasons, approvedAt);
+    expect(dataset.members.some((m) => settled[m.id].some((e) => e.seasonId === pastSeason.id))).toBe(true);
   });
 });

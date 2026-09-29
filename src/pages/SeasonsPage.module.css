@@ -27,6 +27,33 @@
   max-width: 75ch;
 }
 
+.yearNav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.yearLabel {
+  font-size: 18px;
+  font-weight: 700;
+  min-width: 4ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.compareLink {
+  margin-left: auto;
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 13.5px;
+  text-decoration: none;
+}
+
+.compareLink:hover {
+  text-decoration: underline;
+}
+
 .list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -44,11 +71,30 @@
   gap: 10px;
 }
 
+.card[data-status='upcoming'] {
+  border-style: dashed;
+  opacity: 0.85;
+}
+
+.card[data-status='approved'] {
+  border-color: var(--medal-gold);
+  background: linear-gradient(165deg, var(--surface) 0%, var(--medal-gold-bg) 220%);
+}
+
 .cardHead {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 10px;
+}
+
+.cardTitleLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardTitleLink:hover h2 {
+  text-decoration: underline;
 }
 
 .cardHead h2 {
@@ -74,9 +120,38 @@
   background: var(--accent-wash);
 }
 
-.statusTag[data-complete] {
-  color: var(--ink-secondary);
+.statusTag[data-status='approved'] {
+  color: var(--medal-gold);
+  background: var(--medal-gold-bg);
+}
+
+.statusTag[data-status='awaiting_approval'] {
+  color: var(--medal-bronze);
+  background: var(--medal-bronze-bg);
+}
+
+.statusTag[data-status='upcoming'] {
+  color: var(--ink-muted);
   background: var(--surface-sunken);
+}
+
+.metaLine {
+  color: var(--ink-secondary);
+  font-size: 12.5px;
+}
+
+.progressTrack {
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  transition: width 0.4s ease;
 }
 
 .notFinal {
@@ -101,10 +176,16 @@
 
 .standingRow {
   display: grid;
-  grid-template-columns: 22px auto 1fr auto;
+  grid-template-columns: 22px auto 1fr auto auto;
   align-items: center;
   gap: 9px;
   padding: 6px 0;
+}
+
+.rewardGlyph {
+  color: var(--medal-gold);
+  font-size: 14px;
+  cursor: help;
 }
 
 .rank {
@@ -134,8 +215,71 @@
   font-size: 13.5px;
 }
 
-.viewLink {
+.statsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.statChip,
+.highlightChip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  min-width: 0;
+}
+
+.statChip {
+  flex: 1 1 calc(50% - 4px);
+}
+
+.highlightChip {
+  flex: 1 1 100%;
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.12s ease;
+}
+
+.highlightChip:hover {
+  background: var(--accent-wash);
+}
+
+.statChipLabel {
+  font-size: 10.5px;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+}
+
+.statChipValue {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.highlightValue {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  font-size: 12.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
   margin-top: 8px;
+}
+
+.viewLink {
   color: var(--accent-strong);
   font-weight: 600;
   font-size: 13px;

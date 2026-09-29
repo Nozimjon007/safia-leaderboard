@@ -46,9 +46,14 @@
   background: var(--accent-wash);
 }
 
-.seasonBadge[data-complete] {
+.seasonBadge[data-status='approved'] {
   color: var(--ink-secondary);
   background: var(--surface-raised);
+}
+
+.seasonBadge[data-status='awaiting_approval'] {
+  color: var(--medal-bronze);
+  background: var(--medal-bronze-bg);
 }
 
 .seasonName {

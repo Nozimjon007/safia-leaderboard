@@ -1,13 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import {
   currentSeasonIndex,
+  isSeasonApproved,
   isSeasonComplete,
   listSeasons,
+  parseSeasonId,
   quarterOf,
   seasonBounds,
   seasonCloseMs,
   seasonCountdown,
   seasonId,
+  seasonOf,
+  seasonStartCountdown,
+  seasonStartMs,
+  seasonStatus,
+  SEASON_APPROVAL_GRACE_MS,
 } from './seasons';
 import { weekIndexesInRange, weekStartISO } from './dates';
 
@@ -37,6 +44,20 @@ describe('seasonBounds', () => {
 describe('seasonId', () => {
   it('is a stable, sortable id', () => {
     expect(seasonId(2026, 3)).toBe('2026-q3');
+  });
+});
+
+describe('parseSeasonId', () => {
+  it('round-trips seasonOf -> id -> parseSeasonId', () => {
+    const season = seasonOf(2026, 3);
+    expect(parseSeasonId(season.id)).toEqual(season);
+  });
+
+  it('rejects anything not shaped like "YYYY-qN"', () => {
+    expect(parseSeasonId('not-a-season')).toBeNull();
+    expect(parseSeasonId('2026-q5')).toBeNull();
+    expect(parseSeasonId('2026-q0')).toBeNull();
+    expect(parseSeasonId('')).toBeNull();
   });
 });
 
@@ -119,6 +140,72 @@ describe('currentSeasonIndex', () => {
     const seasons = listSeasons('2025-01-01', '2025-12-31');
     const farFuture = Date.parse('2030-01-01T00:00:00+05:00');
     expect(currentSeasonIndex(seasons, farFuture)).toBe(seasons.length - 1);
+  });
+});
+
+describe('seasonStatus (4-state model)', () => {
+  const season = { startISO: '2026-07-01', endISO: '2026-09-30' };
+  const startMs = seasonStartMs(season);
+  const closeMs = seasonCloseMs(season);
+
+  it('is upcoming strictly before the start instant', () => {
+    expect(seasonStatus(season, startMs - 1)).toBe('upcoming');
+  });
+
+  it('is current exactly at the start instant and through the season', () => {
+    expect(seasonStatus(season, startMs)).toBe('current');
+    expect(seasonStatus(season, closeMs - 1)).toBe('current');
+  });
+
+  it('is awaiting_approval exactly at the close instant, through the grace window', () => {
+    expect(seasonStatus(season, closeMs)).toBe('awaiting_approval');
+    expect(seasonStatus(season, closeMs + SEASON_APPROVAL_GRACE_MS - 1)).toBe('awaiting_approval');
+  });
+
+  it('is approved exactly at the grace period end and after', () => {
+    expect(seasonStatus(season, closeMs + SEASON_APPROVAL_GRACE_MS)).toBe('approved');
+    expect(seasonStatus(season, closeMs + SEASON_APPROVAL_GRACE_MS + 999_999)).toBe('approved');
+  });
+
+  it('never skips awaiting_approval — the grace window is strictly positive', () => {
+    expect(SEASON_APPROVAL_GRACE_MS).toBeGreaterThan(0);
+  });
+});
+
+describe('isSeasonApproved', () => {
+  const season = { startISO: '2026-07-01', endISO: '2026-09-30' };
+  const closeMs = seasonCloseMs(season);
+
+  it('is false while current', () => {
+    expect(isSeasonApproved(season, closeMs - 1)).toBe(false);
+  });
+
+  it('is false while awaiting approval, even though isSeasonComplete is already true', () => {
+    const justClosed = closeMs + 1000;
+    expect(isSeasonComplete(season, justClosed)).toBe(true);
+    expect(isSeasonApproved(season, justClosed)).toBe(false);
+  });
+
+  it('is true once the grace period has elapsed', () => {
+    expect(isSeasonApproved(season, closeMs + SEASON_APPROVAL_GRACE_MS)).toBe(true);
+  });
+});
+
+describe('seasonStartCountdown', () => {
+  const season = { startISO: '2026-10-01' };
+  const startMs = seasonStartMs(season);
+
+  it('reports the exact remaining time before an upcoming season starts', () => {
+    const fiveDaysBefore = startMs - 5 * 86_400_000 - 4 * 3_600_000;
+    const c = seasonStartCountdown(season, fiveDaysBefore);
+    expect(c.days).toBe(5);
+    expect(c.hours).toBe(4);
+    expect(c.hasStarted).toBe(false);
+  });
+
+  it('has started at and after the start instant, never a negative remainder', () => {
+    expect(seasonStartCountdown(season, startMs).hasStarted).toBe(true);
+    expect(seasonStartCountdown(season, startMs + 10_000).totalMs).toBe(0);
   });
 });
 
