@@ -13,11 +13,22 @@ interface FiltersBarProps {
   onChange: (patch: Partial<Record<keyof LeaderboardFilters, string>>) => void;
   onExport: () => void;
   exportDisabled?: boolean;
+  /** True while the Season Time Machine owns the period — its slider is the one control for "when", so the
+   * season/preset/date pickers here are disabled rather than left to silently fight it over the same from/to. */
+  periodLockedByTimeMachine?: boolean;
 }
 
 const PRESETS = [1, 4, 8] as const;
 
-export function FiltersBar({ filters, dataset, areaOptions, onChange, onExport, exportDisabled }: FiltersBarProps) {
+export function FiltersBar({
+  filters,
+  dataset,
+  areaOptions,
+  onChange,
+  onExport,
+  exportDisabled,
+  periodLockedByTimeMachine,
+}: FiltersBarProps) {
   const { t } = useI18n();
   const minDate = dataset.firstWeekStart;
   const maxDate = weekEndISO(dataset.firstWeekStart, dataset.weekCount - 1);
@@ -39,6 +50,7 @@ export function FiltersBar({ filters, dataset, areaOptions, onChange, onExport, 
 
   return (
     <form className={styles.filters} onSubmit={(e) => e.preventDefault()} aria-label={t('period_label')}>
+      {periodLockedByTimeMachine && <p className={styles.timeMachineNote}>{t('filters_locked_by_time_machine')}</p>}
       <div className={styles.field}>
         <label className="fieldLabel" htmlFor="filter-season">
           {t('season_selector_label')}
@@ -47,6 +59,7 @@ export function FiltersBar({ filters, dataset, areaOptions, onChange, onExport, 
           id="filter-season"
           className="select"
           value={activeSeasonId}
+          disabled={periodLockedByTimeMachine}
           onChange={(e) => {
             const season = seasons.find((s) => s.id === e.target.value);
             const r = season ? seasonWeekRange(dataset, season) : null;
@@ -78,6 +91,7 @@ export function FiltersBar({ filters, dataset, areaOptions, onChange, onExport, 
               key={n}
               type="button"
               aria-pressed={isPresetActive(n)}
+              disabled={periodLockedByTimeMachine}
               onClick={() => {
                 const r = presetRangeFor(dataset, n);
                 onChange({ fromISO: r.from, toISO: r.to });
@@ -100,6 +114,7 @@ export function FiltersBar({ filters, dataset, areaOptions, onChange, onExport, 
           value={filters.fromISO}
           min={minDate}
           max={maxDate}
+          disabled={periodLockedByTimeMachine}
           onChange={(e) => e.target.value && onChange({ fromISO: e.target.value })}
         />
       </div>
@@ -114,6 +129,7 @@ export function FiltersBar({ filters, dataset, areaOptions, onChange, onExport, 
           value={filters.toISO}
           min={minDate}
           max={maxDate}
+          disabled={periodLockedByTimeMachine}
           onChange={(e) => e.target.value && onChange({ toISO: e.target.value })}
         />
       </div>

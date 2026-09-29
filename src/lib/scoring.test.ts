@@ -11,6 +11,7 @@ import {
   mean,
   previousWeekIndexes,
   roundTo1,
+  scoreReceipt,
   sortRows,
   strengthsAndWeaknesses,
   weekOverall,
@@ -65,6 +66,44 @@ describe('weightedOverall', () => {
       CFG.weights,
     );
     expect(v).toBeNull();
+  });
+});
+
+describe('scoreReceipt', () => {
+  it('every row contribution sums to the overall score, under equal weights', () => {
+    const r = scoreReceipt({ load: 88, control: 84, kaizen: 89, concern: 85, attendance: 96 }, CFG.weights);
+    const sum = r.rows.reduce((s, row) => s + (row.contribution ?? 0), 0);
+    expect(sum).toBeCloseTo(r.overall!, 8);
+    expect(r.overall).toBeCloseTo(88.4, 5);
+    expect(r.weightTotal).toBe(100);
+  });
+
+  it('excludes a missing category from weightTotal and renormalizes the rest, still matching weightedOverall', () => {
+    const categories = { load: 90, control: 90, kaizen: null, concern: 90, attendance: 90 };
+    const r = scoreReceipt(categories, CFG.weights);
+    const kaizenRow = r.rows.find((row) => row.category === 'kaizen')!;
+    expect(kaizenRow.contribution).toBeNull(); // excluded, never a fabricated 0
+    expect(r.weightTotal).toBe(80); // the four present categories' weights only
+    const sum = r.rows.reduce((s, row) => s + (row.contribution ?? 0), 0);
+    expect(sum).toBeCloseTo(r.overall!, 8);
+    expect(r.overall).toBe(weightedOverall(categories, CFG.weights));
+  });
+
+  it('excludes a zero-weight category even when it has a value, matching weightedOverall', () => {
+    const r = scoreReceipt(
+      { load: 100, control: 50, kaizen: null, concern: null, attendance: null },
+      { load: 20, control: 0, kaizen: 20, concern: 20, attendance: 20 },
+    );
+    const controlRow = r.rows.find((row) => row.category === 'control')!;
+    expect(controlRow.contribution).toBeNull();
+    expect(r.overall).toBe(100);
+  });
+
+  it('is null/empty (never NaN) when nothing is present', () => {
+    const r = scoreReceipt({ load: null, control: null, kaizen: null, concern: null, attendance: null }, CFG.weights);
+    expect(r.overall).toBeNull();
+    expect(r.weightTotal).toBe(0);
+    expect(r.rows.every((row) => row.contribution === null)).toBe(true);
   });
 });
 

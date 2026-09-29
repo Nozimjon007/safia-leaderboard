@@ -9,6 +9,7 @@ import {
   seasonCountdown,
   seasonId,
 } from './seasons';
+import { weekIndexesInRange, weekStartISO } from './dates';
 
 describe('quarterOf', () => {
   it('maps a date to its calendar quarter', () => {
@@ -49,6 +50,38 @@ describe('listSeasons', () => {
 
   it('is a single season when both dates fall in the same quarter', () => {
     expect(listSeasons('2026-07-05', '2026-08-20').map((s) => s.id)).toEqual(['2026-q3']);
+  });
+});
+
+describe('week-to-season assignment at a boundary', () => {
+  // firstWeekStart is a Monday; week 12's Monday (2026-03-30) is the week that straddles
+  // Q1/Q2 2026 — Mon 30 Mar through Sun 5 Apr, i.e. 2 days in Q1 and 5 days in Q2.
+  const firstWeekStart = '2026-01-05';
+  const weekCount = 20;
+  const q1 = seasonBounds(2026, 1);
+  const q2 = seasonBounds(2026, 2);
+
+  it('assigns a boundary-straddling week to the quarter containing its Monday, not the other', () => {
+    expect(weekStartISO(firstWeekStart, 12)).toBe('2026-03-30');
+    const q1Weeks = weekIndexesInRange(firstWeekStart, weekCount, q1.startISO, q1.endISO);
+    const q2Weeks = weekIndexesInRange(firstWeekStart, weekCount, q2.startISO, q2.endISO);
+    expect(q1Weeks).toContain(12);
+    expect(q2Weeks).not.toContain(12);
+  });
+
+  it('never double-counts or drops the boundary week — the two quarters partition it exactly once', () => {
+    const q1Weeks = weekIndexesInRange(firstWeekStart, weekCount, q1.startISO, q1.endISO);
+    const q2Weeks = weekIndexesInRange(firstWeekStart, weekCount, q2.startISO, q2.endISO);
+    const overlap = q1Weeks.filter((w) => q2Weeks.includes(w));
+    expect(overlap).toEqual([]);
+    // Q2's first counted week starts exactly 7 days after Q1's last one — no gap, no double week.
+    expect(Math.min(...q2Weeks)).toBe(Math.max(...q1Weeks) + 1);
+  });
+
+  it("a closed season's own week range never changes as the dataset grows more weeks later", () => {
+    const shortRange = weekIndexesInRange(firstWeekStart, 14, q1.startISO, q1.endISO);
+    const longRangeMuchLater = weekIndexesInRange(firstWeekStart, 200, q1.startISO, q1.endISO);
+    expect(longRangeMuchLater).toEqual(shortRange);
   });
 });
 

@@ -6,12 +6,14 @@ import { useDatasetContext } from '../state/DatasetProvider';
 import { useLeaderboardFilters, type LeaderboardFilters } from '../hooks/useLeaderboardFilters';
 import { useLeaderboardResult } from '../hooks/useLeaderboardResult';
 import { useSeasons } from '../hooks/useSeasons';
+import { useTimeMachine } from '../hooks/useTimeMachine';
 import { useMemberProgress } from '../hooks/useMemberProgress';
 import { useScoringConfig } from '../state/ScoringConfigProvider';
 import {
   competitionRank,
   metricValue,
   mean,
+  scoreReceipt,
   strengthsAndWeaknesses,
   weekOverall,
   zoneOf,
@@ -37,6 +39,9 @@ import { BadgesPanel } from '../components/member/BadgesPanel';
 import { SeasonHistoryPanel } from '../components/member/SeasonHistoryPanel';
 import { RewardBadge } from '../components/member/RewardBadge';
 import { CareerCard } from '../components/member/CareerCard';
+import { PathToPodiumPanel } from '../components/member/PathToPodiumPanel';
+import { ScoreReceiptPanel } from '../components/member/ScoreReceiptPanel';
+import { TimeMachineBanner } from '../components/leaderboard/TimeMachineBanner';
 import type { TranslationKey } from '../i18n/locales/en';
 import styles from './MemberProfilePage.module.css';
 
@@ -107,6 +112,7 @@ export function MemberProfilePage() {
       previousWeekIndexes={result.previousWeekIndexes}
       backHref={backHref}
       seasons={seasonsInfo?.seasons ?? null}
+      currentSeason={seasonsInfo?.currentSeason ?? null}
     />
   );
 }
@@ -121,6 +127,7 @@ interface MemberProfileContentProps {
   previousWeekIndexes: number[] | null;
   backHref: { pathname: string; search: string };
   seasons: readonly Season[] | null;
+  currentSeason: Season | null;
 }
 
 function MemberProfileContent({
@@ -133,11 +140,14 @@ function MemberProfileContent({
   previousWeekIndexes,
   backHref,
   seasons,
+  currentSeason,
 }: MemberProfileContentProps) {
   const { t, locale } = useI18n();
   const { config } = useScoringConfig();
   const location = useLocation();
   const progress = useMemberProgress(dataset, config, seasons, row.member.id);
+  const tm = useTimeMachine(dataset, config, currentSeason);
+  const myWeekChange = tm?.changes.find((c) => c.memberId === row.member.id) ?? null;
   const currentSeasonEntry = progress ? (progress.seasonHistory[progress.seasonHistory.length - 1] ?? null) : null;
 
   const zone = zoneOf(row.current.overall, config);
@@ -174,6 +184,7 @@ function MemberProfileContent({
   const rankedCountForMetric = rows.filter((r) => metricValue(r.current, filters.metric) != null).length;
 
   const { strengths, weaknesses } = strengthsAndWeaknesses(row.current.categories, team.categoryAverages);
+  const receipt = scoreReceipt(row.current.categories, config.weights);
   const categoryLabels = Object.fromEntries(CATEGORY_KEYS.map((c) => [c, categoryLabel(t, c)])) as Record<CategoryKey, string>;
 
   const history = useMemo(() => {
@@ -216,6 +227,14 @@ function MemberProfileContent({
         ? rowAbove.current.overall - row.current.overall
         : null;
 
+  const leaderRow = rows[0] ?? null;
+  const gapToLeader =
+    row.rank === 1
+      ? null
+      : leaderRow && leaderRow.current.overall != null && row.current.overall != null
+        ? leaderRow.current.overall - row.current.overall
+        : null;
+
   const currentGreenStreak = useMemo(() => {
     let streak = 0;
     for (let w = dataset.weekCount - 1; w >= 0; w--) {
@@ -232,6 +251,7 @@ function MemberProfileContent({
   return (
     <article>
       <DemoBanner />
+      <TimeMachineBanner tm={tm} members={dataset.members} />
       <div className={styles.crumbs}>
         <Link className={styles.backLink} to={backHref}>
           ← {t('back_to_leaderboard')}
@@ -325,6 +345,17 @@ function MemberProfileContent({
           {t('partial_warning', { categories: row.current.missingCategories.map((c) => categoryLabel(t, c)).join(', ') })}
         </p>
       )}
+
+      <PathToPodiumPanel
+        rank={row.rank}
+        gapToNext={distanceToNext}
+        gapToLeader={gapToLeader}
+        strongest={strengths[0] ?? null}
+        weekChange={myWeekChange}
+        locale={locale}
+      />
+
+      <ScoreReceiptPanel receipt={receipt} locale={locale} />
 
       <div className={styles.twoCol}>
         <section className={styles.panel} aria-labelledby="breakdown-heading">

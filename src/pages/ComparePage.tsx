@@ -7,6 +7,7 @@ import { useDatasetContext } from '../state/DatasetProvider';
 import { useLeaderboardFilters, type LeaderboardFilters } from '../hooks/useLeaderboardFilters';
 import { useLeaderboardResult } from '../hooks/useLeaderboardResult';
 import { useSeasons } from '../hooks/useSeasons';
+import { useTimeMachine } from '../hooks/useTimeMachine';
 import { useScoringConfig } from '../state/ScoringConfigProvider';
 import { compareMembers, weekOverall, type LeaderboardResult } from '../lib/scoring';
 import { formatDateRange, formatShortDate, weekEndISO, weekIndexesInRange, weekStartISO } from '../lib/dates';
@@ -18,6 +19,7 @@ import { LineChart } from '../components/charts/LineChart';
 import { CompareIdentityCard } from '../components/compare/CompareIdentityCard';
 import { CompareCategoryRow } from '../components/compare/CompareCategoryRow';
 import { LeaderboardSkeleton } from '../components/leaderboard/LeaderboardSkeleton';
+import { TimeMachineBanner } from '../components/leaderboard/TimeMachineBanner';
 import styles from './ComparePage.module.css';
 
 const COLOR_A = 'var(--accent)';
@@ -40,6 +42,7 @@ export function ComparePage() {
   const { config } = useScoringConfig();
   const result = useLeaderboardResult(dataset, filters, config);
   const seasonsInfo = useSeasons(dataset);
+  const tm = useTimeMachine(dataset, config, seasonsInfo?.currentSeason ?? null);
   const [allowCrossRole, setAllowCrossRole] = useState(false);
   const backHref = { pathname: '/', search: stripCompareParams(location.search) };
 
@@ -119,6 +122,7 @@ export function ComparePage() {
   return (
     <>
       <DemoBanner />
+      <TimeMachineBanner tm={tm} members={dataset.members} />
       <div className={styles.crumbs}>
         <Link className={styles.backLink} to={backHref}>
           ← {t('back_to_leaderboard')}

@@ -68,6 +68,43 @@ export function weightedOverall(
   return weightTotal > 0 ? sum / weightTotal : null;
 }
 
+export interface ScoreReceiptRow {
+  category: CategoryKey;
+  value: number | null;
+  weight: number;
+  /** This row's own point-contribution to `overall` — value * (weight / weightTotal). Null (excluded, not 0) when the value is missing or the weight is 0. */
+  contribution: number | null;
+}
+
+export interface ScoreReceipt {
+  rows: ScoreReceiptRow[];
+  /** Sum of weights actually used — less than the full configured total whenever a category is missing data. */
+  weightTotal: number;
+  overall: number | null;
+}
+
+/**
+ * A row-by-row, line-item breakdown of `weightedOverall` for one member/period:
+ * every row's `contribution` sums exactly to `overall`. Built from the same
+ * inclusion rule as `weightedOverall` (reused, not reimplemented) so the
+ * receipt can never show a number the real ranking didn't actually use.
+ */
+export function scoreReceipt(categoryValues: Record<CategoryKey, number | null>, weights: Record<CategoryKey, number>): ScoreReceipt {
+  let weightTotal = 0;
+  for (const c of CATEGORY_KEYS) {
+    const v = categoryValues[c];
+    const w = Number(weights[c]) || 0;
+    if (v != null && w > 0) weightTotal += w;
+  }
+  const rows = CATEGORY_KEYS.map((c): ScoreReceiptRow => {
+    const v = categoryValues[c];
+    const w = Number(weights[c]) || 0;
+    const included = v != null && w > 0;
+    return { category: c, value: v, weight: w, contribution: included ? (v * w) / weightTotal : null };
+  });
+  return { rows, weightTotal, overall: weightedOverall(categoryValues, weights) };
+}
+
 /** A single week's overall score (used for sparklines and history charts). */
 export function weekOverall(scores: MemberScores, weekIndex: number, config: ScoringConfig): number | null {
   const cats = {} as Record<CategoryKey, number | null>;

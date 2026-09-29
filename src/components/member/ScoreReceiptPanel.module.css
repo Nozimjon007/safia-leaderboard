@@ -1,0 +1,82 @@
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 22px;
+}
+
+.panel h2 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.sub {
+  color: var(--ink-secondary);
+  font-size: 13.5px;
+  margin: 3px 0 14px;
+}
+
+.details > summary {
+  cursor: pointer;
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 13.5px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  margin-top: 12px;
+}
+
+.table {
+  border-collapse: collapse;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  width: 100%;
+  min-width: 420px;
+}
+
+.table th,
+.table td {
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.table th[scope='row'] {
+  text-align: left;
+  font-weight: 500;
+  font-variant-numeric: normal;
+}
+
+.table tfoot th,
+.table tfoot td {
+  background: var(--surface-sunken);
+  font-weight: 700;
+}
+
+.note {
+  color: var(--ink-muted);
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.disclaimer {
+  color: var(--ink-secondary);
+  font-size: 12.5px;
+  margin-top: 8px;
+  border-top: 1px dashed var(--border-strong);
+  padding-top: 10px;
+}
+
+.disclaimer a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.disclaimer a:hover {
+  text-decoration: underline;
+}

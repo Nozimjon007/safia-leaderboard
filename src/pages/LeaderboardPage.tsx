@@ -6,6 +6,7 @@ import { useDatasetContext } from '../state/DatasetProvider';
 import { useLeaderboardFilters } from '../hooks/useLeaderboardFilters';
 import { useAreaOptions, useLeaderboardResult } from '../hooks/useLeaderboardResult';
 import { useSeasons } from '../hooks/useSeasons';
+import { useTimeMachine } from '../hooks/useTimeMachine';
 import { useViewAsMemberId } from '../hooks/useViewAsMember';
 import { useScoringConfig } from '../state/ScoringConfigProvider';
 import { filterRowsByQuery, sortRows } from '../lib/scoring';
@@ -15,6 +16,7 @@ import { formatDateRange, weekEndISO, weekStartISO } from '../lib/dates';
 import { DemoBanner } from '../components/common/DemoBanner';
 import { StateMessage } from '../components/common/StateMessage';
 import { SeasonPanel } from '../components/leaderboard/SeasonPanel';
+import { TimeMachineControl } from '../components/leaderboard/TimeMachineControl';
 import { Podium } from '../components/leaderboard/Podium';
 import { SummaryStats } from '../components/leaderboard/SummaryStats';
 import { FiltersBar } from '../components/leaderboard/FiltersBar';
@@ -36,6 +38,7 @@ export function LeaderboardPage() {
   const result = useLeaderboardResult(dataset, filters, config);
   const areaOptions = useAreaOptions(dataset);
   const seasonsInfo = useSeasons(dataset);
+  const tm = useTimeMachine(dataset, config, seasonsInfo?.currentSeason ?? null);
   const [viewAsMemberId] = useViewAsMemberId(dataset?.members[0]?.id ?? null);
   const [toast, setToast] = useState<string | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
@@ -161,6 +164,8 @@ export function LeaderboardPage() {
         </p>
       </div>
 
+      {tm && <TimeMachineControl tm={tm} members={dataset.members} />}
+
       <FiltersBar
         filters={filters}
         dataset={dataset}
@@ -168,6 +173,7 @@ export function LeaderboardPage() {
         onChange={updateFilters}
         onExport={handleExport}
         exportDisabled={shown.length === 0}
+        periodLockedByTimeMachine={tm?.active ?? false}
       />
 
       {result.weekIndexes.length === 0 ? (
