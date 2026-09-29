@@ -1,0 +1,335 @@
+.card {
+  display: flex;
+  align-items: flex-start;
+  gap: 30px;
+  background: linear-gradient(155deg, var(--surface) 0%, var(--surface-raised) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin-bottom: 22px;
+}
+
+/* ---- Portrait panel — a tall full-body stage, same collectible-card visual
+   language as the podium cards (facet texture + foil sheen + pointer glint),
+   sized and shaped for a "large portrait on the left" hero. The figure (a
+   real photo, or the standing-silhouette placeholder below) is explicitly
+   stacked above the decorative layers — see the z-index values — so facets
+   and light stay behind the person and never wash out the photo or, on the
+   placeholder, the timeline/text in the column beside it. ---- */
+
+.portraitPanel {
+  position: relative;
+  flex: none;
+  /* Intrinsically responsive — caps at 460px wide but always yields to a narrower container
+     (e.g. mid-size stacked viewports), so it can never overflow horizontally on its own. The
+     fixed aspect ratio keeps it proportioned as a full-length "stage" at any resulting width. */
+  width: min(460px, 100%);
+  aspect-ratio: 460 / 620;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: linear-gradient(165deg, var(--surface-raised) 0%, var(--medal-gold-bg) 140%);
+  box-shadow: var(--shadow-md);
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  /* contain, not cover — a full-length photo must show head to feet, never crop either end. */
+  object-fit: contain;
+  object-position: bottom center;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 6%;
+}
+
+.figure {
+  width: 46%;
+  height: 92%;
+}
+
+.figureHead,
+.figureTorso,
+.figureArm,
+.figureLeg,
+.figureFoot {
+  fill: var(--ink);
+}
+
+.figureHead {
+  opacity: 0.18;
+}
+.figureTorso {
+  opacity: 0.16;
+}
+.figureArm {
+  opacity: 0.14;
+}
+.figureLeg {
+  opacity: 0.13;
+}
+.figureFoot {
+  opacity: 0.12;
+}
+
+.facets,
+.sheen,
+.glint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.facets {
+  z-index: 1;
+  background-image:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.55) 0%,
+      transparent 4%,
+      transparent 46%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 54%,
+      transparent 96%,
+      rgba(255, 255, 255, 0.55) 100%
+    ),
+    linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.35) 0%,
+      transparent 4%,
+      transparent 46%,
+      rgba(255, 255, 255, 0.25) 50%,
+      transparent 54%,
+      transparent 96%,
+      rgba(255, 255, 255, 0.35) 100%
+    );
+  background-size:
+    28px 28px,
+    28px 28px;
+  opacity: 0.12;
+  mix-blend-mode: overlay;
+}
+
+.sheen {
+  z-index: 2;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.4) 48%, rgba(255, 255, 255, 0.1) 53%, transparent 66%);
+  mix-blend-mode: soft-light;
+  opacity: 0.7;
+}
+
+.glint {
+  z-index: 3;
+  background: radial-gradient(circle at var(--glint-x, 32%) var(--glint-y, 20%), rgba(255, 255, 255, 0.5), transparent 45%);
+  mix-blend-mode: soft-light;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .glint {
+    transition: background-position 0.12s ease-out;
+  }
+}
+
+/* ---- Info column ---- */
+
+.info {
+  min-width: 0;
+  flex: 1;
+}
+
+.identity {
+  margin-bottom: 14px;
+}
+
+.name {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.jobTitle {
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 14.5px;
+  margin-top: 2px;
+}
+
+.factGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px 20px;
+  margin-bottom: 6px;
+}
+
+.fact dt {
+  color: var(--ink-muted);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.fact dd {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.tenure {
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+
+/* ---- Career journey timeline ---- */
+
+.journey {
+  margin-top: 16px;
+}
+
+.journey h4,
+.recognition h4 {
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink-muted);
+  margin-bottom: 8px;
+}
+
+.timeline {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 4px;
+}
+
+.timelineStep {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding-left: 16px;
+}
+
+.timelineStep::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 14px;
+  bottom: -10px;
+  width: 1px;
+  background: var(--border-strong);
+}
+
+.timelineStep:last-child::before {
+  display: none;
+}
+
+.timelineDot {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-muted);
+  flex: none;
+}
+
+.timelineStep[data-current] .timelineDot {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.timelineRole {
+  font-weight: 600;
+  font-size: 13.5px;
+}
+
+.timelineStep[data-current] .timelineRole {
+  color: var(--accent-strong);
+}
+
+.timelineDates {
+  color: var(--ink-muted);
+  font-size: 12px;
+  margin-top: 1px;
+}
+
+/* ---- Recognition summary ---- */
+
+.recognition {
+  margin-top: 16px;
+}
+
+.recognitionRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.badgeGlyph {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--medal-gold-bg);
+  color: var(--medal-gold);
+  font-size: 13px;
+}
+
+.rewardCount {
+  color: var(--ink-secondary);
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* ---- Highlight ---- */
+
+.highlight {
+  margin-top: 14px;
+  background: var(--accent-wash);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.highlight b {
+  color: var(--accent-strong);
+}
+
+@media (max-width: 1020px) {
+  .card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 22px;
+  }
+
+  .factGrid {
+    text-align: left;
+  }
+
+  .journey,
+  .recognition {
+    text-align: left;
+  }
+
+  .info {
+    width: 100%;
+  }
+}

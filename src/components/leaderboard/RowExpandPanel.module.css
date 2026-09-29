@@ -1,0 +1,29 @@
+.expand {
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) 1fr;
+  gap: 24px;
+  align-items: center;
+  padding: 18px;
+  animation: expandIn 0.2s ease;
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.openWrap {
+  margin-top: 14px;
+}
+
+@media (max-width: 780px) {
+  .expand {
+    grid-template-columns: 1fr;
+  }
+}

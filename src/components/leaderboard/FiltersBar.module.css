@@ -1,0 +1,28 @@
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: flex-end;
+  margin: 4px 0 18px;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.grow {
+  flex: 1 1 220px;
+}
+
+@media (max-width: 640px) {
+  .filters {
+    padding: 12px;
+  }
+}

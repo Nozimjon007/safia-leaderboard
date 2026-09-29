@@ -1,0 +1,56 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.unit {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-muted);
+}
+
+.goodValue {
+  color: var(--status-good);
+}
+
+.criticalValue {
+  color: var(--status-critical);
+}
+
+.deltaTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.deltaTag[data-dir='up'] {
+  color: var(--delta-up);
+}
+
+.deltaTag[data-dir='down'] {
+  color: var(--delta-down);
+}
+
+.memberLink {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.memberLink:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 1000px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    gap: 10px;
+  }
+}

@@ -1,0 +1,108 @@
+.podium {
+  margin-bottom: 18px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.header h2 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.header p {
+  color: var(--ink-secondary);
+  font-size: 13.5px;
+}
+
+.seasonStrip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  background: var(--surface-sunken);
+  border-radius: var(--radius-md);
+  padding: 9px 14px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--ink-secondary);
+}
+
+.seasonBadge {
+  flex: none;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-radius: var(--radius-full);
+  padding: 2px 9px;
+  color: var(--accent-strong);
+  background: var(--accent-wash);
+}
+
+.seasonBadge[data-complete] {
+  color: var(--ink-secondary);
+  background: var(--surface-raised);
+}
+
+.seasonName {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.seasonCountdown {
+  color: var(--accent-strong);
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Desktop podium order: silver – gold – bronze. Place comes from PodiumCard's own data-place
+   attribute, so this only ever reorders — it never needs to know PodiumCard's class names. */
+.grid > [data-place='1'] {
+  order: 2;
+}
+.grid > [data-place='2'] {
+  order: 1;
+}
+.grid > [data-place='3'] {
+  order: 3;
+}
+
+@media (max-width: 760px) {
+  .grid {
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+  }
+
+  .seasonCountdown {
+    margin-left: 0;
+  }
+
+  /* Mobile: natural rank order, 1st card first. */
+  .grid > [data-place='1'] {
+    order: 0;
+  }
+  .grid > [data-place='2'] {
+    order: 1;
+  }
+  .grid > [data-place='3'] {
+    order: 2;
+  }
+}

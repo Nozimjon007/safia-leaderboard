@@ -1,0 +1,138 @@
+.errDetail {
+  color: var(--ink-muted);
+  font-size: 12.5px;
+}
+
+.crumbs {
+  margin-bottom: 14px;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.head h1 {
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  color: var(--ink-secondary);
+  margin-top: 6px;
+  max-width: 70ch;
+}
+
+.seasonNote {
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.pickers {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin: 18px 0 8px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.pickerField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.crossRoleToggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--ink-secondary);
+  white-space: nowrap;
+  padding-bottom: 9px;
+}
+
+.roleNote {
+  color: var(--ink-muted);
+  font-size: 12.5px;
+  margin-bottom: 18px;
+}
+
+.roleNoteWarn {
+  color: var(--status-critical);
+  font-size: 12.5px;
+  margin-bottom: 18px;
+  font-weight: 600;
+}
+
+.identities {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 22px;
+}
+
+.panel h2 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.insight {
+  color: var(--ink-secondary);
+  font-size: 13.5px;
+  margin: 6px 0 14px;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.twoCol > .panel {
+  margin-bottom: 0;
+}
+
+@media (max-width: 860px) {
+  .identities,
+  .twoCol {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .pickers {
+    flex-direction: column;
+  }
+}

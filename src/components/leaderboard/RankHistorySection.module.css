@@ -1,0 +1,18 @@
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 22px;
+}
+
+.panel h2 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.sub {
+  color: var(--ink-secondary);
+  font-size: 13.5px;
+  margin: 3px 0 14px;
+}

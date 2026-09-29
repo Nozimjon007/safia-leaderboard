@@ -1,0 +1,31 @@
+.avatar {
+  --av-l: 88%;
+  --av-tl: 30%;
+  border-radius: 50%;
+  flex: none;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  overflow: hidden;
+  background: hsl(var(--av-h) 55% var(--av-l));
+  color: hsl(var(--av-h) 60% var(--av-tl));
+  line-height: 1;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+:root[data-theme='dark'] .avatar {
+  --av-l: 26%;
+  --av-tl: 86%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .avatar {
+    --av-l: 26%;
+    --av-tl: 86%;
+  }
+}

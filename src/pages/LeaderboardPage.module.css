@@ -1,0 +1,72 @@
+.head h1 {
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.ctx {
+  color: var(--ink-secondary);
+  margin-top: 8px;
+  max-width: 90ch;
+  line-height: 1.55;
+}
+
+.errDetail {
+  color: var(--ink-muted);
+  font-size: 12.5px;
+}
+
+.board {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 26px;
+}
+
+.desktopOnly {
+  display: block;
+}
+
+.mobileOnly {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .desktopOnly {
+    display: none;
+  }
+  .mobileOnly {
+    display: block;
+  }
+}
+
+.scoringLink {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.scoringLink:hover {
+  text-decoration: underline;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--page);
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  font-size: 13.5px;
+  z-index: 60;
+  max-width: 90vw;
+  box-shadow: var(--shadow-md);
+}
+
+.toast[hidden] {
+  display: none;
+}

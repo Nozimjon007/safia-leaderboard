@@ -1,0 +1,66 @@
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 22px;
+}
+
+.panel h2 {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13.5px;
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.seasonLink {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.seasonLink:hover {
+  text-decoration: underline;
+}
+
+.currentTag {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-strong);
+  background: var(--accent-wash);
+  border-radius: var(--radius-full);
+  padding: 2px 8px;
+  justify-self: start;
+}
+
+.rank {
+  color: var(--ink-secondary);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.score {
+  font-weight: 700;
+  min-width: 46px;
+  text-align: right;
+}

@@ -1,0 +1,196 @@
+.scroll {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 920px;
+}
+
+.table th {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--surface-sunken);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table th button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12.5px;
+  color: inherit;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  border-radius: 6px;
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.table th button:hover {
+  color: var(--ink);
+}
+
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  font-size: 13.5px;
+  transition: background 0.12s ease;
+}
+
+.row:hover td {
+  background: var(--surface-sunken);
+}
+
+.row[data-compare-selected] td {
+  background: var(--accent-wash);
+}
+
+.hl {
+  background: color-mix(in srgb, var(--accent-wash) 65%, transparent);
+}
+
+.rankNum {
+  display: inline-grid;
+  place-items: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--ink-secondary);
+}
+
+.rankCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 190px;
+}
+
+.memberWho {
+  min-width: 0;
+}
+
+.memberName {
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--ink);
+  display: block;
+}
+
+.memberName:hover {
+  text-decoration: underline;
+}
+
+.memberWho small {
+  display: block;
+  color: var(--ink-muted);
+  font-size: 12.5px;
+  margin-top: 1px;
+}
+
+.shiftTag {
+  display: inline-block;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 5px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 3px;
+}
+
+.overallCell {
+  min-width: 140px;
+}
+
+.overallValue {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 5px;
+}
+
+.overallValue b {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.overallValue span {
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+
+.zoneBadgeSpacing {
+  margin-top: 6px;
+}
+
+.partialNote {
+  color: var(--ink-muted);
+  font-size: 11px;
+  margin-top: 4px;
+  max-width: 180px;
+}
+
+.catValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.naCell {
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+
+.expandBtn {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  width: 32px;
+  height: 32px;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.expandBtn:hover {
+  border-color: var(--border-strong);
+}
+
+.expandBtn[aria-expanded='true'] {
+  background: var(--accent-wash);
+  border-color: var(--accent);
+}
+
+.expandBtn span {
+  display: inline-block;
+  transition: transform 0.18s ease;
+}
+
+.expandBtn[aria-expanded='true'] span {
+  transform: rotate(180deg);
+}
+
+.expandRow > td {
+  background: var(--surface-sunken);
+  padding: 0;
+}

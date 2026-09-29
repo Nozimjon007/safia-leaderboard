@@ -1,0 +1,397 @@
+.card {
+  --lift: 0px;
+  position: relative;
+  flex: none;
+  width: 300px;
+  border-radius: var(--radius-lg);
+  /* Restrained corner cut, not a dramatic silhouette — kept small so it can never intrude into
+     any zone's content, only the outermost corners. */
+  clip-path: polygon(5% 0%, 95% 0%, 100% 3%, 100% 100%, 0% 100%, 0% 3%);
+  background: linear-gradient(165deg, var(--surface-raised) 0%, var(--surface) 55%);
+  box-shadow: var(--shadow-md);
+  transform: perspective(1000px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(var(--lift));
+  transition: box-shadow 0.18s ease;
+}
+
+.card[data-place='1'] {
+  width: 330px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card {
+    transition:
+      box-shadow 0.18s ease,
+      transform 0.15s ease-out;
+  }
+}
+
+.card:hover,
+.card:focus-within {
+  --lift: -5px;
+  box-shadow: var(--shadow-lg, 0 18px 30px rgba(0, 0, 0, 0.18));
+}
+
+.card[data-compare-selected] {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.compareBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+}
+
+.cardLink {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardLink:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-lg);
+}
+
+/* ---- Finish per place ---- */
+
+.card[data-place='1'] {
+  background: linear-gradient(165deg, var(--surface-raised) 0%, var(--medal-gold-bg) 130%);
+}
+.card[data-place='2'] {
+  background: linear-gradient(165deg, var(--surface-raised) 0%, var(--medal-silver-bg) 130%);
+}
+.card[data-place='3'] {
+  background: linear-gradient(165deg, var(--surface-raised) 0%, var(--medal-bronze-bg) 130%);
+}
+
+.medalTag {
+  position: absolute;
+  top: 10px;
+  left: 16px;
+  z-index: 1;
+  display: inline-flex;
+  border-radius: var(--radius-full);
+  padding: 2px 11px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--on-accent);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.card[data-place='1'] .medalTag {
+  background: var(--medal-gold);
+}
+.card[data-place='2'] .medalTag {
+  background: var(--medal-silver);
+}
+.card[data-place='3'] .medalTag {
+  background: var(--medal-bronze);
+}
+
+/* ---- Zone 1: rank + score — upper-left, reserved, never overlapped ---- */
+
+.rankScoreZone {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 40px 18px 10px;
+  justify-content: flex-start;
+}
+
+.rankNum {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink-muted);
+  flex: none;
+}
+
+.scoreBlock {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.scoreBlock b {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.card[data-place='1'] .scoreBlock b {
+  font-size: 40px;
+  color: var(--medal-gold);
+}
+.card[data-place='2'] .scoreBlock b {
+  color: var(--ink);
+}
+.card[data-place='3'] .scoreBlock b {
+  color: var(--ink);
+}
+
+.scoreUnit {
+  color: var(--ink-muted);
+  font-size: 12.5px;
+}
+
+/* ---- Zone 2: large portrait band, roughly the upper half of the card ---- */
+
+/* A tall stage sized for a full standing figure, not a face crop — the
+   figure/photo is explicitly stacked above the facet/sheen/glint layers
+   (see their z-index below) so the decorative effects read as "behind the
+   person" rather than glazed over the photo. */
+.portraitZone {
+  position: relative;
+  height: 380px;
+  margin: 0 10px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  flex: none;
+}
+
+.card[data-place='1'] .portraitZone {
+  height: 410px;
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  /* contain + bottom-anchored — a full-length photo must show head to shoes, never crop either end. */
+  object-fit: contain;
+  object-position: bottom center;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 4%;
+}
+
+.figure {
+  width: 44%;
+  height: 94%;
+}
+
+.figureHead,
+.figureTorso,
+.figureArm,
+.figureLeg,
+.figureFoot {
+  fill: var(--ink);
+}
+
+.figureHead {
+  opacity: 0.2;
+}
+.figureTorso {
+  opacity: 0.18;
+}
+.figureArm {
+  opacity: 0.16;
+}
+.figureLeg {
+  opacity: 0.15;
+}
+.figureFoot {
+  opacity: 0.14;
+}
+
+/* Decorative layers, confined to the portrait band only — never near text. */
+.facets,
+.sheen,
+.glint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.facets {
+  z-index: 0;
+  background-image:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.55) 0%,
+      transparent 4%,
+      transparent 46%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 54%,
+      transparent 96%,
+      rgba(255, 255, 255, 0.55) 100%
+    ),
+    linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.35) 0%,
+      transparent 4%,
+      transparent 46%,
+      rgba(255, 255, 255, 0.25) 50%,
+      transparent 54%,
+      transparent 96%,
+      rgba(255, 255, 255, 0.35) 100%
+    );
+  background-size:
+    26px 26px,
+    26px 26px;
+  opacity: 0.14;
+  mix-blend-mode: overlay;
+}
+
+.sheen {
+  z-index: 1;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.45) 48%, rgba(255, 255, 255, 0.1) 53%, transparent 66%);
+  mix-blend-mode: soft-light;
+  opacity: 0.75;
+}
+
+.glint {
+  z-index: 2;
+  background: radial-gradient(circle at var(--glint-x, 30%) var(--glint-y, 18%), rgba(255, 255, 255, 0.5), transparent 45%);
+  mix-blend-mode: soft-light;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .glint {
+    transition: background-position 0.12s ease-out;
+  }
+}
+
+.emblem {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 14px;
+  color: var(--on-accent);
+  background: var(--accent);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.24);
+}
+
+.card[data-place='1'] .emblem {
+  background: var(--medal-gold);
+}
+
+/* ---- Zone 3+4: name, role/team/shift ---- */
+
+.identity {
+  padding: 14px 18px 4px;
+  text-align: center;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 17px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card[data-place='1'] .name {
+  font-size: 19px;
+}
+
+.sub {
+  color: var(--ink-muted);
+  font-size: 12px;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Zone 5: category grid — 3 + 2, never five cramped columns ---- */
+
+.cats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px 4px;
+  padding: 12px 16px;
+  margin-top: 4px;
+}
+
+.cats div {
+  text-align: center;
+  min-width: 0;
+}
+
+.cats b {
+  display: block;
+  font-size: 16px;
+  cursor: default;
+}
+
+.cats span {
+  display: block;
+  font-size: 10px;
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+  line-height: 1.15;
+  margin-top: 1px;
+}
+
+/* ---- Zone 6: rank movement ---- */
+
+.moveZone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 18px 12px;
+  border-top: 1px solid var(--border);
+  margin: 4px 18px 0;
+}
+
+.moveNote {
+  color: var(--ink-muted);
+  font-size: 11.5px;
+}
+
+/* ---- Zone 7: visible action ---- */
+
+.footer {
+  margin-top: auto;
+  padding: 12px 16px 16px;
+}
+
+.viewProfile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 9px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-wash);
+  color: var(--accent-strong);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.card[data-place='1'] .viewProfile {
+  background: var(--medal-gold-bg);
+  color: var(--medal-gold);
+}
+
+@media (max-width: 380px) {
+  .card,
+  .card[data-place='1'] {
+    width: 100%;
+    max-width: 320px;
+  }
+}

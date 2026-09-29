@@ -1,0 +1,103 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 14px;
+  margin-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+
+.gem {
+  --gem-color: var(--ink-muted);
+  position: relative;
+  width: 60px;
+  height: 60px;
+  flex: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.12));
+}
+
+.gem[data-lit] {
+  --gem-color: var(--medal-gold);
+  filter: drop-shadow(0 0 7px rgba(199, 154, 46, 0.4)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.14));
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.f1,
+.f2,
+.f3,
+.f4,
+.f5,
+.f6 {
+  fill: var(--gem-color);
+  transition: fill 0.2s ease;
+}
+
+/* Hand-tuned per-facet opacity, light source from the upper-left — this is what reads as "cut". */
+.f1 {
+  fill-opacity: 0.95;
+}
+.f6 {
+  fill-opacity: 0.8;
+}
+.f2 {
+  fill-opacity: 0.62;
+}
+.f5 {
+  fill-opacity: 0.48;
+}
+.f3 {
+  fill-opacity: 0.36;
+}
+.f4 {
+  fill-opacity: 0.26;
+}
+
+.outline {
+  fill: none;
+  stroke: var(--gem-color);
+  stroke-width: 1.6;
+  stroke-opacity: 0.9;
+}
+
+.glint {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(50% 4%, 90% 27%, 90% 73%, 50% 96%, 10% 73%, 10% 27%);
+  background: radial-gradient(circle at var(--glint-x, 42%) var(--glint-y, 22%), rgba(255, 255, 255, 0.8), transparent 48%);
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.gem[data-lit] .glint {
+  opacity: 0.95;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .glint {
+    transition:
+      background-position 0.12s ease-out,
+      opacity 0.2s ease;
+  }
+}
+
+.captionWrap {
+  min-width: 0;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.caption {
+  color: var(--ink-secondary);
+  font-size: 12px;
+  margin-top: 2px;
+  max-width: 42ch;
+}

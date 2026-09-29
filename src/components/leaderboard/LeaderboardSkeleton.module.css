@@ -1,0 +1,38 @@
+.skel {
+  display: grid;
+  gap: 14px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.block {
+  height: 74px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, var(--surface-sunken), var(--surface-raised), var(--surface-sunken));
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+.big {
+  height: 260px;
+}
+
+.tall {
+  height: 320px;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

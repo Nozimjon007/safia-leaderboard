@@ -1,0 +1,180 @@
+/**
+ * Design tokens — Safia bakery brand: warm cream surfaces, dark warm-brown
+ * ink, a caramel/gold accent. Sourced from safiabakery.uz's real visual
+ * direction (cream backgrounds, dark brown text, warm caramel/gold notes,
+ * clean modern sans-serif — see README for the fetch this was based on;
+ * exact hex values were not extractable from the site, so these are an
+ * original palette in that direction, not a scrape).
+ *
+ * Every categorical/status color below was run through the dataviz skill's
+ * six-checks validator (scripts/validate_palette.js) before use — see the
+ * comments by each pair for the exact command and result. Status colors
+ * (good/critical) are the skill's fixed, never-themed values; only the
+ * brand accent and the second comparison hue are custom to this palette.
+ *
+ * Dark values are declared under both the OS media query and the
+ * [data-theme="dark"] toggle scope, so the viewer's explicit choice always
+ * wins over the OS setting.
+ */
+:root {
+  color-scheme: light;
+
+  --page: #f6eee0;
+  --surface: #ffffff;
+  --surface-raised: #fffdf8;
+  --surface-sunken: #f3ead9;
+  --border: rgba(42, 27, 15, 0.12);
+  --border-strong: #d8c7aa;
+  --gridline: #e6d9c0;
+
+  --ink: #2a1b0f;
+  --ink-secondary: #5c4530;
+  --ink-muted: #7a6448;
+  --on-accent: #fffaf2;
+
+  /* Brand accent (caramel). Validated vs. cat-2 blue:
+     node scripts/validate_palette.js "#A8651C,#2A5FA8" --mode light --surface "#FFFFFF"  -> ALL CHECKS PASS (CVD ΔE 22.2, normal ΔE 26.0) */
+  --accent: #a8651c;
+  --accent-strong: #8a5215;
+  --accent-wash: rgba(168, 101, 28, 0.12);
+  --accent-wash-strong: rgba(168, 101, 28, 0.2);
+
+  /* cat-1 = brand accent (member A everywhere series identity is needed); cat-2 = validated comparison blue (member B) */
+  --cat-1: #a8651c;
+  --cat-2: #2a5fa8;
+  --cat-3: #1baf7a;
+  --cat-4: #7a4bb8;
+  --cat-5: #b8464b;
+
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+  --status-good-bg: #e2f3df;
+  --status-critical-bg: #fbe6e2;
+  --status-mid-bg: #efe4d0;
+
+  --delta-up: #1a7a1a;
+  --delta-down: #b3261e;
+
+  /* Restrained podium medal accents — always paired with the rank number, never color-only. */
+  --medal-gold: #c79a2e;
+  --medal-gold-bg: #f8edd2;
+  --medal-silver: #93897a;
+  --medal-silver-bg: #ece7dd;
+  --medal-bronze: #b0703b;
+  --medal-bronze-bg: #f3e2d1;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(42, 27, 15, 0.08);
+  --shadow-md: 0 10px 28px rgba(42, 27, 15, 0.12);
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --focus-ring: #a8651c;
+
+  --header-h: 60px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --page: #161009;
+    --surface: #1c140c;
+    --surface-raised: #241a0f;
+    --surface-sunken: #140e08;
+    --border: rgba(255, 244, 227, 0.1);
+    --border-strong: #3d2e1c;
+    --gridline: #33271a;
+
+    --ink: #f3e8d8;
+    --ink-secondary: #c9b79e;
+    --ink-muted: #a08d71;
+    --on-accent: #1c140c;
+
+    /* Validated: node scripts/validate_palette.js "#C97A24,#5A8FD6" --mode dark --surface "#1C140C" -> ALL CHECKS PASS (CVD ΔE 23.7, normal ΔE 25.6) */
+    --accent: #c97a24;
+    --accent-strong: #e0954a;
+    --accent-wash: rgba(201, 122, 36, 0.18);
+    --accent-wash-strong: rgba(201, 122, 36, 0.3);
+
+    --cat-1: #c97a24;
+    --cat-2: #5a8fd6;
+    --cat-3: #3fbf8e;
+    --cat-4: #a084e0;
+    --cat-5: #d97078;
+
+    --status-good: #4ade4a;
+    --status-warning: #fab219;
+    --status-serious: #ec835a;
+    --status-critical: #ff8f80;
+    --status-good-bg: rgba(74, 222, 74, 0.16);
+    --status-critical-bg: rgba(255, 143, 128, 0.18);
+    --status-mid-bg: rgba(255, 244, 227, 0.07);
+
+    --delta-up: #4ade4a;
+    --delta-down: #ff9c90;
+
+    --medal-gold: #dcb44a;
+    --medal-gold-bg: rgba(220, 180, 74, 0.16);
+    --medal-silver: #b7ac97;
+    --medal-silver-bg: rgba(183, 172, 151, 0.14);
+    --medal-bronze: #cf9160;
+    --medal-bronze-bg: rgba(207, 145, 96, 0.16);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.5);
+  }
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --page: #161009;
+  --surface: #1c140c;
+  --surface-raised: #241a0f;
+  --surface-sunken: #140e08;
+  --border: rgba(255, 244, 227, 0.1);
+  --border-strong: #3d2e1c;
+  --gridline: #33271a;
+
+  --ink: #f3e8d8;
+  --ink-secondary: #c9b79e;
+  --ink-muted: #a08d71;
+  --on-accent: #1c140c;
+
+  --accent: #c97a24;
+  --accent-strong: #e0954a;
+  --accent-wash: rgba(201, 122, 36, 0.18);
+  --accent-wash-strong: rgba(201, 122, 36, 0.3);
+
+  --cat-1: #c97a24;
+  --cat-2: #5a8fd6;
+  --cat-3: #3fbf8e;
+  --cat-4: #a084e0;
+  --cat-5: #d97078;
+
+  --status-good: #4ade4a;
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #ff8f80;
+  --status-good-bg: rgba(74, 222, 74, 0.16);
+  --status-critical-bg: rgba(255, 143, 128, 0.18);
+  --status-mid-bg: rgba(255, 244, 227, 0.07);
+
+  --delta-up: #4ade4a;
+  --delta-down: #ff9c90;
+
+  --medal-gold: #dcb44a;
+  --medal-gold-bg: rgba(220, 180, 74, 0.16);
+  --medal-silver: #b7ac97;
+  --medal-silver-bg: rgba(183, 172, 151, 0.14);
+  --medal-bronze: #cf9160;
+  --medal-bronze-bg: rgba(207, 145, 96, 0.16);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.5);
+}

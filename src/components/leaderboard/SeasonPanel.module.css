@@ -1,0 +1,161 @@
+.panel {
+  background: linear-gradient(155deg, var(--surface-raised) 0%, var(--accent-wash) 130%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px 18px;
+  margin-bottom: 18px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: 4px;
+}
+
+.title {
+  font: 700 clamp(20px, 2.6vw, 26px) var(--font-sans);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.range {
+  color: var(--ink-secondary);
+  font-size: 13.5px;
+  margin-top: 3px;
+}
+
+.countdown {
+  text-align: right;
+  flex: none;
+}
+
+.countdownLabel {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-muted);
+  margin-bottom: 2px;
+}
+
+.countdownValue {
+  font: 700 22px var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-strong);
+  white-space: nowrap;
+}
+
+.countdownValue[data-complete] {
+  color: var(--ink-secondary);
+}
+
+.progressTrack {
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--surface-sunken);
+  margin: 16px 0 14px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  transition: width 0.4s ease;
+}
+
+.stats {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.statValue {
+  font-weight: 700;
+  font-size: 14.5px;
+}
+
+.leaderLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.leaderLink:hover {
+  text-decoration: underline;
+}
+
+.leaderName {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.leaderLink b {
+  color: var(--accent-strong);
+}
+
+.assumption {
+  font-size: 12px;
+  color: var(--ink-muted);
+  max-width: 80ch;
+  border-top: 1px dashed var(--border-strong);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+.links {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.links a {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+
+.links a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 560px) {
+  .panel {
+    padding: 16px;
+  }
+  .top {
+    flex-direction: column;
+  }
+  .countdown {
+    text-align: left;
+  }
+}

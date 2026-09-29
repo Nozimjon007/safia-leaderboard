@@ -1,0 +1,63 @@
+.figure {
+  width: 100%;
+}
+
+.svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 420px;
+}
+
+.ring {
+  fill: none;
+  stroke: var(--gridline);
+  stroke-width: 1;
+}
+
+.axis {
+  stroke: var(--gridline);
+  stroke-width: 1;
+}
+
+.axisLabel {
+  font: 600 12px var(--font-sans);
+  fill: var(--ink);
+}
+
+.axisValue {
+  font: 600 12px var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+.axisSep {
+  fill: var(--ink-muted);
+  font-weight: 400;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--ink-secondary);
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.swatchSolid {
+  width: 20px;
+  height: 0;
+  border-top: 2.5px solid;
+}
+
+.swatchDashed {
+  width: 20px;
+  height: 0;
+  border-top: 2px dashed;
+}

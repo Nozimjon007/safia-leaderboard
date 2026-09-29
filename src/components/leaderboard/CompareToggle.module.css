@@ -1,0 +1,30 @@
+.toggle {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink-secondary);
+  font-size: 15px;
+  line-height: 1;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.06);
+}
+
+.toggle[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
