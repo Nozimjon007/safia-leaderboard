@@ -1,3 +1,4 @@
+import { motion, useReducedMotion } from 'motion/react';
 import type { LeaderboardDataset, Member, ScoringConfig } from '../../data/types';
 import { categoryLabel, craftPathLabel, useI18n } from '../../i18n';
 import type { TranslationKey } from '../../i18n/locales/en';
@@ -11,6 +12,7 @@ import {
 } from '../../lib/craftPaths';
 import type { Season } from '../../lib/seasons';
 import { formatDate, weekStartISO } from '../../lib/dates';
+import { useNewlyEarnedMissionIds } from '../../hooks/useNewlyEarnedStars';
 import styles from './CraftPathPanel.module.css';
 
 interface CraftPathPanelProps {
@@ -33,8 +35,15 @@ interface CraftPathPanelProps {
  */
 export function CraftPathPanel({ member, dataset, config, currentSeason, seasons, periodWeekIndexes }: CraftPathPanelProps) {
   const { t, locale } = useI18n();
+  const reduceMotion = useReducedMotion();
   const path = craftPathForRole(member.role);
-  if (!path || !currentSeason) {
+  const progress = path && currentSeason ? computeCraftPathProgress(dataset, member, currentSeason) : null;
+  const completedIds = progress ? progress.missions.filter((m) => m.complete).map((m) => m.def.id) : [];
+  // A hook, so it must run unconditionally every render — see the early return just below, which
+  // renders before this could otherwise be reached.
+  const newIds = useNewlyEarnedMissionIds(member.id, completedIds);
+
+  if (!path || !currentSeason || !progress) {
     return (
       <section className={styles.panel} aria-labelledby="craft-path-heading">
         <h2 id="craft-path-heading">{t('craft_path_heading')}</h2>
@@ -43,10 +52,10 @@ export function CraftPathPanel({ member, dataset, config, currentSeason, seasons
     );
   }
 
-  const progress = computeCraftPathProgress(dataset, member, currentSeason)!;
   const mastery = seasons ? computeCraftMastery(dataset, member, seasons) : null;
   const roleRank = computeRoleRank(dataset, config, periodWeekIndexes, member.id);
   const pathName = craftPathLabel(t, path.role);
+  const newMissions = progress.missions.filter((m) => newIds.has(m.def.id));
 
   return (
     <section className={styles.panel} aria-labelledby="craft-path-heading">
@@ -62,28 +71,51 @@ export function CraftPathPanel({ member, dataset, config, currentSeason, seasons
 
       <div className={styles.starsRow}>
         <div className={styles.constellation} role="img" aria-label={t('craft_stars_of', { earned: progress.starsEarned, possible: progress.starsPossible })}>
-          {progress.missions.map((m) => (
-            <span key={m.def.id} className={styles.star} data-complete={m.complete || undefined} aria-hidden="true">
-              ★
-            </span>
-          ))}
+          {progress.missions.map((m) => {
+            const isNew = newIds.has(m.def.id);
+            return (
+              <motion.span
+                key={m.def.id}
+                className={styles.star}
+                data-complete={m.complete || undefined}
+                aria-hidden="true"
+                initial={isNew && !reduceMotion ? { scale: 0, rotate: -35 } : false}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={isNew && !reduceMotion ? { type: 'spring', stiffness: 300, damping: 11, delay: 0.2 } : { duration: 0 }}
+              >
+                ★
+              </motion.span>
+            );
+          })}
         </div>
         <b>{t('craft_stars_of', { earned: progress.starsEarned, possible: progress.starsPossible })}</b>
       </div>
+
+      {newMissions.length > 0 && (
+        <div className={styles.newStarBanner} role="status">
+          {newMissions.map((m) => (
+            <p key={m.def.id}>
+              <span aria-hidden="true">✨</span> {t('craft_new_star', { title: t(`craft_concept_${m.def.concept}_title` as TranslationKey) })}
+            </p>
+          ))}
+        </div>
+      )}
 
       <ul className={styles.missions}>
         {progress.missions.map((m) => {
           const concept: CraftConcept = m.def.concept;
           const pct = Math.round((m.current / m.def.threshold) * 100);
           const earnedDate = m.earnedWeekIndex != null ? formatDate(weekStartISO(dataset.firstWeekStart, m.earnedWeekIndex), locale) : null;
+          const isNew = newIds.has(m.def.id);
           return (
-            <li key={m.def.id} className={styles.mission} data-complete={m.complete || undefined}>
+            <li key={m.def.id} className={styles.mission} data-complete={m.complete || undefined} data-new={isNew || undefined}>
               <div className={styles.missionHead}>
                 <span className={styles.missionGlyph} aria-hidden="true">
                   {m.complete ? '★' : '☆'}
                 </span>
                 <b>{t(`craft_concept_${concept}_title` as TranslationKey)}</b>
                 <span className={styles.categoryTag}>{categoryLabel(t, CRAFT_CONCEPT_CATEGORY[concept])}</span>
+                {isNew && <span className={styles.newChip}>{t('craft_new_chip')}</span>}
               </div>
               <p className={styles.missionDesc}>{t(`craft_concept_${concept}_desc` as TranslationKey)}</p>
               <div className={styles.track}>

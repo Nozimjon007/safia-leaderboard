@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { motion, useReducedMotion } from 'motion/react';
 import { CATEGORY_KEYS, type EarnedAchievement, type Zone } from '../../data/types';
 import { categoryLabel, craftPathLabel, roleLabel, useI18n } from '../../i18n';
 import type { TranslationKey } from '../../i18n/locales/en';
@@ -61,6 +62,7 @@ function MemberCard({ row, team, compareSelected, onToggleCompare, earned, highl
   const { t, locale } = useI18n();
   const { config } = useScoringConfig();
   const location = useLocation();
+  const reduceMotion = useReducedMotion();
   const zone = zoneOf(row.current.overall, config);
   const highlight = computeHighlight(row.current, row.previous);
   const earnedTypes = earnedAchievementTypes(earned);
@@ -77,12 +79,14 @@ function MemberCard({ row, team, compareSelected, onToggleCompare, earned, highl
           : t('trend_down', { d: formatScore(Math.abs(delta), locale), n: row.trend.length });
 
   return (
-    <article
+    <motion.article
       id={`board-row-cards-${row.member.id}`}
       className={styles.card}
       data-compare-selected={compareSelected || undefined}
       data-highlighted={highlighted || undefined}
       style={{ borderTopColor: zoneColorVar(zone) }}
+      layout={!reduceMotion}
+      transition={{ layout: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } }}
     >
       <CompareToggle selected={compareSelected} name={row.member.name} onToggle={onToggleCompare} className={styles.compareBtn} />
       <div className={styles.head}>
@@ -193,6 +197,6 @@ function MemberCard({ row, team, compareSelected, onToggleCompare, earned, highl
           {t('open_profile')}
         </Link>
       </div>
-    </article>
+    </motion.article>
   );
 }

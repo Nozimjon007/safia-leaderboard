@@ -265,6 +265,7 @@ export const en = {
   season_results_heading_upcoming: '{season} · Upcoming Season',
   season_results_heading_custom: '{range}',
   season_live_badge: 'LIVE · Standings are provisional',
+  season_replay_reveal: 'Replay reveal',
   season_final_badge: 'FINAL RESULTS',
   season_progress_through: '{pct}% of the season has passed',
   top_five_heading: 'Top Five',
@@ -510,6 +511,8 @@ export const en = {
   craft_distinction_team_mentor_title: 'Team Mentor',
   craft_distinction_team_mentor_desc: 'The season’s steadiest, most dependable performance — the kind of consistency teammates can rely on.',
   craft_preview_label: 'Craft Path',
+  craft_new_star: 'New star: {title} — earned since your last visit.',
+  craft_new_chip: 'New',
 } as const;
 
 export type TranslationKey = keyof typeof en;

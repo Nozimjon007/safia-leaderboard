@@ -6,6 +6,7 @@ import { useDatasetContext } from '../state/DatasetProvider';
 import { useLeaderboardFilters } from '../hooks/useLeaderboardFilters';
 import { useAreaOptions, useLeaderboardResult, useOverallLeaderboardResult, useRoleOptions } from '../hooks/useLeaderboardResult';
 import { usePageParam } from '../hooks/usePageParam';
+import { useSeasonReveal } from '../hooks/useSeasonReveal';
 import { useSeasons } from '../hooks/useSeasons';
 import { useTimeMachine } from '../hooks/useTimeMachine';
 import { useViewAsMemberId } from '../hooks/useViewAsMember';
@@ -57,6 +58,11 @@ export function LeaderboardPage() {
   const shown = result ? sortRows(filterRowsByQuery(result.rows, filters.query), filters.sortKey, filters.sortDir) : [];
   const totalPages = Math.max(1, Math.ceil(shown.length / PAGE_SIZE));
   const [page, setPage] = usePageParam(totalPages);
+  // Also hoisted ahead of the guards: findContainingSeason only needs dataset/seasonsInfo/filters,
+  // all already safe when the dataset hasn't loaded yet (it just resolves to null), and
+  // useSeasonReveal is itself a hook that must run unconditionally every render.
+  const matchedSeason = dataset && seasonsInfo ? findContainingSeason(dataset, seasonsInfo.seasons, filters.fromISO, filters.toISO) : null;
+  const seasonReveal = useSeasonReveal(matchedSeason?.id ?? null);
   const [toast, setToast] = useState<string | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
@@ -163,7 +169,6 @@ export function LeaderboardPage() {
       if (progress) craftPreviewByMember[r.member.id] = { role: path.role, stars: progress.starsEarned, possible: progress.starsPossible };
     }
   }
-  const matchedSeason = seasonsInfo ? findContainingSeason(dataset, seasonsInfo.seasons, filters.fromISO, filters.toISO) : null;
   const rankedTop5 = overallResult.rows.filter((r) => r.overallRank != null).slice(0, 5);
   const periodText = formatDateRange(filters.fromISO, filters.toISO, locale);
   const weeksLabel = result.weekIndexes.length === 1 ? t('period_week_1') : t('period_weeks_n', { n: result.weekIndexes.length });
@@ -223,6 +228,9 @@ export function LeaderboardPage() {
           overallResult={overallResult}
           viewAsMemberId={viewAsMemberId}
           onSetViewAs={setViewAsMemberId}
+          shouldAnimateReveal={seasonReveal.shouldAnimate}
+          playKey={seasonReveal.playKey}
+          onReplayReveal={seasonReveal.replay}
         />
       )}
 
@@ -235,6 +243,8 @@ export function LeaderboardPage() {
         filterLabel={narrowedLabel}
         compareIds={compareIds}
         onToggleCompare={toggleCompare}
+        shouldAnimateReveal={seasonReveal.shouldAnimate}
+        playKey={seasonReveal.playKey}
       />
 
       <div className={styles.head}>

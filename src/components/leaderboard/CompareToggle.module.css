@@ -23,6 +23,10 @@
   transform: scale(1.06);
 }
 
+.toggle:active {
+  transform: scale(0.9);
+}
+
 .toggle[aria-pressed='true'] {
   background: var(--accent);
   border-color: var(--accent);

@@ -44,6 +44,11 @@
   font-weight: 600;
   font-size: 12.5px;
   list-style: none;
+  transition: opacity 0.15s ease;
+}
+
+.advanced > summary:hover {
+  opacity: 0.75;
 }
 
 .advanced > summary::-webkit-details-marker {

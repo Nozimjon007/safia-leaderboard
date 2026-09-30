@@ -234,11 +234,16 @@
   height: 32px;
   transition:
     background 0.15s ease,
-    border-color 0.15s ease;
+    border-color 0.15s ease,
+    transform 0.1s ease;
 }
 
 .expandBtn:hover {
   border-color: var(--border-strong);
+}
+
+.expandBtn:active {
+  transform: scale(0.9);
 }
 
 .expandBtn[aria-expanded='true'] {

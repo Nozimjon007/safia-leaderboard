@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { motion, useReducedMotion } from 'motion/react';
 import type { LeaderboardDataset } from '../../data/types';
 import type { LeaderboardResult } from '../../lib/scoring';
 import type { LeaderboardFilters } from '../../hooks/useLeaderboardFilters';
@@ -19,6 +20,14 @@ interface SeasonPanelProps {
   overallResult: LeaderboardResult;
   viewAsMemberId: string | null;
   onSetViewAs: (id: string) => void;
+  /** True only during a genuine reveal moment (first-ever view of this season, or an explicit
+   * replay) — see useSeasonReveal. The status badge gets a brief entrance; everywhere else it just
+   * appears in its resting state. */
+  shouldAnimateReveal: boolean;
+  /** Changes exactly when a fresh play should start — used as the `key` on the badge so Motion
+   * remounts it and its entrance transition actually runs again on replay. */
+  playKey: string;
+  onReplayReveal: () => void;
 }
 
 /**
@@ -27,9 +36,21 @@ interface SeasonPanelProps {
  * 4 weeks" still headlines the right season), never just the real-world current one. Falls back to a
  * neutral custom-period treatment when the filters span something no single season contains.
  */
-export function SeasonPanel({ dataset, filters, matchedSeason, overallResult, viewAsMemberId, onSetViewAs }: SeasonPanelProps) {
+export function SeasonPanel({
+  dataset,
+  filters,
+  matchedSeason,
+  overallResult,
+  viewAsMemberId,
+  onSetViewAs,
+  shouldAnimateReveal,
+  playKey,
+  onReplayReveal,
+}: SeasonPanelProps) {
   const { t, locale } = useI18n();
   const location = useLocation();
+  const reduceMotion = useReducedMotion();
+  const playEntrance = shouldAnimateReveal && !reduceMotion;
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -68,15 +89,27 @@ export function SeasonPanel({ dataset, filters, matchedSeason, overallResult, vi
           {matchedSeason && <p className={styles.range}>{formatDateRange(matchedSeason.startISO, matchedSeason.endISO, locale)}</p>}
         </div>
         {status && (
-          <span className={styles.statusBadge} data-status={status}>
-            {status === 'current'
-              ? t('season_live_badge')
-              : status === 'approved'
-                ? t('season_final_badge')
-                : status === 'upcoming'
-                  ? t('season_upcoming_badge')
-                  : t('season_awaiting_approval_badge')}
-          </span>
+          <div className={styles.statusWrap}>
+            <motion.span
+              key={playKey}
+              className={styles.statusBadge}
+              data-status={status}
+              initial={playEntrance ? { opacity: 0, scale: 0.85, y: -6 } : false}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={playEntrance ? { duration: 0.35, ease: 'easeOut' } : { duration: 0 }}
+            >
+              {status === 'current'
+                ? t('season_live_badge')
+                : status === 'approved'
+                  ? t('season_final_badge')
+                  : status === 'upcoming'
+                    ? t('season_upcoming_badge')
+                    : t('season_awaiting_approval_badge')}
+            </motion.span>
+            <button type="button" className={styles.replayBtn} onClick={onReplayReveal}>
+              <span aria-hidden="true">↻</span> {t('season_replay_reveal')}
+            </button>
+          </div>
         )}
       </div>
 

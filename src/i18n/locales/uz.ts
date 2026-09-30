@@ -267,6 +267,7 @@ export const uz: TranslationDict = {
   season_results_heading_upcoming: '{season} · Кейинги мавсум',
   season_results_heading_custom: '{range}',
   season_live_badge: 'LIVE · Натижалар дастлабки',
+  season_replay_reveal: 'Анимацияни такрорлаш',
   season_final_badge: 'ЯКУНИЙ НАТИЖАЛАР',
   season_progress_through: 'Мавсумнинг {pct}% ўтди',
   top_five_heading: 'Топ-5',
@@ -522,4 +523,6 @@ export const uz: TranslationDict = {
   craft_distinction_team_mentor_title: 'Жамоа устози',
   craft_distinction_team_mentor_desc: 'Мавсумнинг энг барқарор, энг ишончли натижаси — жамоа таяниши мумкин бўлган барқарорлик.',
   craft_preview_label: 'Уста йўли',
+  craft_new_star: 'Янги юлдуз: {title} — сўнгги ташрифингиздан бери қўлга киритилди.',
+  craft_new_chip: 'Янги',
 };

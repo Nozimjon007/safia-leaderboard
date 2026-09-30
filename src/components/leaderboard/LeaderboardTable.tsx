@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, type Location } from 'react-router-dom';
+import { motion, useReducedMotion } from 'motion/react';
 import { CATEGORY_KEYS, type MetricKey, type SortKey, type Zone } from '../../data/types';
 import { categoryLabel, roleLabel, useI18n } from '../../i18n';
 import { trendDirection, zoneOf, type LeaderboardRow, type TeamStats } from '../../lib/scoring';
@@ -114,6 +115,7 @@ function TableRow({ row, team, metric, isOpen, onToggle, compareSelected, onTogg
   const { t, locale } = useI18n();
   const { config } = useScoringConfig();
   const location: Location = useLocation();
+  const reduceMotion = useReducedMotion();
   const zone = zoneOf(row.current.overall, config);
   const { direction, delta } = trendDirection(row.trend);
   const trendZone: Zone = direction > 0 ? 'good' : direction < 0 ? 'low' : 'mid';
@@ -128,7 +130,14 @@ function TableRow({ row, team, metric, isOpen, onToggle, compareSelected, onTogg
 
   return (
     <>
-      <tr id={`board-row-table-${row.member.id}`} className={styles.row} data-compare-selected={compareSelected || undefined} data-highlighted={highlighted || undefined}>
+      <motion.tr
+        id={`board-row-table-${row.member.id}`}
+        className={styles.row}
+        data-compare-selected={compareSelected || undefined}
+        data-highlighted={highlighted || undefined}
+        layout={!reduceMotion}
+        transition={{ layout: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } }}
+      >
         <td>
           <CompareToggle selected={compareSelected} name={row.member.name} onToggle={onToggleCompare} />
         </td>
@@ -220,7 +229,7 @@ function TableRow({ row, team, metric, isOpen, onToggle, compareSelected, onTogg
             <span aria-hidden="true">▾</span>
           </button>
         </td>
-      </tr>
+      </motion.tr>
       {isOpen && (
         <tr className={styles.expandRow} id={`expand-${row.member.id}`}>
           <td colSpan={COLUMN_COUNT}>

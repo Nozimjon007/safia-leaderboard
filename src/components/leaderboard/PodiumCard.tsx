@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { CATEGORY_KEYS, type AchievementId, type MetricKey, type RewardId } from '../../data/types';
 import type { LeaderboardRow } from '../../lib/scoring';
 import { metricValue } from '../../lib/scoring';
@@ -22,6 +23,10 @@ interface PodiumCardProps {
   emblem: PodiumEmblem;
   compareSelected: boolean;
   onToggleCompare: () => void;
+  /** Seconds to wait before playing a one-time restrained sheen sweep, timed to land exactly when
+   * this card finishes its own season-reveal entrance (see TopFive) — never a looping/permanent
+   * effect. Undefined everywhere else, including the old 3-card Podium, which never celebrates. */
+  celebrateDelay?: number;
 }
 
 const MEDAL_KEYS = ['podium_gold', 'podium_silver', 'podium_bronze'] as const;
@@ -34,7 +39,7 @@ const MEDAL_KEYS = ['podium_gold', 'podium_silver', 'podium_bronze'] as const;
  * allowed to sit behind the portrait or the decorative facet/foil layers,
  * which are confined to the portrait band itself.
  */
-export function PodiumCard({ row, place, metric, metricLabel, emblem, compareSelected, onToggleCompare }: PodiumCardProps) {
+export function PodiumCard({ row, place, metric, metricLabel, emblem, compareSelected, onToggleCompare, celebrateDelay }: PodiumCardProps) {
   const { t, locale } = useI18n();
   const location = useLocation();
   const tiltRef = usePointerTilt<HTMLElement>();
@@ -76,6 +81,15 @@ export function PodiumCard({ row, place, metric, metricLabel, emblem, compareSel
           <span className={styles.facets} aria-hidden="true" />
           <span className={styles.sheen} aria-hidden="true" />
           <span className={styles.glint} aria-hidden="true" />
+          {celebrateDelay != null && (
+            <motion.span
+              className={styles.celebrateSweep}
+              aria-hidden="true"
+              initial={{ x: '-140%', opacity: 0 }}
+              animate={{ x: '140%', opacity: [0, 1, 0] }}
+              transition={{ delay: celebrateDelay, duration: 0.9, ease: 'easeOut', times: [0, 0.15, 1] }}
+            />
+          )}
           {row.member.fullBodyPhoto ? (
             <img src={row.member.fullBodyPhoto} alt="" className={styles.photo} />
           ) : (

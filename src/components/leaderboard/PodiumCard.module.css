@@ -294,6 +294,20 @@
   }
 }
 
+/* A one-time restrained flourish for the season-reveal moment (see PodiumCardProps.celebrateDelay)
+   — confined behind the photo like the rest of the crystal layers (z-index 3, below .photo's 4), so
+   it only ever shows through the portrait's edges, never over the person's face. Timed by Motion
+   (see PodiumCard.tsx), not a CSS keyframe, so it can share the champion card's own entrance delay
+   exactly instead of guessing a fixed offset. */
+.celebrateSweep {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.85) 50%, transparent 65%);
+  mix-blend-mode: soft-light;
+}
+
 .emblem {
   position: absolute;
   top: 10px;

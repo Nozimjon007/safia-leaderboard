@@ -267,6 +267,7 @@ export const ru: TranslationDict = {
   season_results_heading_upcoming: '{season} · Предстоящий сезон',
   season_results_heading_custom: '{range}',
   season_live_badge: 'LIVE · Результаты предварительные',
+  season_replay_reveal: 'Повторить анимацию',
   season_final_badge: 'ИТОГОВЫЕ РЕЗУЛЬТАТЫ',
   season_progress_through: 'Пройдено {pct}% сезона',
   top_five_heading: 'Топ-5',
@@ -522,4 +523,6 @@ export const ru: TranslationDict = {
   craft_distinction_team_mentor_title: 'Наставник команды',
   craft_distinction_team_mentor_desc: 'Самые стабильные, надёжные результаты сезона — та стабильность, на которую может положиться команда.',
   craft_preview_label: 'Путь мастерства',
+  craft_new_star: 'Новая звезда: {title} — получена с момента вашего последнего визита.',
+  craft_new_chip: 'Новое',
 };
