@@ -1,5 +1,5 @@
 import type { Member } from '../../data/types';
-import { roleLabel, useI18n } from '../../i18n';
+import { areaLabel, roleLabel, shiftLabel, useI18n } from '../../i18n';
 import type { PeriodStats } from '../../lib/scoring';
 import { zoneOf } from '../../lib/scoring';
 import { useScoringConfig } from '../../state/ScoringConfigProvider';
@@ -34,7 +34,7 @@ export function CompareIdentityCard({ member, stats, color, rank, rankedCount, i
             {member.name}
           </h2>
           <p className={styles.sub}>
-            {roleLabel(t, member.role)} · {member.area} · {member.shift}
+            {roleLabel(t, member.role)} · {areaLabel(t, member.area)} · {shiftLabel(t, member.shift)}
           </p>
         </div>
       </div>

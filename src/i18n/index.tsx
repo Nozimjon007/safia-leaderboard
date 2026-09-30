@@ -139,6 +139,24 @@ export function roleIcon(role: string): string {
   return ROLE_ICON[role] ?? '💼';
 }
 
+const SITE_RE = /^Site (\d+)$/;
+const SHIFT_RE = /^S(\d+)$/;
+
+/** Member.area is demo data shaped like "Site 7" (see demoData.ts) — localized here rather than
+ * baking a translated string into the data itself, so the same member record renders correctly in
+ * every locale. Degrades to the raw value for anything that doesn't match the expected shape. */
+export function areaLabel(t: TFunction, area: string): string {
+  const m = SITE_RE.exec(area);
+  return m ? t('site_n', { n: m[1] }) : area;
+}
+
+/** Member.shift is "S1"/"S2" — same localization approach as areaLabel, and the same pattern
+ * FiltersBar's shift filter already uses for its own option labels. */
+export function shiftLabel(t: TFunction, shift: string): string {
+  const m = SHIFT_RE.exec(shift);
+  return m ? t('shift_n', { n: m[1] }) : shift;
+}
+
 const CLAN_NAME_KEYS: Record<string, TranslationKey> = {
   golden_crust: 'clan_name_golden_crust',
   saffron_rise: 'clan_name_saffron_rise',

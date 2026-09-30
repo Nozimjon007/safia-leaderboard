@@ -8,6 +8,11 @@ interface BoardToolbarProps {
   onChange: (patch: Partial<Record<keyof LeaderboardFilters, string>>) => void;
   shownCount: number;
   totalCount: number;
+  /** How many of the shown rows actually have a rank (a real score in this period) — shown as an
+   * explicit "N ranked, M without data" breakdown whenever it differs from shownCount, so a bare
+   * "100 / 100" here can never look like it disagrees with the "99 members with data" the KPI tiles
+   * report just below. */
+  rankedCount: number;
   heading: string;
   /** Whether a viewer has actually been selected (see the Season Results hero's "View progress as"
    * picker) — "Find my position" has no "me" to find otherwise, so it's disabled rather than hidden,
@@ -19,7 +24,7 @@ interface BoardToolbarProps {
 const METRICS: MetricKey[] = ['overall', ...CATEGORY_KEYS];
 const SORT_KEYS: SortKey[] = ['rank', 'name', 'overall', 'move', ...CATEGORY_KEYS];
 
-export function BoardToolbar({ filters, onChange, shownCount, totalCount, heading, canFindMe, onFindMe }: BoardToolbarProps) {
+export function BoardToolbar({ filters, onChange, shownCount, totalCount, rankedCount, heading, canFindMe, onFindMe }: BoardToolbarProps) {
   const { t } = useI18n();
 
   function sortLabel(key: SortKey): string {
@@ -43,6 +48,9 @@ export function BoardToolbar({ filters, onChange, shownCount, totalCount, headin
         <h2 className={styles.heading}>{heading}</h2>
         <p className={`${styles.sub} tabular`}>
           {shownCount} / {totalCount}
+          {rankedCount < shownCount && (
+            <span className={styles.rankedNote}> · {t('board_ranked_breakdown', { ranked: rankedCount, missing: shownCount - rankedCount })}</span>
+          )}
         </p>
       </div>
       <div className={styles.tools}>

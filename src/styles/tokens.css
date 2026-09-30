@@ -74,9 +74,21 @@
   --shadow-md: 0 10px 28px rgba(42, 27, 15, 0.12);
 
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Safia League's editorial display face — warm literary serif, used only for hero headlines and
+     champion/contender names, never body copy or UI chrome (see README on the "Safia League"
+     direction: strong typography + restrained crystal/gold detail over the existing brand palette).
+     Chosen specifically for full Cyrillic coverage — Fraunces was the first pick but has Latin/
+     Vietnamese glyphs only (verified via document.fonts), which would silently fall back to a
+     generic serif for Russian/Uzbek and break the "one coherent design direction" this exists for. */
+  --font-display: 'Spectral', ui-serif, Georgia, serif;
   --focus-ring: #a8651c;
 
   --header-h: 60px;
+
+  /* A slightly richer version of --accent-wash, reserved for the season hero's own background —
+     keeps the everyday accent wash (cards, buttons) visually distinct from "this is the marquee
+     moment" framing. */
+  --hero-gradient: linear-gradient(165deg, var(--surface-raised) 0%, var(--medal-gold-bg) 120%, var(--accent-wash) 200%);
 }
 
 @media (prefers-color-scheme: dark) {

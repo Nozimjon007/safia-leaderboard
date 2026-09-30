@@ -1,0 +1,281 @@
+.feature {
+  --lift: 0px;
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(165deg, var(--surface-raised) 0%, var(--medal-gold-bg) 145%);
+  box-shadow: 0 0 0 1px var(--medal-gold-bg), var(--shadow-md);
+  transform: perspective(1200px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(var(--lift));
+  transition: box-shadow 0.18s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .feature {
+    transition:
+      box-shadow 0.18s ease,
+      transform 0.15s ease-out;
+  }
+}
+
+.feature:hover,
+.feature:focus-within {
+  --lift: -4px;
+  box-shadow: 0 0 0 1px var(--medal-gold-bg), var(--shadow-lg, 0 18px 30px rgba(0, 0, 0, 0.18));
+}
+
+.compareBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+}
+
+.link {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(160px, 220px) 1fr;
+  gap: 22px;
+  padding: 18px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-lg);
+}
+
+.medalTag {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  z-index: 2;
+  display: inline-flex;
+  border-radius: var(--radius-full);
+  padding: 2px 11px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--on-accent);
+  background: var(--medal-gold);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* ---- Portrait: a designed frame, not a tall empty stage — real photo covers it, and
+   PortraitFallback (see the component) fills it just as intentionally when there's no photo. ---- */
+
+.portrait {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.portraitFallback {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+}
+
+.facets,
+.sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.facets {
+  z-index: 0;
+  background-image:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.55) 0%,
+      transparent 4%,
+      transparent 46%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 54%,
+      transparent 96%,
+      rgba(255, 255, 255, 0.55) 100%
+    ),
+    linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.35) 0%,
+      transparent 4%,
+      transparent 46%,
+      rgba(255, 255, 255, 0.25) 50%,
+      transparent 54%,
+      transparent 96%,
+      rgba(255, 255, 255, 0.35) 100%
+    );
+  background-size:
+    26px 26px,
+    26px 26px;
+  opacity: 0.14;
+  mix-blend-mode: overlay;
+}
+
+.sheen {
+  z-index: 1;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.45) 48%, rgba(255, 255, 255, 0.1) 53%, transparent 66%);
+  mix-blend-mode: soft-light;
+  opacity: 0.75;
+}
+
+/* A one-time restrained flourish for the season-reveal moment (see ChampionFeatureProps.celebrateDelay)
+   — confined behind the photo/fallback (z-index 3, below their z-index 4), so it only ever shows
+   through the portrait's edges. Timed by Motion (see ChampionFeature.tsx). */
+.celebrateSweep {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.85) 50%, transparent 65%);
+  mix-blend-mode: soft-light;
+}
+
+.emblem {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 14px;
+  color: var(--on-accent);
+  background: var(--medal-gold);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.24);
+}
+
+/* ---- Info column ---- */
+
+.info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(22px, 3vw, 30px);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rankScoreRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.rankNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 26px;
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+  background: var(--medal-gold);
+  color: var(--on-accent);
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.rankScoreRow b {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--medal-gold);
+  letter-spacing: -0.01em;
+}
+
+.scoreUnit {
+  color: var(--ink-muted);
+  font-size: 12.5px;
+}
+
+.cats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-strong);
+}
+
+.cats div {
+  text-align: center;
+  min-width: 0;
+}
+
+.cats b {
+  display: block;
+  font-size: 15px;
+  cursor: default;
+}
+
+.cats span {
+  display: block;
+  font-size: 9.5px;
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+  line-height: 1.15;
+  margin-top: 1px;
+}
+
+.viewProfile {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 12px;
+  color: var(--medal-gold);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* JobPanel sits outside the profile Link (its own clan-crest link would otherwise nest inside it —
+   see TopFive's SupportingCard for the same rule), as a plain full-width sibling so it can never
+   spill past the feature's own bottom edge into whatever section follows. */
+.jobWrap {
+  padding: 0 18px 18px;
+}
+
+@media (max-width: 640px) {
+  .link {
+    grid-template-columns: 1fr;
+  }
+  .portrait {
+    aspect-ratio: 16 / 10;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .name,
+  .rankScoreRow,
+  .cats,
+  .viewProfile {
+    text-align: center;
+    justify-content: center;
+  }
+  .cats {
+    justify-items: center;
+  }
+}

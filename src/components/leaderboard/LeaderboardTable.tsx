@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, type Location } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import { CATEGORY_KEYS, type MetricKey, type SortKey, type Zone } from '../../data/types';
-import { categoryLabel, roleLabel, useI18n } from '../../i18n';
+import { areaLabel, categoryLabel, roleLabel, shiftLabel, useI18n } from '../../i18n';
 import { trendDirection, zoneOf, type LeaderboardRow, type TeamStats } from '../../lib/scoring';
 import { formatPercent, formatScore } from '../../lib/format';
 import { useScoringConfig } from '../../state/ScoringConfigProvider';
@@ -177,7 +177,8 @@ function TableRow({ row, team, metric, isOpen, onToggle, compareSelected, onTogg
                 {row.member.name}
               </Link>
               <small>
-                {roleLabel(t, row.member.role)} · {row.member.area} <span className={styles.shiftTag}>{row.member.shift}</span>
+                {roleLabel(t, row.member.role)} · {areaLabel(t, row.member.area)}{' '}
+                <span className={styles.shiftTag}>{shiftLabel(t, row.member.shift)}</span>
               </small>
             </div>
           </div>

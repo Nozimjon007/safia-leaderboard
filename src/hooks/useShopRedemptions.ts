@@ -25,6 +25,9 @@ function writeStored(redemptions: readonly Redemption[]) {
 export interface ShopRedemptionsStore {
   redemptions: Redemption[];
   addRedemption: (r: Redemption) => void;
+  /** Moves one redemption to a new status — the demo's stand-in for a real management
+   * approve/reject workflow (see ShopPage's clearly-labeled "demo simulation" controls). */
+  setStatus: (id: string, status: Redemption['status']) => void;
   resetAll: () => void;
 }
 
@@ -42,6 +45,14 @@ export function useShopRedemptions(): ShopRedemptionsStore {
     });
   }, []);
 
+  const setStatus = useCallback((id: string, status: Redemption['status']) => {
+    setRedemptions((prev) => {
+      const next = prev.map((r) => (r.id === id ? { ...r, status } : r));
+      writeStored(next);
+      return next;
+    });
+  }, []);
+
   const resetAll = useCallback(() => {
     setRedemptions([]);
     try {
@@ -51,5 +62,5 @@ export function useShopRedemptions(): ShopRedemptionsStore {
     }
   }, []);
 
-  return { redemptions, addRedemption, resetAll };
+  return { redemptions, addRedemption, setStatus, resetAll };
 }

@@ -46,6 +46,10 @@
   gap: 2px;
   margin-right: auto;
   overflow-x: auto;
+  /* When an item doesn't fully fit, this fades it toward the edge instead of an abrupt word-clip —
+     reads as "more to scroll to", not a rendering glitch. Harmless once everything fits. */
+  mask-image: linear-gradient(90deg, black calc(100% - 20px), transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, black calc(100% - 20px), transparent 100%);
 }
 
 .navLink,
@@ -76,6 +80,17 @@
 
 :root[data-theme='dark'] .navLinkActive {
   color: var(--accent-strong);
+}
+
+/* The shop is explicitly called out as its own destination (not just another nav item) —
+   a restrained gold tint keeps it findable at a glance without shouting. */
+.navLinkShop {
+  color: var(--medal-gold);
+  font-weight: 700;
+}
+
+.navLinkShop:hover {
+  background: var(--medal-gold-bg);
 }
 
 .tools {

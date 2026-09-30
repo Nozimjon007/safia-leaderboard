@@ -1,5 +1,5 @@
 import type { EarnedAchievement, Member } from '../../data/types';
-import { roleLabel, seasonQuarterLabel, useI18n } from '../../i18n';
+import { areaLabel, roleLabel, seasonQuarterLabel, shiftLabel, useI18n } from '../../i18n';
 import type { TranslationKey } from '../../i18n/locales/en';
 import { careerTimeline, deriveCareerHighlight, tenureBreakdown } from '../../lib/career';
 import { ACHIEVEMENT_GLYPHS, earnedAchievementTypes } from '../../lib/achievements';
@@ -87,7 +87,7 @@ export function CareerCard({
           <div className={styles.fact}>
             <dt>{t('career_team_label')}</dt>
             <dd>
-              {member.area} · {member.shift}
+              {areaLabel(t, member.area)} · {shiftLabel(t, member.shift)}
             </dd>
           </div>
           {member.dateJoinedISO && tenure && (

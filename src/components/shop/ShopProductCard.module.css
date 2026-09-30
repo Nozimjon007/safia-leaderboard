@@ -1,0 +1,143 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+  .card:hover {
+    transform: none;
+  }
+}
+
+.imageBand {
+  position: relative;
+  height: 108px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(120% 140% at 25% 15%, color-mix(in srgb, var(--product-accent) 22%, var(--surface-raised)) 0%, var(--surface-sunken) 80%);
+  color: var(--product-accent);
+}
+
+.imageGrain {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(color-mix(in srgb, var(--product-accent) 45%, transparent) 1px, transparent 1.6px);
+  background-size: 15px 15px;
+  opacity: 0.14;
+}
+
+.icon {
+  position: relative;
+  width: 46px;
+  height: 46px;
+}
+
+.icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.limited {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--medal-gold);
+  background: var(--medal-gold-bg);
+  border-radius: var(--radius-sm);
+  padding: 3px 7px;
+  white-space: nowrap;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 12px 14px 14px;
+}
+
+.category {
+  font-size: 10.5px;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.itemName {
+  font-size: 14.5px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.itemDesc {
+  font-size: 12.5px;
+  color: var(--ink-secondary);
+  margin-top: 5px;
+}
+
+.itemMeta {
+  font-size: 11px;
+  color: var(--ink-muted);
+  margin-top: 3px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.price {
+  font-size: 15px;
+  color: var(--medal-gold);
+}
+
+.disabledNote {
+  font-size: 11.5px;
+  color: var(--status-critical);
+  margin-top: 6px;
+}
+
+.confirm {
+  border-top: 1px dashed var(--border-strong);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.confirm h3 {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.confirm p {
+  font-size: 12.5px;
+  color: var(--ink-secondary);
+}
+
+.confirmActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}

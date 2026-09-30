@@ -25,7 +25,7 @@ export function Header() {
       <div className={`container ${styles.inner}`}>
         <NavLink to={{ pathname: '/', search }} className={styles.brand}>
           <span className={styles.brandMark} aria-hidden="true">
-            R
+            S
           </span>
           <span className={styles.brandName}>{t('app_title')}</span>
         </NavLink>
@@ -33,6 +33,13 @@ export function Header() {
         <nav className={styles.nav} aria-label={t('nav_leaderboard')}>
           <NavLink to={{ pathname: '/', search }} end className={({ isActive }) => (isActive ? styles.navLinkActive : styles.navLink)}>
             {t('nav_leaderboard')}
+          </NavLink>
+          {/* Right after Leaderboard, deliberately before Compare/Seasons — the nav's overflow
+              fallback is a horizontal scroll starting from the left (see .nav below), so whatever
+              sits this early always stays fully visible even at the narrowest phone widths, which
+              is exactly what "impossible to miss" requires for the shop specifically. */}
+          <NavLink to="/shop" data-nav-shop className={({ isActive }) => `${isActive ? styles.navLinkActive : styles.navLink} ${styles.navLinkShop}`}>
+            <span aria-hidden="true">◈</span> {t('nav_shop')}
           </NavLink>
           <NavLink to={{ pathname: '/compare', search }} className={({ isActive }) => (isActive ? styles.navLinkActive : styles.navLink)}>
             {t('nav_compare')}

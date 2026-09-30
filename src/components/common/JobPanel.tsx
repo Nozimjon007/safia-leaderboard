@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import type { Member } from '../../data/types';
 import type { ClanId } from '../../lib/clans';
-import { clanName, roleDescription, roleIcon, roleLabel, useI18n } from '../../i18n';
+import { areaLabel, clanName, roleDescription, roleIcon, roleLabel, shiftLabel, useI18n } from '../../i18n';
 import { formatScore } from '../../lib/format';
 import { ClanCrest } from './ClanCrest';
 import styles from './JobPanel.module.css';
@@ -41,7 +41,7 @@ export function JobPanel({ member, clanId, overallRank, overallScore, compact, s
       {description && <p className={styles.roleDesc}>{description}</p>}
 
       <p className={styles.siteLine}>
-        {member.area} <span className={styles.shiftTag}>{member.shift}</span>
+        {areaLabel(t, member.area)} <span className={styles.shiftTag}>{shiftLabel(t, member.shift)}</span>
       </p>
 
       {clanId && (

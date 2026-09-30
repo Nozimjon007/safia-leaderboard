@@ -1,26 +1,49 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDatasetContext } from '../state/DatasetProvider';
+import { useScoringConfig } from '../state/ScoringConfigProvider';
 import { useViewAsMemberId } from '../hooks/useViewAsMember';
 import { useCoinLedger } from '../hooks/useCoinLedger';
 import { useShopRedemptions } from '../hooks/useShopRedemptions';
-import { balanceForMember } from '../lib/coins';
+import { useClanAssignments } from '../hooks/useClans';
+import { useSeasons } from '../hooks/useSeasons';
+import { balanceForMember, computeSeasonCoinAwards } from '../lib/coins';
 import { hasOpenRedemption, redemptionsForMember, SHOP_CATALOG, SHOP_CATEGORIES, type Redemption, type ShopCategory, type ShopItem } from '../lib/shop';
-import { shopCategoryLabel, shopItemDescription, shopItemName, shopPendingReasonLabel, shopStatusLabel, useI18n } from '../i18n';
+import { shopCategoryLabel, shopItemName, shopStatusLabel, useI18n } from '../i18n';
 import { DemoBanner } from '../components/common/DemoBanner';
 import { StateMessage } from '../components/common/StateMessage';
 import { LeaderboardSkeleton } from '../components/leaderboard/LeaderboardSkeleton';
+import { ShopProductCard } from '../components/shop/ShopProductCard';
+import { StatTile } from '../components/charts/StatTile';
 import styles from './ShopPage.module.css';
 
-const CATEGORY_GLYPH: Record<ShopCategory, string> = { merchandise: '👕', learning: '🎓', experiences: '✨' };
 const STATUS_GLYPH: Record<Redemption['status'], string> = { pending: '⏳', approved: '✓', fulfilled: '★', rejected: '✕' };
+
+/** Richest-first, for the shop's own "Preview as demo employee" default (see the spec: a fresh
+ * demo must be able to show an affordable request immediately, not zero coins for everyone). */
+function richestMemberId(transactions: { memberId: string; amount: number }[]): string | null {
+  const byMember = new Map<string, number>();
+  for (const tx of transactions) byMember.set(tx.memberId, (byMember.get(tx.memberId) ?? 0) + tx.amount);
+  let best: string | null = null;
+  let bestAmount = -Infinity;
+  for (const [id, amount] of byMember) {
+    if (amount > bestAmount) {
+      best = id;
+      bestAmount = amount;
+    }
+  }
+  return best;
+}
 
 export function ShopPage() {
   const { t, locale } = useI18n();
   const { status, dataset, error, reload } = useDatasetContext();
-  const [viewAsMemberId, setViewAsMemberId] = useViewAsMemberId(null);
+  const { config } = useScoringConfig();
+  const seasonsInfo = useSeasons(dataset);
+  const clanAssignments = useClanAssignments(dataset);
   const coinLedger = useCoinLedger();
   const shopStore = useShopRedemptions();
+  const [viewAsMemberId, setViewAsMemberId] = useViewAsMemberId(richestMemberId(coinLedger.transactions));
   const [category, setCategory] = useState<ShopCategory | 'all'>('all');
   const [confirmingItemId, setConfirmingItemId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -30,6 +53,19 @@ export function ShopPage() {
     const timer = setTimeout(() => setToast(null), 4000);
     return () => clearTimeout(timer);
   }, [toast]);
+
+  // A live preview of what the *current*, still-open season would award if finalized today — never
+  // written to the ledger (see lib/coins.ts's module docs on why finalize is a deliberate, one-time
+  // action), just shown so "pending" coins are a real, honest number rather than a vague promise.
+  const pendingByMember = useMemo(() => {
+    if (!dataset || !seasonsInfo) return {};
+    const idx = seasonsInfo.seasons.findIndex((s) => s.id === seasonsInfo.currentSeason.id);
+    const previous = idx > 0 ? seasonsInfo.seasons[idx - 1] : null;
+    const preview = computeSeasonCoinAwards(dataset, config, clanAssignments, seasonsInfo.currentSeason, previous);
+    const byMember: Record<string, number> = {};
+    for (const tx of preview) byMember[tx.memberId] = (byMember[tx.memberId] ?? 0) + tx.amount;
+    return byMember;
+  }, [dataset, seasonsInfo, config, clanAssignments]);
 
   if (status === 'error') {
     return (
@@ -66,7 +102,9 @@ export function ShopPage() {
 
   const member = viewAsMemberId ? (dataset.members.find((m) => m.id === viewAsMemberId) ?? null) : null;
   const balance = member ? balanceForMember(coinLedger.transactions, member.id) : 0;
+  const pendingCoins = member ? (pendingByMember[member.id] ?? 0) : 0;
   const myRedemptions = member ? redemptionsForMember(shopStore.redemptions, member.id) : [];
+  const reservedCoins = myRedemptions.filter((r) => r.status === 'pending' || r.status === 'approved').reduce((sum, r) => sum + r.coinsSpent, 0);
   const items = category === 'all' ? SHOP_CATALOG : SHOP_CATALOG.filter((i) => i.category === category);
 
   function requestItem(item: ShopItem) {
@@ -79,6 +117,24 @@ export function ShopPage() {
     shopStore.addRedemption({ id: stamp, memberId: member.id, itemId: item.id, status: 'pending', coinsSpent: item.priceCoins, requestedDateISO: dateISO });
     setConfirmingItemId(null);
     setToast(t('shop_request_success', { item: shopItemName(t, item.id) }));
+  }
+
+  // The demo's stand-in for a real management decision — clearly labeled as a simulation in the UI
+  // (never presented as authentication or a real approval system). Rejecting refunds the exact
+  // amount reserved, as its own new ledger entry (never editing the original debit).
+  function decideRedemption(r: Redemption, approve: boolean) {
+    shopStore.setStatus(r.id, approve ? 'approved' : 'rejected');
+    if (!approve) {
+      coinLedger.addTransaction({
+        id: `${r.id}:refund`,
+        memberId: r.memberId,
+        seasonId: 'shop',
+        amount: r.coinsSpent,
+        reason: 'shop_refund',
+        dateISO: new Date().toISOString().slice(0, 10),
+      });
+    }
+    setToast(approve ? t('shop_admin_approved', { item: shopItemName(t, r.itemId) }) : t('shop_admin_rejected', { item: shopItemName(t, r.itemId) }));
   }
 
   function resetDemoData() {
@@ -121,9 +177,20 @@ export function ShopPage() {
           </select>
         </label>
         {member ? (
-          <div className={styles.balance}>
-            <b className="tabular">{balance.toLocaleString(locale)}</b>
-            <span>{t('coins_balance_unit')}</span>
+          <div className={styles.balanceRow}>
+            <StatTile compact label={t('coins_balance_label')} value={<span className={styles.balanceValue}>{balance.toLocaleString(locale)}</span>} />
+            <StatTile
+              compact
+              label={t('coins_reserved_label')}
+              value={<span className={styles.reservedValue}>{reservedCoins.toLocaleString(locale)}</span>}
+              description={t('coins_reserved_desc')}
+            />
+            <StatTile
+              compact
+              label={t('coins_pending_label')}
+              value={<span className={styles.pendingValue}>{pendingCoins > 0 ? `+${pendingCoins.toLocaleString(locale)}` : '0'}</span>}
+              description={t('coins_pending_desc')}
+            />
             <Link to={{ pathname: `/member/${member.id}` }} className={styles.balanceLink}>
               {member.name} →
             </Link>
@@ -140,7 +207,7 @@ export function ShopPage() {
           </button>
           {SHOP_CATEGORIES.map((c) => (
             <button key={c} type="button" aria-pressed={category === c} onClick={() => setCategory(c)}>
-              {CATEGORY_GLYPH[c]} {shopCategoryLabel(t, c)}
+              {shopCategoryLabel(t, c)}
             </button>
           ))}
         </div>
@@ -151,60 +218,21 @@ export function ShopPage() {
           const affordable = member != null && balance >= item.priceCoins;
           const duplicate = member != null && hasOpenRedemption(shopStore.redemptions, member.id, item.id);
           const disabledReason = !member ? null : duplicate ? t('shop_request_already_open') : !affordable ? t('shop_request_insufficient') : null;
-          const confirming = confirmingItemId === item.id;
 
           return (
-            <li key={item.id} className={styles.card}>
-              <div className={styles.cardHead}>
-                <span className={styles.glyph} aria-hidden="true">
-                  {CATEGORY_GLYPH[item.category]}
-                </span>
-                <div>
-                  <h2 className={styles.itemName}>{shopItemName(t, item.id)}</h2>
-                  <span className={styles.category}>{shopCategoryLabel(t, item.category)}</span>
-                </div>
-                {item.limitedAvailability && <span className={styles.limited}>{t('shop_limited_badge')}</span>}
-              </div>
-              <p className={styles.itemDesc}>{shopItemDescription(t, item.id)}</p>
-              <p className={styles.itemMeta}>{t('shop_eligibility_note')}</p>
-              <p className={styles.itemMeta}>{shopPendingReasonLabel(t, item.pendingReason)}</p>
-
-              <div className={styles.cardFooter}>
-                <b className={`${styles.price} tabular`}>{t('shop_price_label', { price: item.priceCoins.toLocaleString(locale) })}</b>
-                {!confirming ? (
-                  <button
-                    type="button"
-                    className="btn btnPrimary"
-                    disabled={!member || disabledReason != null}
-                    title={disabledReason ?? undefined}
-                    onClick={() => setConfirmingItemId(item.id)}
-                  >
-                    {t('shop_request_button')}
-                  </button>
-                ) : null}
-              </div>
-              {member && disabledReason && !confirming && <p className={styles.disabledNote}>{disabledReason}</p>}
-
-              {confirming && member && (
-                <div className={styles.confirm}>
-                  <h3>{t('shop_confirm_heading')}</h3>
-                  <p>
-                    {t('shop_confirm_balance_before')}: <b className="tabular">{balance.toLocaleString(locale)}</b>
-                  </p>
-                  <p>
-                    {t('shop_confirm_balance_after')}: <b className="tabular">{(balance - item.priceCoins).toLocaleString(locale)}</b>
-                  </p>
-                  <div className={styles.confirmActions}>
-                    <button type="button" className="btn btnPrimary" onClick={() => requestItem(item)}>
-                      {t('shop_confirm_submit')}
-                    </button>
-                    <button type="button" className="btn" onClick={() => setConfirmingItemId(null)}>
-                      {t('shop_confirm_cancel')}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </li>
+            <ShopProductCard
+              key={item.id}
+              item={item}
+              hasViewer={member != null}
+              affordable={affordable}
+              disabledReason={disabledReason}
+              shortfall={member ? Math.max(0, item.priceCoins - balance) : 0}
+              confirming={confirmingItemId === item.id}
+              balance={balance}
+              onRequestClick={() => setConfirmingItemId(item.id)}
+              onConfirm={() => requestItem(item)}
+              onCancel={() => setConfirmingItemId(null)}
+            />
           );
         })}
       </ul>
@@ -223,6 +251,17 @@ export function ShopPage() {
                   <span className={styles.historyStatus}>{shopStatusLabel(t, r.status)}</span>
                   <span className={`${styles.historyCoins} tabular`}>-{r.coinsSpent.toLocaleString(locale)}</span>
                   <span className={styles.historyDate}>{r.requestedDateISO}</span>
+                  {r.status === 'pending' && (
+                    <span className={styles.historyActions}>
+                      <span className={styles.demoNote}>{t('shop_admin_note')}</span>
+                      <button type="button" className={styles.approveBtn} onClick={() => decideRedemption(r, true)}>
+                        {t('shop_approve_action')}
+                      </button>
+                      <button type="button" className={styles.rejectBtn} onClick={() => decideRedemption(r, false)}>
+                        {t('shop_reject_action')}
+                      </button>
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

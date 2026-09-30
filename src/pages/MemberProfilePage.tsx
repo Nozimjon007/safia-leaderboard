@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { CATEGORY_KEYS, type CategoryKey, type LeaderboardDataset } from '../data/types';
-import { categoryLabel, roleLabel, useI18n } from '../i18n';
+import { areaLabel, categoryLabel, roleLabel, shiftLabel, useI18n } from '../i18n';
 import { useDatasetContext } from '../state/DatasetProvider';
 import { useLeaderboardFilters, type LeaderboardFilters } from '../hooks/useLeaderboardFilters';
 import { useLeaderboardResult } from '../hooks/useLeaderboardResult';
@@ -286,7 +286,8 @@ function MemberProfileContent({
         <div className={styles.who}>
           <h1>{row.member.name}</h1>
           <p>
-            {roleLabel(t, row.member.role)} · {row.member.area} <span className={styles.shiftTag}>{row.member.shift}</span> ·{' '}
+            {roleLabel(t, row.member.role)} · {areaLabel(t, row.member.area)}{' '}
+            <span className={styles.shiftTag}>{shiftLabel(t, row.member.shift)}</span> ·{' '}
             {formatDateRange(filters.fromISO, filters.toISO, locale)} ·{' '}
             {periodIndexes.length === 1 ? t('period_week_1') : t('period_weeks_n', { n: periodIndexes.length })}
           </p>

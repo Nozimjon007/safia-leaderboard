@@ -19,6 +19,11 @@
   margin-top: 2px;
 }
 
+.rankedNote {
+  font-variant-numeric: normal;
+  color: var(--ink-secondary);
+}
+
 .tools {
   display: flex;
   flex-wrap: wrap;

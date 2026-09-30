@@ -5,7 +5,7 @@ import type { LeaderboardRow } from '../../lib/scoring';
 import { metricValue } from '../../lib/scoring';
 import { ACHIEVEMENT_GLYPHS } from '../../lib/achievements';
 import { REWARD_GLYPHS } from '../member/RewardBadge';
-import { categoryLabel, roleLabel, useI18n } from '../../i18n';
+import { areaLabel, categoryLabel, roleLabel, shiftLabel, useI18n } from '../../i18n';
 import type { TranslationKey } from '../../i18n/locales/en';
 import { formatScore } from '../../lib/format';
 import { usePointerTilt } from '../../hooks/usePointerTilt';
@@ -117,7 +117,7 @@ export function PodiumCard({ row, place, metric, metricLabel, emblem, compareSel
         <div className={styles.identity}>
           <h3 className={styles.name}>{row.member.name}</h3>
           <p className={styles.sub}>
-            {roleLabel(t, row.member.role)} · {row.member.area} · {row.member.shift}
+            {roleLabel(t, row.member.role)} · {areaLabel(t, row.member.area)} · {shiftLabel(t, row.member.shift)}
           </p>
         </div>
 

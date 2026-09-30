@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { motion, useReducedMotion } from 'motion/react';
 import type { EarnedAchievement, Member } from '../data/types';
-import { categoryLabel, roleLabel, useI18n } from '../i18n';
+import { areaLabel, categoryLabel, roleLabel, useI18n } from '../i18n';
 import { useDatasetContext } from '../state/DatasetProvider';
 import { useLeaderboardFilters } from '../hooks/useLeaderboardFilters';
 import { useAreaOptions, useLeaderboardResult, useOverallLeaderboardResult, useRoleOptions } from '../hooks/useLeaderboardResult';
@@ -17,12 +18,14 @@ import { computeAllAchievements } from '../lib/achievements';
 import { computeCraftPathProgress, craftPathForRole, type CraftPreview } from '../lib/craftPaths';
 import { CLAN_IDS } from '../lib/clans';
 import { computeClanStandings } from '../lib/clanPoints';
+import { balanceForMember } from '../lib/coins';
+import { useCoinLedger } from '../hooks/useCoinLedger';
 import { buildLeaderboardCsv, downloadCsv } from '../lib/csv';
 import { formatDateRange, weekEndISO, weekStartISO } from '../lib/dates';
-import { findContainingSeason } from '../lib/seasons';
+import { findContainingSeason, seasonWeekRange, type Season } from '../lib/seasons';
 import { DemoBanner } from '../components/common/DemoBanner';
 import { StateMessage } from '../components/common/StateMessage';
-import { SeasonPanel } from '../components/leaderboard/SeasonPanel';
+import { SeasonPanel, seasonDefaultRange } from '../components/leaderboard/SeasonPanel';
 import { TimeMachineControl } from '../components/leaderboard/TimeMachineControl';
 import { TopFive } from '../components/leaderboard/TopFive';
 import { BoardModeToggle } from '../components/leaderboard/BoardModeToggle';
@@ -48,6 +51,7 @@ const PAGE_SIZE = 24;
 export function LeaderboardPage() {
   const { t, locale } = useI18n();
   const location = useLocation();
+  const reduceMotion = useReducedMotion();
   const { status, dataset, error, reload } = useDatasetContext();
   const { filters, updateFilters, isPeriodExplicit } = useLeaderboardFilters(dataset);
   const { config } = useScoringConfig();
@@ -73,6 +77,8 @@ export function LeaderboardPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const coinLedger = useCoinLedger();
+  const coinsBalance = viewAsMemberId ? balanceForMember(coinLedger.transactions, viewAsMemberId) : null;
   const achievementsByMember = useMemo<Record<string, EarnedAchievement[]>>(
     () => (dataset && seasonsInfo ? computeAllAchievements(dataset, config, seasonsInfo.seasons) : {}),
     [dataset, config, seasonsInfo],
@@ -129,6 +135,11 @@ export function LeaderboardPage() {
     const timer = setTimeout(() => setHighlightedId(null), 2200);
     return () => clearTimeout(timer);
   }, [highlightedId, page]);
+
+  function selectSeason(season: Season) {
+    const range = dataset ? seasonDefaultRange(dataset, season) : null;
+    if (range) updateFilters({ fromISO: range.from, toISO: range.to });
+  }
 
   function findMe() {
     if (!viewAsMemberId) return;
@@ -190,10 +201,25 @@ export function LeaderboardPage() {
     }
   }
   const rankedTop5 = overallResult.rows.filter((r) => r.overallRank != null).slice(0, 5);
-  const periodText = formatDateRange(filters.fromISO, filters.toISO, locale);
+  // A season's default period is week-snapped internally (scoring only ever operates on whole
+  // weeks), which can overshoot the season's real calendar boundaries by up to six days (R6) — so
+  // showing that snapped range as "the period" next to a heading that (correctly) shows the
+  // season's exact dates reads as two different, disagreeing date ranges for the same view. Once
+  // the viewer has actually chosen a period that isn't that snapped default (an explicit date pick,
+  // a preset, or Time Machine), the snapped range is the real, honest answer again and is shown
+  // as-is. Deliberately NOT based on isPeriodExplicit: the page canonicalizes the URL to an explicit
+  // from/to the moment the dataset loads (see the effect below), so isPeriodExplicit alone would be
+  // true on almost every render, including the season's own untouched default.
+  const seasonOwnRange = matchedSeason ? seasonWeekRange(dataset, matchedSeason) : null;
+  const isCustomPeriod =
+    Boolean(tm?.active) || (matchedSeason != null && (seasonOwnRange == null || filters.fromISO !== seasonOwnRange.from || filters.toISO !== seasonOwnRange.to));
+  const periodText =
+    matchedSeason && !isCustomPeriod
+      ? formatDateRange(matchedSeason.startISO, matchedSeason.endISO, locale)
+      : formatDateRange(filters.fromISO, filters.toISO, locale);
   const weeksLabel = result.weekIndexes.length === 1 ? t('period_week_1') : t('period_weeks_n', { n: result.weekIndexes.length });
   const shiftLabel = filters.shift === 'all' ? t('shift_all') : t('shift_n', { n: filters.shift.replace('S', '') });
-  const areaLabelText = filters.area === 'all' ? t('area_all') : filters.area;
+  const areaLabelText = filters.area === 'all' ? t('area_all') : areaLabel(t, filters.area);
   const roleLabelText = filters.role === 'all' ? t('role_all') : roleLabel(t, filters.role);
   const narrowedLabel =
     [
@@ -245,9 +271,13 @@ export function LeaderboardPage() {
           dataset={dataset}
           filters={filters}
           matchedSeason={matchedSeason}
+          seasons={seasonsInfo?.seasons ?? []}
+          isCustomPeriod={isCustomPeriod}
           overallResult={overallResult}
           viewAsMemberId={viewAsMemberId}
           onSetViewAs={setViewAsMemberId}
+          onSelectSeason={selectSeason}
+          coinsBalance={coinsBalance}
           shouldAnimateReveal={seasonReveal.shouldAnimate}
           playKey={seasonReveal.playKey}
           onReplayReveal={seasonReveal.replay}
@@ -260,26 +290,33 @@ export function LeaderboardPage() {
         </div>
       )}
 
-      {filters.board === 'clans' && clanStandings ? (
-        <ClanStandingsPanel standings={clanStandings} memberById={memberById} filterLabel={narrowedLabel} />
-      ) : (
-        <>
-          <TopFive
-            rows={rankedTop5}
-            dataset={dataset}
-            config={config}
-            matchedSeason={matchedSeason}
-            achievementsByMember={achievementsByMember}
-            clanAssignments={clanAssignments}
-            filterLabel={narrowedLabel}
-            compareIds={compareIds}
-            onToggleCompare={toggleCompare}
-            shouldAnimateReveal={seasonReveal.shouldAnimate}
-            playKey={seasonReveal.playKey}
-          />
-          {clanStandings && <ClanStandingsPreview standings={clanStandings} memberById={memberById} />}
-        </>
-      )}
+      <motion.div
+        key={filters.board}
+        initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {filters.board === 'clans' && clanStandings ? (
+          <ClanStandingsPanel standings={clanStandings} memberById={memberById} filterLabel={narrowedLabel} />
+        ) : (
+          <>
+            <TopFive
+              rows={rankedTop5}
+              dataset={dataset}
+              config={config}
+              matchedSeason={matchedSeason}
+              achievementsByMember={achievementsByMember}
+              clanAssignments={clanAssignments}
+              filterLabel={narrowedLabel}
+              compareIds={compareIds}
+              onToggleCompare={toggleCompare}
+              shouldAnimateReveal={seasonReveal.shouldAnimate}
+              playKey={seasonReveal.playKey}
+            />
+            {clanStandings && <ClanStandingsPreview standings={clanStandings} memberById={memberById} />}
+          </>
+        )}
+      </motion.div>
 
       <div className={styles.head}>
         <p className={styles.ctx}>
@@ -326,6 +363,7 @@ export function LeaderboardPage() {
               onChange={updateFilters}
               shownCount={shown.length}
               totalCount={result.rows.length}
+              rankedCount={shown.filter((r) => r.rank != null).length}
               heading={`${t('nav_leaderboard')}: ${metricLabel}`}
               canFindMe={viewAsMemberId != null}
               onFindMe={findMe}

@@ -1,0 +1,48 @@
+.fallback {
+  container-type: inline-size;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(135% 135% at 28% 18%, color-mix(in srgb, var(--portrait-color) 26%, var(--surface-raised)) 0%, var(--surface-sunken) 78%);
+}
+
+/* A soft, restrained "flour dust" texture — small repeating dots, low opacity, never busy enough to
+   compete with the initials it sits behind. */
+.grain {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(color-mix(in srgb, var(--portrait-color) 50%, transparent) 1px, transparent 1.6px);
+  background-size: 16px 16px;
+  opacity: 0.16;
+}
+
+.ring {
+  position: absolute;
+  width: 72cqw;
+  height: 72cqw;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--portrait-color) 45%, transparent);
+  opacity: 0.55;
+}
+
+.initials {
+  position: relative;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 34cqw;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: color-mix(in srgb, var(--portrait-color) 78%, var(--ink) 22%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .initials {
+    color: color-mix(in srgb, var(--portrait-color) 88%, var(--ink) 12%);
+  }
+}
+:root[data-theme='dark'] .initials {
+  color: color-mix(in srgb, var(--portrait-color) 88%, var(--ink) 12%);
+}

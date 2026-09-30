@@ -1,4 +1,4 @@
-import { roleLabel, seasonQuarterLabel, useI18n } from '../../i18n';
+import { areaLabel, roleLabel, seasonQuarterLabel, useI18n } from '../../i18n';
 import type { LeaderboardDataset } from '../../data/types';
 import type { LeaderboardFilters } from '../../hooks/useLeaderboardFilters';
 import { presetRangeFor } from '../../hooks/useLeaderboardFilters';
@@ -132,7 +132,7 @@ export function FiltersBar({
           <option value="all">{t('area_all')}</option>
           {areaOptions.map((a) => (
             <option key={a} value={a}>
-              {a}
+              {areaLabel(t, a)}
             </option>
           ))}
         </select>

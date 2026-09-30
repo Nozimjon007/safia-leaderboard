@@ -438,6 +438,7 @@ function StandingsTab({
           onChange={updateLocal}
           shownCount={shown.length}
           totalCount={result.rows.length}
+          rankedCount={shown.filter((r) => r.rank != null).length}
           heading={t('season_detail_standings_title')}
           canFindMe={false}
           onFindMe={() => {}}
