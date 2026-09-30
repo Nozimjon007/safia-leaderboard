@@ -29,6 +29,51 @@
   flex: 1 1 220px;
 }
 
+.advanced {
+  width: 100%;
+  flex-basis: 100%;
+  order: 10;
+  border-top: 1px dashed var(--border-strong);
+  margin-top: 4px;
+  padding-top: 10px;
+}
+
+.advanced > summary {
+  cursor: pointer;
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 12.5px;
+  list-style: none;
+}
+
+.advanced > summary::-webkit-details-marker {
+  display: none;
+}
+
+.advanced > summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 5px;
+  transition: transform 0.15s ease;
+}
+
+.advanced[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .advanced > summary::before {
+    transition: none;
+  }
+}
+
+.advancedFields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 10px;
+}
+
 @media (max-width: 640px) {
   .filters {
     padding: 12px;

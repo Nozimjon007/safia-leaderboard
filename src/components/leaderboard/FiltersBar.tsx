@@ -1,4 +1,4 @@
-import { seasonQuarterLabel, useI18n } from '../../i18n';
+import { roleLabel, seasonQuarterLabel, useI18n } from '../../i18n';
 import type { LeaderboardDataset } from '../../data/types';
 import type { LeaderboardFilters } from '../../hooks/useLeaderboardFilters';
 import { presetRangeFor } from '../../hooks/useLeaderboardFilters';
@@ -10,7 +10,9 @@ interface FiltersBarProps {
   filters: LeaderboardFilters;
   dataset: LeaderboardDataset;
   areaOptions: string[];
+  roleOptions: string[];
   onChange: (patch: Partial<Record<keyof LeaderboardFilters, string>>) => void;
+  onReset: () => void;
   onExport: () => void;
   exportDisabled?: boolean;
   /** True while the Season Time Machine owns the period — its slider is the one control for "when", so the
@@ -24,7 +26,9 @@ export function FiltersBar({
   filters,
   dataset,
   areaOptions,
+  roleOptions,
   onChange,
+  onReset,
   onExport,
   exportDisabled,
   periodLockedByTimeMachine,
@@ -32,6 +36,7 @@ export function FiltersBar({
   const { t } = useI18n();
   const minDate = dataset.firstWeekStart;
   const maxDate = weekEndISO(dataset.firstWeekStart, dataset.weekCount - 1);
+  const hasActiveNarrowing = filters.query !== '' || filters.shift !== 'all' || filters.area !== 'all' || filters.role !== 'all';
 
   const today = new Date().toISOString().slice(0, 10);
   const seasons = listSeasons(dataset.firstWeekStart, today);
@@ -47,6 +52,11 @@ export function FiltersBar({
     const r = presetRangeFor(dataset, n);
     return filters.fromISO === r.from && filters.toISO === r.to;
   }
+
+  // The exact from/to inputs are "advanced" — season + presets cover the common cases, so they stay
+  // tucked away, but default open whenever they're the only thing that actually explains the current
+  // period (never hide the control that's genuinely driving the view behind a collapsed disclosure).
+  const isCustomRange = !activeSeasonId && !isPresetActive(1) && !isPresetActive(4) && !isPresetActive(8);
 
   return (
     <form className={styles.filters} onSubmit={(e) => e.preventDefault()} aria-label={t('period_label')}>
@@ -104,37 +114,6 @@ export function FiltersBar({
       </div>
 
       <div className={styles.field}>
-        <label className="fieldLabel" htmlFor="filter-from">
-          {t('period_from')}
-        </label>
-        <input
-          id="filter-from"
-          className="input"
-          type="date"
-          value={filters.fromISO}
-          min={minDate}
-          max={maxDate}
-          disabled={periodLockedByTimeMachine}
-          onChange={(e) => e.target.value && onChange({ fromISO: e.target.value })}
-        />
-      </div>
-      <div className={styles.field}>
-        <label className="fieldLabel" htmlFor="filter-to">
-          {t('period_to')}
-        </label>
-        <input
-          id="filter-to"
-          className="input"
-          type="date"
-          value={filters.toISO}
-          min={minDate}
-          max={maxDate}
-          disabled={periodLockedByTimeMachine}
-          onChange={(e) => e.target.value && onChange({ toISO: e.target.value })}
-        />
-      </div>
-
-      <div className={styles.field}>
         <label className="fieldLabel" htmlFor="filter-shift">
           {t('shift_label')}
         </label>
@@ -159,6 +138,20 @@ export function FiltersBar({
         </select>
       </div>
 
+      <div className={styles.field}>
+        <label className="fieldLabel" htmlFor="filter-role">
+          {t('role_label')}
+        </label>
+        <select id="filter-role" className="select" value={filters.role} onChange={(e) => onChange({ role: e.target.value })}>
+          <option value="all">{t('role_all')}</option>
+          {roleOptions.map((r) => (
+            <option key={r} value={r}>
+              {roleLabel(t, r)}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className={`${styles.field} ${styles.grow}`}>
         <label className="fieldLabel" htmlFor="filter-search">
           {t('search_label')}
@@ -174,9 +167,49 @@ export function FiltersBar({
         />
       </div>
 
+      <button type="button" className="btn" onClick={onReset} disabled={!hasActiveNarrowing}>
+        {t('clear_filters')}
+      </button>
+
       <button type="button" className="btn" onClick={onExport} disabled={exportDisabled}>
         {t('export_button')}
       </button>
+
+      <details className={styles.advanced} open={isCustomRange}>
+        <summary>{t('filters_advanced_dates')}</summary>
+        <div className={styles.advancedFields}>
+          <div className={styles.field}>
+            <label className="fieldLabel" htmlFor="filter-from">
+              {t('period_from')}
+            </label>
+            <input
+              id="filter-from"
+              className="input"
+              type="date"
+              value={filters.fromISO}
+              min={minDate}
+              max={maxDate}
+              disabled={periodLockedByTimeMachine}
+              onChange={(e) => e.target.value && onChange({ fromISO: e.target.value })}
+            />
+          </div>
+          <div className={styles.field}>
+            <label className="fieldLabel" htmlFor="filter-to">
+              {t('period_to')}
+            </label>
+            <input
+              id="filter-to"
+              className="input"
+              type="date"
+              value={filters.toISO}
+              min={minDate}
+              max={maxDate}
+              disabled={periodLockedByTimeMachine}
+              onChange={(e) => e.target.value && onChange({ toISO: e.target.value })}
+            />
+          </div>
+        </div>
+      </details>
     </form>
   );
 }

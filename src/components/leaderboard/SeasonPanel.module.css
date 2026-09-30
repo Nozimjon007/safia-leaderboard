@@ -4,6 +4,28 @@
   border-radius: var(--radius-lg);
   padding: 20px 22px 18px;
   margin-bottom: 18px;
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Distinct warm gold treatment for the active season only — reuses the same --medal-gold
+   token as the podium's 1st-place finish so "this is happening right now" reads as special,
+   not just the everyday brand accent used throughout the rest of the page. */
+.panel[data-status='current'] {
+  background: linear-gradient(155deg, var(--surface-raised) 0%, var(--medal-gold-bg) 145%);
+  border-color: var(--medal-gold);
+  box-shadow: 0 0 0 1px var(--medal-gold-bg), var(--shadow-md);
+}
+
+/* Completed/approved seasons get a quieter, settled treatment — no gold, no shadow lift. */
+.panel[data-status='approved'] {
+  background: var(--surface-raised);
+}
+
+.panel[data-status='awaiting_approval'] {
+  background: linear-gradient(155deg, var(--surface-raised) 0%, var(--medal-bronze-bg) 130%);
 }
 
 .top {
@@ -35,42 +57,74 @@
   margin-top: 3px;
 }
 
-.countdown {
-  text-align: right;
+.statusBadge {
   flex: none;
-}
-
-.countdownLabel {
-  display: block;
-  font-size: 12px;
-  color: var(--ink-muted);
-  margin-bottom: 2px;
-}
-
-.countdownValue {
-  font: 700 22px var(--font-sans);
-  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-radius: var(--radius-full);
+  padding: 5px 12px;
   color: var(--accent-strong);
+  background: var(--accent-wash);
   white-space: nowrap;
 }
 
-.countdownValue[data-complete] {
+.statusBadge[data-status='current'] {
+  color: var(--medal-gold);
+  background: var(--medal-gold-bg);
+  box-shadow: inset 0 0 0 1px var(--medal-gold);
+}
+
+.statusBadge[data-status='approved'] {
   color: var(--ink-secondary);
+  background: var(--surface-sunken);
+}
+
+.statusBadge[data-status='awaiting_approval'] {
+  color: var(--medal-bronze);
+  background: var(--medal-bronze-bg);
+}
+
+.statusBadge[data-status='upcoming'] {
+  color: var(--ink-muted);
+  background: var(--surface-sunken);
 }
 
 .progressTrack {
   height: 8px;
   border-radius: var(--radius-full);
   background: var(--surface-sunken);
-  margin: 16px 0 14px;
+  margin: 16px 0 10px;
   overflow: hidden;
 }
 
 .progressFill {
   height: 100%;
   border-radius: var(--radius-full);
-  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  background: linear-gradient(90deg, var(--medal-gold), var(--accent-strong));
   transition: width 0.4s ease;
+}
+
+.countdownRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--ink-secondary);
+  margin-bottom: 14px;
+}
+
+.countdownRow b {
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-strong);
+}
+
+.progressText {
+  color: var(--ink-muted);
+  font-size: 12.5px;
 }
 
 .stats {
@@ -84,6 +138,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .statLabel {
@@ -121,6 +176,27 @@
   color: var(--accent-strong);
 }
 
+.viewAsSelect {
+  height: 32px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 0 8px;
+  font-size: 13px;
+  color: var(--ink);
+  max-width: 220px;
+}
+
+.viewAsSelect:hover {
+  border-color: var(--border-strong);
+}
+
+.viewAsLine {
+  font-size: 12.5px;
+  color: var(--ink-secondary);
+  max-width: 240px;
+}
+
 .assumption {
   font-size: 12px;
   color: var(--ink-muted);
@@ -155,7 +231,13 @@
   .top {
     flex-direction: column;
   }
-  .countdown {
-    text-align: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    transition: none;
+  }
+  .progressFill {
+    transition: none;
   }
 }

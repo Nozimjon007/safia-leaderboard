@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link, useLocation, type Location } from 'react-router-dom';
-import { CATEGORY_KEYS, type SortKey, type Zone } from '../../data/types';
+import { CATEGORY_KEYS, type MetricKey, type SortKey, type Zone } from '../../data/types';
 import { categoryLabel, roleLabel, useI18n } from '../../i18n';
 import { trendDirection, zoneOf, type LeaderboardRow, type TeamStats } from '../../lib/scoring';
 import { formatPercent, formatScore } from '../../lib/format';
 import { useScoringConfig } from '../../state/ScoringConfigProvider';
 import { medalFor, zoneColorVar, zoneGlyph } from '../../lib/zoneStyle';
+import type { CraftPreview } from '../../lib/craftPaths';
 import { Avatar } from '../common/Avatar';
 import { MoveBadge } from '../common/MoveBadge';
 import { ZoneBadge } from '../common/ZoneBadge';
@@ -23,11 +24,16 @@ interface LeaderboardTableProps {
   onChange: (patch: Partial<Record<keyof LeaderboardFilters, string>>) => void;
   compareIds: string[];
   onToggleCompare: (id: string) => void;
+  /** The member "Find my position" just jumped to — briefly highlighted, not a persistent selection state. */
+  highlightedId?: string | null;
+  /** This season's Craft Path preview, keyed by member id — see LeaderboardPage. Only ever populated
+   * for the rows actually being rendered. */
+  craftPreviewByMember?: Record<string, CraftPreview>;
 }
 
 const COLUMN_COUNT = 4 + CATEGORY_KEYS.length + 2;
 
-export function LeaderboardTable({ rows, team, filters, onChange, compareIds, onToggleCompare }: LeaderboardTableProps) {
+export function LeaderboardTable({ rows, team, filters, onChange, compareIds, onToggleCompare, highlightedId, craftPreviewByMember }: LeaderboardTableProps) {
   const { t } = useI18n();
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set());
 
@@ -77,10 +83,13 @@ export function LeaderboardTable({ rows, team, filters, onChange, compareIds, on
               key={row.member.id}
               row={row}
               team={team}
+              metric={filters.metric}
               isOpen={expanded.has(row.member.id)}
               onToggle={() => toggle(row.member.id)}
               compareSelected={compareIds.includes(row.member.id)}
               onToggleCompare={() => onToggleCompare(row.member.id)}
+              highlighted={highlightedId === row.member.id}
+              craftPreview={craftPreviewByMember?.[row.member.id] ?? null}
             />
           ))}
         </tbody>
@@ -92,13 +101,16 @@ export function LeaderboardTable({ rows, team, filters, onChange, compareIds, on
 interface TableRowProps {
   row: LeaderboardRow;
   team: TeamStats;
+  metric: MetricKey;
   isOpen: boolean;
   onToggle: () => void;
   compareSelected: boolean;
   onToggleCompare: () => void;
+  highlighted: boolean;
+  craftPreview: CraftPreview | null;
 }
 
-function TableRow({ row, team, isOpen, onToggle, compareSelected, onToggleCompare }: TableRowProps) {
+function TableRow({ row, team, metric, isOpen, onToggle, compareSelected, onToggleCompare, highlighted, craftPreview }: TableRowProps) {
   const { t, locale } = useI18n();
   const { config } = useScoringConfig();
   const location: Location = useLocation();
@@ -116,21 +128,21 @@ function TableRow({ row, team, isOpen, onToggle, compareSelected, onToggleCompar
 
   return (
     <>
-      <tr className={styles.row} data-compare-selected={compareSelected || undefined}>
+      <tr id={`board-row-table-${row.member.id}`} className={styles.row} data-compare-selected={compareSelected || undefined} data-highlighted={highlighted || undefined}>
         <td>
           <CompareToggle selected={compareSelected} name={row.member.name} onToggle={onToggleCompare} />
         </td>
         <td>
-          {row.rank == null ? (
+          {row.overallRank == null ? (
             <span className={styles.rankNum} title={t('unranked_note')}>
               –
             </span>
           ) : (
-            <div className={styles.rankCell}>
-              <span className={`${styles.rankNum} tabular`} data-medal={medalFor(row.rank)}>
-                {row.rank}
+            <div className={styles.rankCell} title={t('season_rank_note')}>
+              <span className={`${styles.rankNum} tabular`} data-medal={medalFor(row.overallRank)}>
+                {row.overallRank}
               </span>
-              <MoveBadge move={row.move} />
+              <MoveBadge move={row.overallMove} />
             </div>
           )}
         </td>
@@ -173,6 +185,7 @@ function TableRow({ row, team, isOpen, onToggle, compareSelected, onToggleCompar
         {CATEGORY_KEYS.map((c) => {
           const v = row.current.categories[c];
           const cellZone = zoneOf(v, config);
+          const showMetricRank = metric === c && row.rank != null;
           return (
             <td key={c}>
               {v == null ? (
@@ -182,6 +195,11 @@ function TableRow({ row, team, isOpen, onToggle, compareSelected, onToggleCompar
               ) : (
                 <span className={styles.catValue} style={{ color: zoneColorVar(cellZone) }}>
                   <span aria-hidden="true">{zoneGlyph(cellZone)}</span> {formatPercent(v)}
+                  {showMetricRank && (
+                    <span className={styles.metricRankChip} title={t('category_rank_note', { category: categoryLabel(t, c) })}>
+                      #{row.rank}
+                    </span>
+                  )}
                 </span>
               )}
             </td>
@@ -206,7 +224,7 @@ function TableRow({ row, team, isOpen, onToggle, compareSelected, onToggleCompar
       {isOpen && (
         <tr className={styles.expandRow} id={`expand-${row.member.id}`}>
           <td colSpan={COLUMN_COUNT}>
-            <RowExpandPanel row={row} team={team} />
+            <RowExpandPanel row={row} team={team} craftPreview={craftPreview} />
           </td>
         </tr>
       )}

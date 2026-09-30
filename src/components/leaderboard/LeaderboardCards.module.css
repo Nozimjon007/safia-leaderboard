@@ -31,6 +31,29 @@
   box-shadow: 0 0 0 1px var(--accent);
 }
 
+/* "Find my position" — a one-shot fade, never a looping highlight (LeaderboardPage clears
+   data-highlighted itself after 2.2s). */
+.card[data-highlighted] {
+  border-color: var(--medal-gold);
+  box-shadow: 0 0 0 2px var(--medal-gold);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card[data-highlighted] {
+    animation: card-highlight-fade 2.2s ease-out;
+  }
+}
+
+@keyframes card-highlight-fade {
+  0%,
+  55% {
+    background: var(--medal-gold-bg);
+  }
+  100% {
+    background: var(--surface);
+  }
+}
+
 .compareBtn {
   position: absolute;
   top: 10px;
@@ -137,10 +160,40 @@
   margin-left: auto;
 }
 
+.details > summary {
+  cursor: pointer;
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 12.5px;
+  list-style: none;
+}
+
+.details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.details > summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 5px;
+  transition: transform 0.15s ease;
+}
+
+.details[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .details > summary::before {
+    transition: none;
+  }
+}
+
 .mini {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  margin-top: 10px;
 }
 
 .mini li {
@@ -174,6 +227,17 @@
 .highlight b {
   color: var(--ink);
   font-weight: 600;
+}
+
+.craftPreview {
+  font-size: 12px;
+  color: var(--ink-secondary);
+  margin-top: -2px;
+}
+
+.craftPreview span[aria-hidden] {
+  color: var(--medal-gold);
+  letter-spacing: 1px;
 }
 
 .badges {

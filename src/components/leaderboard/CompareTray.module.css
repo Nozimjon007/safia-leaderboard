@@ -22,6 +22,12 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .tray {
+    animation: none;
+  }
+}
+
 .inner {
   pointer-events: auto;
   background: var(--surface-raised);

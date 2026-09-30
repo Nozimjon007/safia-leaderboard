@@ -176,6 +176,16 @@ export interface LeaderboardRow {
   previousRank: number | null;
   /** previousRank - rank: positive = moved up (improved). Null when no comparable previous period (R5). */
   move: number | null;
+  /**
+   * Rank by the *overall* score specifically, independent of whatever `metric` this result was built
+   * with — the one stable "season rank" identity a member keeps no matter which column the explorer is
+   * currently sorted or displayed by. Equal to `rank` whenever `metric` is already 'overall'. Anything
+   * presenting "the season's winners" (top five, podium, rewards) must use this, never `rank`, so
+   * switching the table's display metric can never silently rewrite who's in first place.
+   */
+  overallRank: number | null;
+  /** previousOverallRank - overallRank, same convention as `move`, but for `overallRank`. */
+  overallMove: number | null;
   /** Up to 8 weekly overall scores ending at the period's last week, for the trend sparkline. */
   trend: ReadonlyArray<number | null>;
 }
@@ -240,10 +250,22 @@ export function buildLeaderboard(params: BuildLeaderboardParams): LeaderboardRes
     ? competitionRank(base.map((r) => ({ id: r.member.id, value: r.previous ? metricValue(r.previous, metric) : null })))
     : new Map<string, number>();
 
+  // Always computed with 'overall', regardless of `metric` above — see LeaderboardRow.overallRank.
+  const currentOverallRanks =
+    metric === 'overall' ? currentRanks : competitionRank(base.map((r) => ({ id: r.member.id, value: r.current.overall })));
+  const previousOverallRanks = !prevIdx
+    ? new Map<string, number>()
+    : metric === 'overall'
+      ? previousRanks
+      : competitionRank(base.map((r) => ({ id: r.member.id, value: r.previous?.overall ?? null })));
+
   const rows: LeaderboardRow[] = base.map(({ member, current, previous }) => {
     const rank = currentRanks.get(member.id) ?? null;
     const previousRank = previousRanks.get(member.id) ?? null;
     const move = rank != null && previousRank != null ? previousRank - rank : null;
+    const overallRank = currentOverallRanks.get(member.id) ?? null;
+    const previousOverallRank = previousOverallRanks.get(member.id) ?? null;
+    const overallMove = overallRank != null && previousOverallRank != null ? previousOverallRank - overallRank : null;
     return {
       member,
       current,
@@ -251,6 +273,8 @@ export function buildLeaderboard(params: BuildLeaderboardParams): LeaderboardRes
       rank,
       previousRank,
       move,
+      overallRank,
+      overallMove,
       trend: trendWeeks(scores[member.id], weekIndexes, weekCount, config, trendLookbackWeeks),
     };
   });

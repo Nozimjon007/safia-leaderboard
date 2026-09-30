@@ -39,6 +39,7 @@ import { BadgesPanel } from '../components/member/BadgesPanel';
 import { SeasonHistoryPanel } from '../components/member/SeasonHistoryPanel';
 import { RewardBadge } from '../components/member/RewardBadge';
 import { CareerCard } from '../components/member/CareerCard';
+import { CraftPathPanel } from '../components/member/CraftPathPanel';
 import { PathToPodiumPanel } from '../components/member/PathToPodiumPanel';
 import { ScoreReceiptPanel } from '../components/member/ScoreReceiptPanel';
 import { TimeMachineBanner } from '../components/leaderboard/TimeMachineBanner';
@@ -339,6 +340,15 @@ function MemberProfileContent({
           rewardCount={progress.myRewards.length}
         />
       )}
+
+      <CraftPathPanel
+        member={row.member}
+        dataset={dataset}
+        config={config}
+        currentSeason={currentSeason}
+        seasons={seasons}
+        periodWeekIndexes={periodIndexes}
+      />
 
       {row.current.missingCategories.length > 0 && (
         <p className={styles.warn} role="note">

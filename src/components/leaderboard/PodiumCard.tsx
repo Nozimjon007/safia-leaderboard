@@ -55,14 +55,15 @@ export function PodiumCard({ row, place, metric, metricLabel, emblem, compareSel
       <Link
         to={profileHref}
         className={styles.cardLink}
-        aria-label={`${t('open_profile')}: ${row.member.name}, ${t('rank_label')} ${row.rank}, ${formatScore(value, locale)}/100 ${metricLabel}`}
+        aria-label={`${t('open_profile')}: ${row.member.name}, ${t('rank_label')} ${row.overallRank}, ${formatScore(value, locale)}/100 ${metricLabel}`}
       >
         <span className={styles.medalTag}>{t(MEDAL_KEYS[place - 1])}</span>
 
-        {/* Zone 1: rank + score, deliberately upper-left, never centered or overlapped. */}
+        {/* Zone 1: rank + score, deliberately upper-left, never centered or overlapped. Always the
+            member's overall season rank, regardless of which metric this card's score/value shows. */}
         <div className={styles.rankScoreZone}>
           <span className={styles.rankNum}>
-            <span className="visually-hidden">{t('rank_label')} </span>#{row.rank}
+            <span className="visually-hidden">{t('rank_label')} </span>#{row.overallRank}
           </span>
           <div className={styles.scoreBlock}>
             <b className="tabular">{formatScore(value, locale)}</b>
@@ -123,7 +124,7 @@ export function PodiumCard({ row, place, metric, metricLabel, emblem, compareSel
 
         {/* Zone 6: rank movement + what it's compared against. */}
         <div className={styles.moveZone}>
-          <MoveBadge move={row.move} />
+          <MoveBadge move={row.overallMove} />
           <span className={styles.moveNote}>{t('podium_vs_previous')}</span>
         </div>
 

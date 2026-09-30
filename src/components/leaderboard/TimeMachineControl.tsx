@@ -54,9 +54,12 @@ export function TimeMachineControl({ tm, members }: TimeMachineControlProps) {
 
   if (!tm.active) {
     return (
-      <button type="button" className="btn" onClick={() => tm.setActive(true)}>
-        <span aria-hidden="true">🕐</span> {t('time_machine_open')}
-      </button>
+      <div className={styles.closed}>
+        <button type="button" className="btn" onClick={() => tm.setActive(true)}>
+          <span aria-hidden="true">🕐</span> {t('time_machine_open')}
+        </button>
+        <p className={styles.closedHint}>{t('time_machine_subtitle')}</p>
+      </div>
     );
   }
 

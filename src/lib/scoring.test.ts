@@ -249,6 +249,39 @@ describe('buildLeaderboard', () => {
     expect(result.team.previousAverage).toBeNull();
   });
 
+  it('overallRank stays put even when a category metric genuinely flips the display order', () => {
+    // x: strong overall (90 avg) but weak attendance (60). y: weaker overall (70 avg) but strong attendance (95).
+    const flipMembers: Member[] = [M('x', 'Xander', 'Area 1'), M('y', 'Yelena', 'Area 1')];
+    const flipScores: Record<string, MemberScores> = {
+      x: makeScores({ load: [95], control: [95], kaizen: [95], concern: [95], attendance: [60] }),
+      y: makeScores({ load: [65], control: [65], kaizen: [65], concern: [65], attendance: [95] }),
+    };
+    const byOverall = buildLeaderboard({ members: flipMembers, scores: flipScores, weekIndexes: [0], weekCount: 1, metric: 'overall', config: CFG });
+    const byAttendance = buildLeaderboard({ members: flipMembers, scores: flipScores, weekIndexes: [0], weekCount: 1, metric: 'attendance', config: CFG });
+
+    // Sanity: attendance really does flip who's #1 in `rank` (the display-metric rank).
+    expect(byOverall.rows.find((r) => r.member.id === 'x')!.rank).toBe(1);
+    expect(byAttendance.rows.find((r) => r.member.id === 'y')!.rank).toBe(1);
+
+    // But overallRank agrees with the overall-built result in both cases — never rewritten by the metric choice.
+    for (const id of ['x', 'y']) {
+      const expected = byOverall.rows.find((r) => r.member.id === id)!.overallRank;
+      expect(byAttendance.rows.find((r) => r.member.id === id)!.overallRank).toBe(expected);
+    }
+    expect(byOverall.rows.find((r) => r.member.id === 'x')!.overallRank).toBe(1);
+  });
+
+  it('overallRank never changes when built with a different display metric (the "sorting by Attendance" bug)', () => {
+    const byOverall = buildLeaderboard({ members, scores, weekIndexes: [0, 1], weekCount: 2, metric: 'overall', config: CFG });
+    const byAttendance = buildLeaderboard({ members, scores, weekIndexes: [0, 1], weekCount: 2, metric: 'attendance', config: CFG });
+    for (const id of ['a', 'b', 'c']) {
+      const ra = byOverall.rows.find((r) => r.member.id === id)!;
+      const rb = byAttendance.rows.find((r) => r.member.id === id)!;
+      expect(rb.overallRank).toBe(ra.overallRank);
+      expect(rb.overallRank).toBe(ra.rank); // and matches the plain rank when metric already is 'overall'
+    }
+  });
+
   it('computes rank movement once a full previous period exists', () => {
     const fourWeekScores: Record<string, MemberScores> = {
       a: makeScores({

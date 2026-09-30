@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   currentSeasonIndex,
+  findContainingSeason,
   isSeasonApproved,
   isSeasonComplete,
   listSeasons,
@@ -14,6 +15,7 @@ import {
   seasonStartCountdown,
   seasonStartMs,
   seasonStatus,
+  seasonWeekRange,
   SEASON_APPROVAL_GRACE_MS,
 } from './seasons';
 import { weekIndexesInRange, weekStartISO } from './dates';
@@ -231,5 +233,36 @@ describe('seasonCountdown', () => {
     expect(c.days).toBe(2);
     expect(c.hours).toBe(3);
     expect(c.isComplete).toBe(false);
+  });
+});
+
+describe('findContainingSeason', () => {
+  const dataset = { firstWeekStart: '2025-12-29', weekCount: 60 }; // covers all of 2026 with margin
+  const seasons = [seasonOf(2026, 2), seasonOf(2026, 3)]; // Apr–Jun, Jul–Sep 2026
+
+  it('matches a range that exactly equals a season’s own week-snapped bounds', () => {
+    const r = seasonWeekRange(dataset, seasonOf(2026, 3))!;
+    expect(findContainingSeason(dataset, seasons, r.from, r.to)?.id).toBe('2026-q3');
+  });
+
+  it('matches a sub-period strictly inside one season (a Time Machine week, a date preset)', () => {
+    expect(findContainingSeason(dataset, seasons, '2026-08-03', '2026-08-09')?.id).toBe('2026-q3');
+  });
+
+  it('is null for a range spanning two seasons', () => {
+    expect(findContainingSeason(dataset, seasons, '2026-06-15', '2026-07-15')).toBeNull();
+  });
+
+  it('is null for a range outside every known season', () => {
+    expect(findContainingSeason(dataset, seasons, '2025-01-01', '2025-01-07')).toBeNull();
+  });
+
+  it('matches a season against its OWN week-snapped default period, even when that period overshoots the season’s calendar end (R6) — the exact regression this function exists to avoid', () => {
+    const q3 = seasonOf(2026, 3);
+    const r = seasonWeekRange(dataset, q3);
+    expect(r).not.toBeNull();
+    // Sanity: prove this fixture actually exercises the overshoot the test claims to guard.
+    expect(r!.to > q3.endISO).toBe(true);
+    expect(findContainingSeason(dataset, seasons, r!.from, r!.to)?.id).toBe('2026-q3');
   });
 });

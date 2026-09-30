@@ -8,7 +8,8 @@ import { buildLeaderboard, filterRowsByQuery, sortRows, zoneOf, type Leaderboard
 import { computeAllAchievements, ACHIEVEMENT_GLYPHS, earnedAchievementTypes, countOf } from '../lib/achievements';
 import { computeSeasonRewards } from '../lib/rewards';
 import { seasonWeeks, snapshotAt, computeWeekChanges, deriveCaption } from '../lib/timeMachine';
-import { parseSeasonId, seasonStatus, type Season, type SeasonStatus } from '../lib/seasons';
+import { parseSeasonId, seasonOf, seasonStatus, type Quarter, type Season, type SeasonStatus } from '../lib/seasons';
+import { computeSeasonDistinctions, type SeasonDistinction } from '../lib/craftPaths';
 import { formatDateRange, weekEndISO, weekIndexesInRange, weekStartISO, formatShortDate } from '../lib/dates';
 import { formatScore, formatSigned } from '../lib/format';
 import { zoneColorVar } from '../lib/zoneStyle';
@@ -137,6 +138,10 @@ interface SeasonDetailContentProps {
   locationSearch: string;
 }
 
+function previousSeasonOf(season: Season): Season {
+  return season.quarter === 1 ? seasonOf(season.year - 1, 4) : seasonOf(season.year, (season.quarter - 1) as Quarter);
+}
+
 function SeasonDetailContent({ dataset, config, season, statusValue, now, tab, setTab, backHref }: SeasonDetailContentProps) {
   const { t, locale } = useI18n();
 
@@ -160,6 +165,13 @@ function SeasonDetailContent({ dataset, config, season, statusValue, now, tab, s
   const achievementsByMember = useMemo(() => computeAllAchievements(dataset, config, [season], now), [dataset, config, season, now]);
   const rewards = useMemo(
     () => (statusValue === 'approved' ? computeSeasonRewards(dataset, config, season) : []),
+    [dataset, config, season, statusValue],
+  );
+  // Shown even before approval (clearly labeled provisional — see AwardsTab), unlike `rewards`: Craft
+  // Path distinctions are proposed recognition, not an official prize, so there's no reason to hide
+  // them during a live season the way an official-sounding reward is held back until final.
+  const distinctions = useMemo(
+    () => (statusValue === 'upcoming' ? [] : computeSeasonDistinctions(dataset, config, season, previousSeasonOf(season))),
     [dataset, config, season, statusValue],
   );
 
@@ -247,6 +259,7 @@ function SeasonDetailContent({ dataset, config, season, statusValue, now, tab, s
             statusValue={statusValue}
             rewards={rewards}
             achievementsByMember={achievementsByMember}
+            distinctions={distinctions}
             seasonSearch={seasonSearch}
           />
         )}
@@ -375,6 +388,7 @@ function StandingsTab({
     toISO: '',
     shift: 'all',
     area: 'all',
+    role: 'all',
     metric: 'overall',
     query: '',
     sortKey: 'rank',
@@ -408,7 +422,15 @@ function StandingsTab({
       </label>
 
       <section className={styles.panel}>
-        <BoardToolbar filters={local} onChange={updateLocal} shownCount={shown.length} totalCount={result.rows.length} heading={t('season_detail_standings_title')} />
+        <BoardToolbar
+          filters={local}
+          onChange={updateLocal}
+          shownCount={shown.length}
+          totalCount={result.rows.length}
+          heading={t('season_detail_standings_title')}
+          canFindMe={false}
+          onFindMe={() => {}}
+        />
         {shown.length === 0 ? (
           <StateMessage title={t('state_empty_title')} body={t('state_empty_body')} dashed={false} />
         ) : local.view === 'table' ? (
@@ -545,11 +567,13 @@ function AwardsTab({
   statusValue,
   rewards,
   achievementsByMember,
+  distinctions,
   seasonSearch,
 }: TabCommonProps & {
   season: Season;
   rewards: ReturnType<typeof computeSeasonRewards>;
   achievementsByMember: ReturnType<typeof computeAllAchievements>;
+  distinctions: SeasonDistinction[];
   seasonSearch: string;
 }) {
   const { t } = useI18n();
@@ -624,6 +648,40 @@ function AwardsTab({
               </ul>
             )}
           </>
+        )}
+      </section>
+
+      <section className={styles.panel}>
+        <h2>{t('craft_distinctions_heading')}</h2>
+        <p className={styles.sub}>{t('craft_distinctions_subtitle')}</p>
+        {statusValue !== 'approved' && distinctions.length > 0 && <p className={styles.sub}>{t('craft_distinctions_provisional_note')}</p>}
+        {distinctions.length === 0 ? (
+          <StateMessage title={t('craft_distinctions_heading')} body={t('craft_distinctions_none')} dashed={false} />
+        ) : (
+          <div className={styles.winnersGrid}>
+            {distinctions.map((d) => {
+              const member = dataset.members.find((m) => m.id === d.memberId);
+              if (!member) return null;
+              return (
+                <Link
+                  key={`${d.id}-${d.memberId}`}
+                  className={styles.winnerCard}
+                  to={{ pathname: `/member/${member.id}`, search: seasonSearch }}
+                  title={t(`craft_distinction_${d.id}_desc` as TranslationKey)}
+                >
+                  <span className={styles.winnerGlyph} aria-hidden="true">
+                    ★
+                  </span>
+                  <Avatar id={member.id} name={member.name} photoUrl={member.avatarPhoto} size={34} />
+                  <div>
+                    <div className={styles.winnerReward}>{t(`craft_distinction_${d.id}_title` as TranslationKey)}</div>
+                    <div className={styles.winnerName}>{member.name}</div>
+                    <div className={styles.winnerDesc}>{t(`craft_distinction_${d.id}_desc` as TranslationKey)}</div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         )}
       </section>
     </div>

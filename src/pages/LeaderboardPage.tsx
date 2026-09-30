@@ -1,33 +1,42 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import type { EarnedAchievement, Member } from '../data/types';
-import { categoryLabel, useI18n } from '../i18n';
+import { categoryLabel, roleLabel, useI18n } from '../i18n';
 import { useDatasetContext } from '../state/DatasetProvider';
 import { useLeaderboardFilters } from '../hooks/useLeaderboardFilters';
-import { useAreaOptions, useLeaderboardResult } from '../hooks/useLeaderboardResult';
+import { useAreaOptions, useLeaderboardResult, useOverallLeaderboardResult, useRoleOptions } from '../hooks/useLeaderboardResult';
+import { usePageParam } from '../hooks/usePageParam';
 import { useSeasons } from '../hooks/useSeasons';
 import { useTimeMachine } from '../hooks/useTimeMachine';
 import { useViewAsMemberId } from '../hooks/useViewAsMember';
 import { useScoringConfig } from '../state/ScoringConfigProvider';
 import { filterRowsByQuery, sortRows } from '../lib/scoring';
 import { computeAllAchievements } from '../lib/achievements';
+import { computeCraftPathProgress, craftPathForRole, type CraftPreview } from '../lib/craftPaths';
 import { buildLeaderboardCsv, downloadCsv } from '../lib/csv';
 import { formatDateRange, weekEndISO, weekStartISO } from '../lib/dates';
+import { findContainingSeason } from '../lib/seasons';
 import { DemoBanner } from '../components/common/DemoBanner';
 import { StateMessage } from '../components/common/StateMessage';
 import { SeasonPanel } from '../components/leaderboard/SeasonPanel';
 import { TimeMachineControl } from '../components/leaderboard/TimeMachineControl';
-import { Podium } from '../components/leaderboard/Podium';
+import { TopFive } from '../components/leaderboard/TopFive';
 import { SummaryStats } from '../components/leaderboard/SummaryStats';
 import { FiltersBar } from '../components/leaderboard/FiltersBar';
 import { BoardToolbar } from '../components/leaderboard/BoardToolbar';
 import { LeaderboardTable } from '../components/leaderboard/LeaderboardTable';
 import { LeaderboardCards } from '../components/leaderboard/LeaderboardCards';
+import { Pagination } from '../components/leaderboard/Pagination';
 import { UnrankedNote } from '../components/leaderboard/UnrankedNote';
 import { RankHistorySection } from '../components/leaderboard/RankHistorySection';
 import { LeaderboardSkeleton } from '../components/leaderboard/LeaderboardSkeleton';
 import { CompareTray } from '../components/leaderboard/CompareTray';
 import styles from './LeaderboardPage.module.css';
+
+/** Rows/cards per page — matches "at least 100 demo employees" nicely (a bit over 4 pages) and, more
+ * importantly, is what keeps the explorer fast once the roster grows toward 500+: only this many
+ * rows/cards are ever mounted at once, never the full filtered set (see pageRows below). */
+const PAGE_SIZE = 24;
 
 export function LeaderboardPage() {
   const { t, locale } = useI18n();
@@ -36,12 +45,21 @@ export function LeaderboardPage() {
   const { filters, updateFilters, isPeriodExplicit } = useLeaderboardFilters(dataset);
   const { config } = useScoringConfig();
   const result = useLeaderboardResult(dataset, filters, config);
+  const overallResult = useOverallLeaderboardResult(dataset, filters, config);
   const areaOptions = useAreaOptions(dataset);
+  const roleOptions = useRoleOptions(dataset);
   const seasonsInfo = useSeasons(dataset);
   const tm = useTimeMachine(dataset, config, seasonsInfo?.currentSeason ?? null);
-  const [viewAsMemberId] = useViewAsMemberId(dataset?.members[0]?.id ?? null);
+  const [viewAsMemberId, setViewAsMemberId] = useViewAsMemberId(null);
+  // Computed here (ahead of the loading/error guards below) purely so usePageParam — a hook, so it
+  // must run unconditionally every render — has a real totalPages to clamp against as soon as one
+  // exists, rather than always resetting to page 1 while the dataset is still loading.
+  const shown = result ? sortRows(filterRowsByQuery(result.rows, filters.query), filters.sortKey, filters.sortDir) : [];
+  const totalPages = Math.max(1, Math.ceil(shown.length / PAGE_SIZE));
+  const [page, setPage] = usePageParam(totalPages);
   const [toast, setToast] = useState<string | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const achievementsByMember = useMemo<Record<string, EarnedAchievement[]>>(
     () => (dataset && seasonsInfo ? computeAllAchievements(dataset, config, seasonsInfo.seasons) : {}),
     [dataset, config, seasonsInfo],
@@ -69,6 +87,35 @@ export function LeaderboardPage() {
     return () => clearTimeout(timer);
   }, [toast]);
 
+  // "Find my position": jump to whichever page the viewed-as member's row falls on, then scroll to
+  // and briefly highlight it. Runs after the page number itself has actually committed (the `page`
+  // dependency), so the row exists in the DOM by the time this looks for it. The table and card
+  // renderings of the same row can both be mounted at once (desktop table + mobile card fallback),
+  // so this picks whichever of the two is actually visible rather than assuming the table one.
+  useEffect(() => {
+    if (!highlightedId) return;
+    const candidates = [
+      document.getElementById(`board-row-table-${highlightedId}`),
+      document.getElementById(`board-row-cards-${highlightedId}`),
+    ];
+    const el = candidates.find((c) => c && c.offsetParent !== null) ?? candidates.find((c): c is HTMLElement => c != null);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const timer = setTimeout(() => setHighlightedId(null), 2200);
+    return () => clearTimeout(timer);
+  }, [highlightedId, page]);
+
+  function findMe() {
+    if (!viewAsMemberId) return;
+    const idx = shown.findIndex((r) => r.member.id === viewAsMemberId);
+    if (idx === -1) {
+      setToast(t('find_me_not_shown'));
+      return;
+    }
+    const targetPage = Math.floor(idx / PAGE_SIZE) + 1;
+    if (targetPage !== page) setPage(targetPage);
+    setHighlightedId(viewAsMemberId);
+  }
+
   if (status === 'error') {
     return (
       <>
@@ -93,7 +140,7 @@ export function LeaderboardPage() {
     );
   }
 
-  if (status === 'loading' || !dataset || !result) {
+  if (status === 'loading' || !dataset || !result || !overallResult) {
     return (
       <>
         <DemoBanner />
@@ -103,12 +150,34 @@ export function LeaderboardPage() {
   }
 
   const metricLabel = filters.metric === 'overall' ? t('metric_overall') : categoryLabel(t, filters.metric);
-  const shown = sortRows(filterRowsByQuery(result.rows, filters.query), filters.sortKey, filters.sortDir);
-  const rankedTop3 = result.rows.filter((r) => r.rank != null).slice(0, 3);
+  const pageRows = shown.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  // A short "role-mastery preview" for the currently-visible page only (never the full roster) —
+  // this season's Craft Path progress, same convention as the profile page's own panel (always the
+  // real current season, independent of whatever period/season the explorer itself is filtered to).
+  const craftPreviewByMember: Record<string, CraftPreview> = {};
+  if (seasonsInfo?.currentSeason) {
+    for (const r of pageRows) {
+      const path = craftPathForRole(r.member.role);
+      if (!path) continue;
+      const progress = computeCraftPathProgress(dataset, r.member, seasonsInfo.currentSeason);
+      if (progress) craftPreviewByMember[r.member.id] = { role: path.role, stars: progress.starsEarned, possible: progress.starsPossible };
+    }
+  }
+  const matchedSeason = seasonsInfo ? findContainingSeason(dataset, seasonsInfo.seasons, filters.fromISO, filters.toISO) : null;
+  const rankedTop5 = overallResult.rows.filter((r) => r.overallRank != null).slice(0, 5);
   const periodText = formatDateRange(filters.fromISO, filters.toISO, locale);
   const weeksLabel = result.weekIndexes.length === 1 ? t('period_week_1') : t('period_weeks_n', { n: result.weekIndexes.length });
   const shiftLabel = filters.shift === 'all' ? t('shift_all') : t('shift_n', { n: filters.shift.replace('S', '') });
   const areaLabelText = filters.area === 'all' ? t('area_all') : filters.area;
+  const roleLabelText = filters.role === 'all' ? t('role_all') : roleLabel(t, filters.role);
+  const narrowedLabel =
+    [
+      filters.area !== 'all' ? areaLabelText : null,
+      filters.shift !== 'all' ? shiftLabel : null,
+      filters.role !== 'all' ? roleLabelText : null,
+    ]
+      .filter(Boolean)
+      .join(' · ') || null;
   const prevText = result.previousWeekIndexes
     ? formatDateRange(
         weekStartISO(dataset.firstWeekStart, result.previousWeekIndexes[0]),
@@ -136,7 +205,7 @@ export function LeaderboardPage() {
   }
 
   function clearFilters() {
-    updateFilters({ query: '', shift: 'all', area: 'all' });
+    updateFilters({ query: '', shift: 'all', area: 'all', role: 'all' });
   }
 
   const selectedMembers: Member[] = compareIds
@@ -147,10 +216,28 @@ export function LeaderboardPage() {
     <>
       <DemoBanner />
       {seasonsInfo && (
-        <SeasonPanel dataset={dataset} config={config} season={seasonsInfo.currentSeason} viewAsMemberId={viewAsMemberId} />
+        <SeasonPanel
+          dataset={dataset}
+          filters={filters}
+          matchedSeason={matchedSeason}
+          overallResult={overallResult}
+          viewAsMemberId={viewAsMemberId}
+          onSetViewAs={setViewAsMemberId}
+        />
       )}
+
+      <TopFive
+        rows={rankedTop5}
+        dataset={dataset}
+        config={config}
+        matchedSeason={matchedSeason}
+        achievementsByMember={achievementsByMember}
+        filterLabel={narrowedLabel}
+        compareIds={compareIds}
+        onToggleCompare={toggleCompare}
+      />
+
       <div className={styles.head}>
-        <h1>{t('app_title')}</h1>
         <p className={styles.ctx}>
           {t('ctx_line', {
             period: periodText,
@@ -170,7 +257,9 @@ export function LeaderboardPage() {
         filters={filters}
         dataset={dataset}
         areaOptions={areaOptions}
+        roleOptions={roleOptions}
         onChange={updateFilters}
+        onReset={clearFilters}
         onExport={handleExport}
         exportDisabled={shown.length === 0}
         periodLockedByTimeMachine={tm?.active ?? false}
@@ -180,19 +269,6 @@ export function LeaderboardPage() {
         <StateMessage title={t('state_empty_title')} body={t('state_empty_body')} />
       ) : (
         <>
-          <Podium
-            rows={rankedTop3}
-            metric={filters.metric}
-            metricLabel={metricLabel}
-            achievementsByMember={achievementsByMember}
-            dataset={dataset}
-            config={config}
-            seasons={seasonsInfo?.seasons ?? null}
-            periodFromISO={filters.fromISO}
-            periodToISO={filters.toISO}
-            compareIds={compareIds}
-            onToggleCompare={toggleCompare}
-          />
           <SummaryStats
             team={result.team}
             topImprovement={result.topImprovement}
@@ -207,6 +283,8 @@ export function LeaderboardPage() {
               shownCount={shown.length}
               totalCount={result.rows.length}
               heading={`${t('nav_leaderboard')}: ${metricLabel}`}
+              canFindMe={viewAsMemberId != null}
+              onFindMe={findMe}
             />
             {shown.length === 0 ? (
               <StateMessage
@@ -223,33 +301,40 @@ export function LeaderboardPage() {
               <>
                 <div className={styles.desktopOnly}>
                   <LeaderboardTable
-                    rows={shown}
+                    rows={pageRows}
                     team={result.team}
                     filters={filters}
                     onChange={updateFilters}
                     compareIds={compareIds}
                     onToggleCompare={toggleCompare}
+                    highlightedId={highlightedId}
+                    craftPreviewByMember={craftPreviewByMember}
                   />
                 </div>
                 <div className={styles.mobileOnly}>
                   <LeaderboardCards
-                    rows={shown}
+                    rows={pageRows}
                     team={result.team}
                     compareIds={compareIds}
                     onToggleCompare={toggleCompare}
                     achievementsByMember={achievementsByMember}
+                    highlightedId={highlightedId}
+                    craftPreviewByMember={craftPreviewByMember}
                   />
                 </div>
               </>
             ) : (
               <LeaderboardCards
-                rows={shown}
+                rows={pageRows}
                 team={result.team}
                 compareIds={compareIds}
                 onToggleCompare={toggleCompare}
                 achievementsByMember={achievementsByMember}
+                highlightedId={highlightedId}
+                craftPreviewByMember={craftPreviewByMember}
               />
             )}
+            <Pagination page={page} pageSize={PAGE_SIZE} totalItems={shown.length} onChange={setPage} />
             <UnrankedNote rows={shown} />
           </section>
 

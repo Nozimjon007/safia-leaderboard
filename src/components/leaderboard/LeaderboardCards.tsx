@@ -1,12 +1,13 @@
 import { Link, useLocation } from 'react-router-dom';
 import { CATEGORY_KEYS, type EarnedAchievement, type Zone } from '../../data/types';
-import { categoryLabel, roleLabel, useI18n } from '../../i18n';
+import { categoryLabel, craftPathLabel, roleLabel, useI18n } from '../../i18n';
 import type { TranslationKey } from '../../i18n/locales/en';
 import { computeHighlight, trendDirection, zoneOf, type LeaderboardRow, type TeamStats } from '../../lib/scoring';
 import { formatPercent, formatScore, formatSigned } from '../../lib/format';
 import { ACHIEVEMENT_GLYPHS, countOf, earnedAchievementTypes } from '../../lib/achievements';
 import { useScoringConfig } from '../../state/ScoringConfigProvider';
 import { medalFor, zoneColorVar } from '../../lib/zoneStyle';
+import type { CraftPreview } from '../../lib/craftPaths';
 import { Avatar } from '../common/Avatar';
 import { MoveBadge } from '../common/MoveBadge';
 import { ZoneBadge } from '../common/ZoneBadge';
@@ -21,9 +22,13 @@ interface LeaderboardCardsProps {
   compareIds: string[];
   onToggleCompare: (id: string) => void;
   achievementsByMember?: Record<string, EarnedAchievement[]>;
+  /** The member "Find my position" just jumped to — briefly highlighted, not a persistent selection state. */
+  highlightedId?: string | null;
+  /** This season's Craft Path preview, keyed by member id — see LeaderboardPage. */
+  craftPreviewByMember?: Record<string, CraftPreview>;
 }
 
-export function LeaderboardCards({ rows, team, compareIds, onToggleCompare, achievementsByMember }: LeaderboardCardsProps) {
+export function LeaderboardCards({ rows, team, compareIds, onToggleCompare, achievementsByMember, highlightedId, craftPreviewByMember }: LeaderboardCardsProps) {
   return (
     <div className={styles.grid}>
       {rows.map((row) => (
@@ -34,6 +39,8 @@ export function LeaderboardCards({ rows, team, compareIds, onToggleCompare, achi
           compareSelected={compareIds.includes(row.member.id)}
           onToggleCompare={() => onToggleCompare(row.member.id)}
           earned={achievementsByMember?.[row.member.id] ?? []}
+          highlighted={highlightedId === row.member.id}
+          craftPreview={craftPreviewByMember?.[row.member.id] ?? null}
         />
       ))}
     </div>
@@ -46,9 +53,11 @@ interface MemberCardProps {
   compareSelected: boolean;
   onToggleCompare: () => void;
   earned: EarnedAchievement[];
+  highlighted: boolean;
+  craftPreview: CraftPreview | null;
 }
 
-function MemberCard({ row, team, compareSelected, onToggleCompare, earned }: MemberCardProps) {
+function MemberCard({ row, team, compareSelected, onToggleCompare, earned, highlighted, craftPreview }: MemberCardProps) {
   const { t, locale } = useI18n();
   const { config } = useScoringConfig();
   const location = useLocation();
@@ -68,7 +77,13 @@ function MemberCard({ row, team, compareSelected, onToggleCompare, earned }: Mem
           : t('trend_down', { d: formatScore(Math.abs(delta), locale), n: row.trend.length });
 
   return (
-    <article className={styles.card} data-compare-selected={compareSelected || undefined} style={{ borderTopColor: zoneColorVar(zone) }}>
+    <article
+      id={`board-row-cards-${row.member.id}`}
+      className={styles.card}
+      data-compare-selected={compareSelected || undefined}
+      data-highlighted={highlighted || undefined}
+      style={{ borderTopColor: zoneColorVar(zone) }}
+    >
       <CompareToggle selected={compareSelected} name={row.member.name} onToggle={onToggleCompare} className={styles.compareBtn} />
       <div className={styles.head}>
         <Avatar id={row.member.id} name={row.member.name} photoUrl={row.member.avatarPhoto} />
@@ -80,18 +95,18 @@ function MemberCard({ row, team, compareSelected, onToggleCompare, earned }: Mem
             {roleLabel(t, row.member.role)} · {row.member.area} · {row.member.shift}
           </small>
         </div>
-        <div className={styles.rank}>
-          {row.rank == null ? (
+        <div className={styles.rank} title={t('season_rank_note')}>
+          {row.overallRank == null ? (
             <span className={styles.rankNum} title={t('unranked_note')}>
               –
             </span>
           ) : (
-            <span className={`${styles.rankNum} tabular`} data-medal={medalFor(row.rank)}>
+            <span className={`${styles.rankNum} tabular`} data-medal={medalFor(row.overallRank)}>
               <span className="visually-hidden">{t('rank_label')} </span>
-              {row.rank}
+              {row.overallRank}
             </span>
           )}
-          <MoveBadge move={row.move} />
+          <MoveBadge move={row.overallMove} />
         </div>
       </div>
 
@@ -105,22 +120,6 @@ function MemberCard({ row, team, compareSelected, onToggleCompare, earned }: Mem
           <Sparkline values={row.trend} zone={trendZone} ariaLabel={trendLabel} emptyLabel={t('trend_na')} />
         </span>
       </div>
-
-      <ul className={styles.mini}>
-        {CATEGORY_KEYS.map((c) => {
-          const v = row.current.categories[c];
-          const zz = zoneOf(v, config);
-          return (
-            <li key={c}>
-              <span className={styles.miniLabel}>{categoryLabel(t, c)}</span>
-              <Meter value={v} zone={zz} markerValue={team.categoryAverages[c]} />
-              <span className={styles.miniValue} style={{ color: zoneColorVar(zz) }}>
-                {v == null ? '—' : formatPercent(v)}
-              </span>
-            </li>
-          );
-        })}
-      </ul>
 
       <p className={styles.highlight}>
         {highlight.strongest ? (
@@ -143,6 +142,36 @@ function MemberCard({ row, team, compareSelected, onToggleCompare, earned }: Mem
           </>
         )}
       </p>
+
+      {craftPreview && (
+        <p className={styles.craftPreview}>
+          <span aria-hidden="true">
+            {'★'.repeat(craftPreview.stars)}
+            {'☆'.repeat(craftPreview.possible - craftPreview.stars)}
+          </span>{' '}
+          {craftPathLabel(t, craftPreview.role)}
+          <span className="visually-hidden"> · {t('craft_stars_of', { earned: craftPreview.stars, possible: craftPreview.possible })}</span>
+        </p>
+      )}
+
+      <details className={styles.details}>
+        <summary>{t('card_show_categories')}</summary>
+        <ul className={styles.mini}>
+          {CATEGORY_KEYS.map((c) => {
+            const v = row.current.categories[c];
+            const zz = zoneOf(v, config);
+            return (
+              <li key={c}>
+                <span className={styles.miniLabel}>{categoryLabel(t, c)}</span>
+                <Meter value={v} zone={zz} markerValue={team.categoryAverages[c]} />
+                <span className={styles.miniValue} style={{ color: zoneColorVar(zz) }}>
+                  {v == null ? '—' : formatPercent(v)}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </details>
 
       {earnedTypes.length > 0 && (
         <ul className={styles.badges} aria-label={t('badges_title')}>

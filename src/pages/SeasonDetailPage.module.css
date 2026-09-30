@@ -367,6 +367,12 @@
   font-size: 13.5px;
 }
 
+.winnerDesc {
+  font-size: 11px;
+  color: var(--ink-muted);
+  margin-top: 1px;
+}
+
 .badgeList {
   display: flex;
   flex-direction: column;

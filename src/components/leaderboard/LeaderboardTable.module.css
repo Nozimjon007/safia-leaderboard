@@ -1,5 +1,11 @@
+/* Its own bounded scroll region (not the whole page) — the parent .board panel clips to a rounded
+   border with overflow:hidden, which would otherwise cut the sticky header loose from the viewport
+   the moment .board's own top edge scrolled past it. Scrolling inside a fixed-height box is also
+   what actually makes a sticky header meaningful on a 24-row page: enough rows show at once to be
+   worth pinning a header over. */
 .scroll {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: 70vh;
 }
 
 .table {
@@ -17,6 +23,10 @@
   background: var(--surface-sunken);
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
+  /* Sticks to the top of .scroll's own scrollport (see above) as the table scrolls internally. */
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 
 .table th button {
@@ -52,6 +62,29 @@
 
 .row[data-compare-selected] td {
   background: var(--accent-wash);
+}
+
+/* "Find my position" — a one-shot fade, never a looping highlight (see LeaderboardPage's
+   2.2s-then-clear timer, which is what actually removes data-highlighted). */
+.row[data-highlighted] td {
+  background: var(--medal-gold-bg);
+  box-shadow: inset 0 0 0 1px var(--medal-gold);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .row[data-highlighted] td {
+    animation: row-highlight-fade 2.2s ease-out;
+  }
+}
+
+@keyframes row-highlight-fade {
+  0%,
+  55% {
+    background: var(--medal-gold-bg);
+  }
+  100% {
+    background: transparent;
+  }
 }
 
 .hl {
@@ -173,6 +206,19 @@
   gap: 4px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+.metricRankChip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--accent-strong);
+  background: var(--accent-wash);
+  border-radius: var(--radius-full);
+  padding: 0 6px;
+  height: 16px;
+  cursor: help;
 }
 
 .naCell {

@@ -9,12 +9,17 @@ interface BoardToolbarProps {
   shownCount: number;
   totalCount: number;
   heading: string;
+  /** Whether a viewer has actually been selected (see the Season Results hero's "View progress as"
+   * picker) — "Find my position" has no "me" to find otherwise, so it's disabled rather than hidden,
+   * consistent with the rest of the app never showing a control that can't do anything. */
+  canFindMe: boolean;
+  onFindMe: () => void;
 }
 
 const METRICS: MetricKey[] = ['overall', ...CATEGORY_KEYS];
 const SORT_KEYS: SortKey[] = ['rank', 'name', 'overall', 'move', ...CATEGORY_KEYS];
 
-export function BoardToolbar({ filters, onChange, shownCount, totalCount, heading }: BoardToolbarProps) {
+export function BoardToolbar({ filters, onChange, shownCount, totalCount, heading, canFindMe, onFindMe }: BoardToolbarProps) {
   const { t } = useI18n();
 
   function sortLabel(key: SortKey): string {
@@ -41,6 +46,10 @@ export function BoardToolbar({ filters, onChange, shownCount, totalCount, headin
         </p>
       </div>
       <div className={styles.tools}>
+        <button type="button" className="btn" onClick={onFindMe} disabled={!canFindMe} title={!canFindMe ? t('view_as_picker_none') : undefined}>
+          <span aria-hidden="true">◎</span> {t('find_me')}
+        </button>
+
         <div className={styles.field}>
           <span className="fieldLabel" id="metric-label">
             {t('metric_label')}

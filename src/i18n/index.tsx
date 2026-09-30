@@ -92,6 +92,22 @@ export function roleLabel(t: TFunction, role: string): string {
   return key ? t(key) : role;
 }
 
+// See lib/craftPaths.ts's CRAFT_PATHS — one path per role, named separately from the plain role
+// label (e.g. "Baker's Path" vs. "Baker") since it's shown right alongside the role itself.
+const CRAFT_PATH_NAME_KEYS: Record<string, TranslationKey> = {
+  Baker: 'craft_path_name_baker',
+  'Shift Lead': 'craft_path_name_shift_lead',
+  Decorator: 'craft_path_name_decorator',
+  Packer: 'craft_path_name_packer',
+  Cashier: 'craft_path_name_cashier',
+  Delivery: 'craft_path_name_delivery',
+};
+
+export function craftPathLabel(t: TFunction, role: string): string {
+  const key = CRAFT_PATH_NAME_KEYS[role];
+  return key ? t(key) : t('craft_path_heading');
+}
+
 /** "Q3 2026" / "3 кв. 2026" / "2026 йил, 3-чорак" — compact quarter label, locale-aware. */
 export function seasonQuarterLabel(t: TFunction, season: { year: number; quarter: number }): string {
   return t('season_quarter_label', { quarter: season.quarter, year: season.year });

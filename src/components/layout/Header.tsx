@@ -1,15 +1,13 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { LOCALES, LOCALE_NAMES, useI18n, type Locale } from '../../i18n';
 import { useTheme } from '../../theme/ThemeProvider';
-import { useDatasetContext } from '../../state/DatasetProvider';
 import { useViewAsMemberId } from '../../hooks/useViewAsMember';
 import styles from './Header.module.css';
 
 export function Header() {
   const { t, locale, setLocale } = useI18n();
   const { isDark, toggle } = useTheme();
-  const { dataset } = useDatasetContext();
-  const [viewAsMemberId] = useViewAsMemberId(dataset?.members[0]?.id ?? null);
+  const [viewAsMemberId] = useViewAsMemberId(null);
   // Carry whatever leaderboard filters (period/shift/area/etc.) are in the current URL across nav
   // clicks, so switching tabs and coming back never silently resets what the viewer had selected.
   // The compare page's own a/b picks are page-specific, so they're stripped before reuse elsewhere.

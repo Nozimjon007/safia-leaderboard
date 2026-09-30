@@ -200,3 +200,27 @@ export function seasonWeekRange(
   if (!idxs.length) return null;
   return { from: weekStartISO(dataset.firstWeekStart, idxs[0]), to: weekEndISO(dataset.firstWeekStart, idxs[idxs.length - 1]) };
 }
+
+/**
+ * The season whose *week-snapped* range (see seasonWeekRange) contains [fromISO, toISO] — more
+ * robust than Podium.tsx's exact-range equality for a Time Machine sub-period or a date preset
+ * that falls inside a season without spanning it exactly.
+ *
+ * Deliberately compares against each season's own week-snapped bounds, not its raw calendar
+ * startISO/endISO: a season's default/full period (see useLeaderboardFilters's defaultRangeFor)
+ * snaps to whole Monday–Sunday weeks, which routinely overshoots the season's calendar end by up
+ * to six days (R6). Comparing raw calendar dates would make even the season's own default period
+ * fail to match itself whenever its last week spills past the quarter boundary.
+ */
+export function findContainingSeason(
+  dataset: { firstWeekStart: string; weekCount: number },
+  seasons: readonly Season[],
+  fromISO: string,
+  toISO: string,
+): Season | null {
+  for (const s of seasons) {
+    const r = seasonWeekRange(dataset, s);
+    if (r && fromISO >= r.from && toISO <= r.to) return s;
+  }
+  return null;
+}

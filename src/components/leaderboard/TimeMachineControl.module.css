@@ -1,3 +1,17 @@
+.closed {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.closedHint {
+  color: var(--ink-muted);
+  font-size: 12.5px;
+  max-width: 60ch;
+}
+
 .panel {
   background: linear-gradient(155deg, var(--surface) 0%, var(--surface-raised) 100%);
   border: 1px solid var(--border);

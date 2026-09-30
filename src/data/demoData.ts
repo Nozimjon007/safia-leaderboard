@@ -182,6 +182,120 @@ const SEED_MEMBERS: readonly SeedMember[] = [
   },
 ];
 
+// ---- Synthetic roster (Task: 100+ demo employees) ----
+//
+// Extends the 12 hand-authored SEED_MEMBERS above with procedurally generated identities, so the
+// leaderboard has enough people to meaningfully exercise search/filter/pagination/compare at scale.
+// Every one of them runs through the *exact same* per-season random-walk score generator below as
+// the original 12 — there is no separate "fake" scoring path, and nothing here changes what those
+// 12 already produce: this batch draws from its own PRNG stream (SEED + 1), and — because it's
+// appended *after* SEED_MEMBERS in the array the main loop iterates — it can only ever consume
+// random draws that come after the original 12 already have theirs. avatarPhoto/fullBodyPhoto stay
+// null for this batch (see Member.avatarPhoto docs): no photo was sourced/licensed for them, and the
+// UI's initials-fallback already handles that — it does not imply a missing/broken asset.
+const SYNTHETIC_FIRST_NAMES_M: readonly string[] = [
+  'Sardor', 'Jasur', 'Bekzod', "Ulug'bek", 'Sherzod', 'Davron', 'Farrukh', 'Ilhom', 'Rustam', 'Anvar',
+  'Bahodir', 'Doston', 'Eldor', 'Fayzullo', 'Jamshid', 'Karim', 'Laziz', 'Mansur', 'Nurbek', 'Olimjon',
+  'Ozodbek', 'Rasul', 'Sanjar', 'Temur', 'Umid', 'Valijon', 'Xurshid', 'Yusuf', 'Zafar', 'Dilshod',
+];
+const SYNTHETIC_FIRST_NAMES_F: readonly string[] = [
+  'Maftuna', 'Sevinch', 'Malika', 'Nigora', 'Ozoda', 'Parvina', 'Rayhon', 'Sabina', 'Tamila', 'Umida',
+  'Vasila', 'Yulduz', 'Zilola', 'Kamola', 'Lobar', 'Muslima', 'Nafisa', "Oy'sha", 'Sitora', 'Xosiyat',
+  'Yasmina', "G'ulnora", 'Dildora', 'Barno', 'Iroda', 'Munisa', 'Nilufar', 'Sarvinoz', 'Zuhra', 'Chinora',
+];
+const SYNTHETIC_SURNAME_STEMS: readonly string[] = [
+  'Yusup', 'Rahmon', 'Tursun', 'Abdulla', 'Qodir', 'Ahmad', 'Sodiq', 'Qurbon', 'Xoliq', 'Yoldash',
+  'Nazar', 'Karim', 'Ismoil', 'Toshkent', 'Bekmurod', 'Ergash', "G'ani", 'Hakim', 'Inoyat', "Jo'ra",
+  'Komil', 'Latif', 'Mirzo', 'Normat', 'Otash', "Po'lat", 'Qahramon', 'Saidov', 'Tojiboy', 'Usmon',
+  'Xoja', 'Yormat', 'Zokir', 'Boboyor', 'Ne\'mat',
+];
+
+const SYNTHETIC_ROLE_POOL: readonly { role: string; weight: number }[] = [
+  { role: 'Baker', weight: 25 },
+  { role: 'Packer', weight: 20 },
+  { role: 'Decorator', weight: 15 },
+  { role: 'Cashier', weight: 15 },
+  { role: 'Delivery', weight: 15 },
+  { role: 'Shift Lead', weight: 10 },
+];
+
+/** Deterministic "who tends to be a strong/typical/developing performer" tiers — a workplace has more
+ * solid/average performers than stars or strugglers, so this is weighted, not a flat distribution. */
+const SYNTHETIC_SKILL_TIERS: readonly { min: number; max: number; weight: number }[] = [
+  { min: 86, max: 97, weight: 18 },
+  { min: 74, max: 88, weight: 42 },
+  { min: 58, max: 76, weight: 28 },
+  { min: 38, max: 60, weight: 12 },
+];
+
+function pickWeighted<T extends { weight: number }>(rnd: () => number, pool: readonly T[]): T {
+  const total = pool.reduce((sum, x) => sum + x.weight, 0);
+  let x = rnd() * total;
+  for (const item of pool) {
+    x -= item.weight;
+    if (x <= 0) return item;
+  }
+  return pool[pool.length - 1];
+}
+
+function pick<T>(rnd: () => number, arr: readonly T[]): T {
+  return arr[Math.floor(rnd() * arr.length)];
+}
+
+function generateSyntheticSeedMembers(count: number): SeedMember[] {
+  const rnd = mulberry32(SEED + 1);
+  const today = new Date().toISOString().slice(0, 10);
+  const usedNames = new Set<string>(SEED_MEMBERS.map((m) => m.name));
+  const out: SeedMember[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const isFemale = rnd() < 0.5;
+    let name = '';
+    for (let attempt = 0; attempt < 25; attempt++) {
+      const first = pick(rnd, isFemale ? SYNTHETIC_FIRST_NAMES_F : SYNTHETIC_FIRST_NAMES_M);
+      const stem = pick(rnd, SYNTHETIC_SURNAME_STEMS);
+      const softEnding = rnd() < 0.5; // real Uzbek surnames split between -ov/-ova and -ev/-eva; so does SEED_MEMBERS (Yoldashev vs. Rahmonov).
+      const surname = stem + (isFemale ? (softEnding ? 'eva' : 'ova') : softEnding ? 'ev' : 'ov');
+      const candidate = `${first} ${surname}`;
+      if (!usedNames.has(candidate)) {
+        name = candidate;
+        break;
+      }
+    }
+    if (!name) name = `${isFemale ? pick(rnd, SYNTHETIC_FIRST_NAMES_F) : pick(rnd, SYNTHETIC_FIRST_NAMES_M)} Employee${i + 1}`;
+    usedNames.add(name);
+
+    const role = pickWeighted(rnd, SYNTHETIC_ROLE_POOL).role;
+    const area = `Site ${1 + Math.floor(rnd() * 8)}`;
+    const shift: ShiftId = rnd() < 0.5 ? 'S1' : 'S2';
+
+    const tier = pickWeighted(rnd, SYNTHETIC_SKILL_TIERS);
+    const base = Array.from({ length: 5 }, () => Math.round(tier.min + rnd() * (tier.max - tier.min))) as [
+      number, number, number, number, number,
+    ];
+    const drift = Math.round((rnd() - 0.5) * 120) / 100; // -0.6 .. +0.6, same order as the hand-authored 12
+
+    const daysAgo = 60 + Math.floor(rnd() * 3540); // ~2 months to ~10 years of tenure
+    const dateJoinedISO = addDaysISO(today, -daysAgo);
+
+    let careerHistory: CareerStep[] | undefined;
+    if (daysAgo > 500 && rnd() < 0.2) {
+      const otherRoles = SYNTHETIC_ROLE_POOL.map((r) => r.role).filter((r) => r !== role);
+      const prevRole = pick(rnd, otherRoles);
+      const promoDaysAgo = Math.floor(daysAgo * (0.3 + rnd() * 0.4)); // promoted sometime after joining, well before today
+      const promoDateISO = addDaysISO(today, -promoDaysAgo);
+      careerHistory = [{ role: prevRole, startISO: dateJoinedISO, endISO: promoDateISO }];
+    }
+
+    out.push({ id: `emp${String(i + 1).padStart(3, '0')}`, name, area, shift, role, base, drift, dateJoinedISO, careerHistory });
+  }
+  return out;
+}
+
+const REAL_PHOTO_IDS: ReadonlySet<string> = new Set(SEED_MEMBERS.map((m) => m.id));
+/** 88 generated + the 12 hand-authored = 100, matching the "100 demo employees" the UI promises. */
+const ALL_SEED_MEMBERS: readonly SeedMember[] = [...SEED_MEMBERS, ...generateSyntheticSeedMembers(88)];
+
 /** The `pastCount` calendar quarters before today's, plus today's own — oldest first. */
 function pastSeasonSequence(todayISO: string, pastCount: number): Array<{ startISO: string; endISO: string }> {
   const { year: curYear, quarter: curQuarter } = quarterOf(todayISO);
@@ -256,7 +370,8 @@ export function buildDemoDataset(): LeaderboardDataset {
   const members: Member[] = [];
   const scores: Record<string, MemberScores> = {};
 
-  for (const seedMember of SEED_MEMBERS) {
+  for (const seedMember of ALL_SEED_MEMBERS) {
+    const hasRealPhoto = REAL_PHOTO_IDS.has(seedMember.id);
     members.push({
       id: seedMember.id,
       name: seedMember.name,
@@ -264,10 +379,13 @@ export function buildDemoDataset(): LeaderboardDataset {
       shift: seedMember.shift,
       role: seedMember.role,
       // AI-generated demo portraits, not real people — see public/portraits/README.md for sourcing.
-      avatarPhoto: `/portraits/${seedMember.id}.jpg`,
+      // The generated roster beyond the original 12 has no sourced/licensed photo, so it renders
+      // through the UI's initials-fallback (see components/common/Avatar.tsx) rather than a broken
+      // or reused image — never implying a stock photo is a real Safia employee.
+      avatarPhoto: hasRealPhoto ? `/portraits/${seedMember.id}.jpg` : null,
       // Full-body stock photography (unrelated models, not the avatarPhoto face above) used only
       // to preview the full-body card/hero layout — see public/fullbody/README.md for sourcing.
-      fullBodyPhoto: `/fullbody/${seedMember.id}.jpg`,
+      fullBodyPhoto: hasRealPhoto ? `/fullbody/${seedMember.id}.jpg` : null,
       dateJoinedISO: seedMember.dateJoinedISO,
       careerHistory: seedMember.careerHistory,
     });

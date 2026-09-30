@@ -11,6 +11,7 @@ export interface LeaderboardFilters {
   toISO: string;
   shift: 'all' | 'S1' | 'S2';
   area: string;
+  role: string;
   metric: MetricKey;
   query: string;
   sortKey: SortKey;
@@ -76,6 +77,7 @@ export function useLeaderboardFilters(dataset: LeaderboardDataset | null): {
     const shiftRaw = params.get('shift');
     const shift = shiftRaw === 'S1' || shiftRaw === 'S2' ? shiftRaw : 'all';
     const area = params.get('area') ?? 'all';
+    const role = params.get('role') ?? 'all';
     const metricRaw = params.get('metric');
     const metric: MetricKey = isMetric(metricRaw) ? (metricRaw as MetricKey) : 'overall';
     const query = params.get('q') ?? '';
@@ -84,7 +86,7 @@ export function useLeaderboardFilters(dataset: LeaderboardDataset | null): {
     const sortDir: SortDirection = params.get('sortDir') === 'desc' ? 'desc' : 'asc';
     const view: LeaderboardView = params.get('view') === 'cards' ? 'cards' : 'table';
 
-    return { fromISO, toISO, shift, area, metric, query, sortKey, sortDir, view };
+    return { fromISO, toISO, shift, area, role, metric, query, sortKey, sortDir, view };
   }, [params, dataset, rawFrom, rawTo]);
 
   const updateFilters = useCallback(
@@ -97,6 +99,7 @@ export function useLeaderboardFilters(dataset: LeaderboardDataset | null): {
             toISO: 'to',
             shift: 'shift',
             area: 'area',
+            role: 'role',
             metric: 'metric',
             query: 'q',
             sortKey: 'sortKey',
