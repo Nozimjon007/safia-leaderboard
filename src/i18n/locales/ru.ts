@@ -284,7 +284,8 @@ export const ru: TranslationDict = {
   view_as_picker_none: '— Выберите сотрудника —',
   view_as_position_line: 'Текущая позиция {name}: №{rank} из {total}',
   season_panel_assumption:
-    'Сезоны соответствуют календарным кварталам (янв–мар, апр–июн, июл–сен, окт–дек) — демонстрационное допущение до официального календаря сезонов от Safia.',
+    'Сезоны соответствуют календарным кварталам (янв-мар, апр-июн, июл-сен, окт-дек), демонстрационное допущение до официального календаря сезонов от Safia. Баллы начисляются только за целые недели, поэтому точный учитываемый период может начинаться или заканчиваться на несколько дней позже границ квартала; точные даты смотрите в разделе «Точные даты (доп.)» под фильтрами.',
+  season_scored_weeks_note: 'Учитываемые недели: {range}',
   season_countdown_label: 'Осталось времени',
   season_countdown_days_hours: 'Осталось {d} дн. {h} ч.',
   season_countdown_hours_only: 'Осталось {h} ч. {m} мин.',
@@ -473,7 +474,7 @@ export const ru: TranslationDict = {
   career_recognition_title: 'Признание',
   career_reward_count: 'Наград за сезоны: ×{n}',
   career_highlight_title: 'Главное достижение:',
-  career_highlight_achievement: '{title} — {season}.',
+  career_highlight_achievement: '{title}, {season}.',
   career_highlight_promotion: 'Повышен(а) до «{role}» в {date}.',
   career_crystal_title: 'Карьерный кристалл',
   career_crystal_desc_earned: 'Отражает подтверждённый послужной список: достижения ×{achievements}, повышения ×{promotions}.',

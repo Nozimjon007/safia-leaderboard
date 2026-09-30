@@ -7,6 +7,7 @@ import { formatDate } from '../../lib/dates';
 import { formatScore } from '../../lib/format';
 import type { Season } from '../../lib/seasons';
 import { usePointerGlint } from '../../hooks/usePointerGlint';
+import { PortraitFallback } from '../common/PortraitFallback';
 import { CareerCrystal } from './CareerCrystal';
 import styles from './CareerCard.module.css';
 
@@ -62,18 +63,7 @@ export function CareerCard({
         {member.fullBodyPhoto ? (
           <img src={member.fullBodyPhoto} alt="" className={styles.photo} />
         ) : (
-          <div className={styles.placeholder} aria-hidden="true" title={t('career_photo_placeholder_note')}>
-            <svg viewBox="0 0 200 400" className={styles.figure} focusable="false">
-              <ellipse className={styles.figureFoot} cx="88" cy="372" rx="18" ry="9" />
-              <ellipse className={styles.figureFoot} cx="112" cy="372" rx="18" ry="9" />
-              <rect className={styles.figureLeg} x="78" y="222" width="20" height="145" rx="9" />
-              <rect className={styles.figureLeg} x="102" y="222" width="20" height="145" rx="9" />
-              <path className={styles.figureArm} d="M60,120 L45,218 L59,224 L71,126 Z" />
-              <path className={styles.figureArm} d="M140,120 L155,218 L141,224 L129,126 Z" />
-              <path className={styles.figureTorso} d="M66,116 L134,116 L124,228 L76,228 Z" />
-              <circle className={styles.figureHead} cx="100" cy="42" r="28" />
-            </svg>
-          </div>
+          <PortraitFallback id={member.id} name={member.name} className={styles.placeholder} />
         )}
       </div>
 
@@ -121,7 +111,7 @@ export function CareerCard({
                   <div className={styles.timelineBody}>
                     <div className={styles.timelineRole}>{roleLabel(t, step.role)}</div>
                     <div className={styles.timelineDates}>
-                      {formatDate(step.startISO, locale)} — {step.endISO ? formatDate(step.endISO, locale) : t('career_present_label')}
+                      {formatDate(step.startISO, locale)} - {step.endISO ? formatDate(step.endISO, locale) : t('career_present_label')}
                     </div>
                   </div>
                 </li>

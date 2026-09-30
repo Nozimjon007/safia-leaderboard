@@ -284,7 +284,8 @@ export const uz: TranslationDict = {
   view_as_picker_none: '— Ходимни танланг —',
   view_as_position_line: '{name} нинг жорий ўрни: №{rank} / {total}',
   season_panel_assumption:
-    'Мавсумлар календарь чоракларига мос келади (янв–мар, апр–июн, июл–сен, окт–дек) — Safia расмий мавсум тақвимини тасдиқлагунча намунавий тахмин.',
+    'Мавсумлар календарь чоракларига мос келади (янв-мар, апр-июн, июл-сен, окт-дек), Safia расмий мавсум тақвимини тасдиқлагунча намунавий тахмин. Баллар фақат тўлиқ ҳафталар учун ҳисобланади, шунинг учун аниқ ҳисобланган давр чорак чегарасидан бир неча кун кейин бошланиши ёки тугаши мумкин; аниқ саналарни фильтрлар остидаги «Аниқ саналар (қўшимча)» бўлимида кўринг.',
+  season_scored_weeks_note: 'Ҳисобга олинган ҳафталар: {range}',
   season_countdown_label: 'Қолган вақт',
   season_countdown_days_hours: '{d} кун {h} соат қолди',
   season_countdown_hours_only: '{h} соат {m} дақиқа қолди',
@@ -473,7 +474,7 @@ export const uz: TranslationDict = {
   career_recognition_title: 'Эътироф',
   career_reward_count: 'Мавсум мукофотлари: ×{n}',
   career_highlight_title: 'Асосий ютуқ:',
-  career_highlight_achievement: '{title} — {season}.',
+  career_highlight_achievement: '{title}, {season}.',
   career_highlight_promotion: '{date} санасида «{role}» лавозимига кўтарилган.',
   career_crystal_title: 'Карьера кристали',
   career_crystal_desc_earned: 'Тасдиқланган натижаларни акс эттиради: ютуқлар ×{achievements}, кўтарилишлар ×{promotions}.',

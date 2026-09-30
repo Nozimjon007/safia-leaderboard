@@ -97,6 +97,16 @@ export function SeasonPanel({
     ? t(headingKey, { season: seasonQuarterLabel(t, matchedSeason) })
     : t('season_results_heading_custom', { range: formatDateRange(filters.fromISO, filters.toISO, locale) });
 
+  // Scoring only ever runs on whole weeks, so the real scored range can start or end up to six days
+  // into the season's calendar quarter (R6). The heading above deliberately shows the clean quarter
+  // dates; this note is what keeps that honest instead of silently disagreeing with every link,
+  // profile header, and the Advanced: exact dates panel below, which all show the real range.
+  const seasonOwnRange = showsFullSeason && matchedSeason ? seasonWeekRange(dataset, matchedSeason) : null;
+  const scoredWeeksNote =
+    seasonOwnRange && (seasonOwnRange.from !== matchedSeason!.startISO || seasonOwnRange.to !== matchedSeason!.endISO)
+      ? t('season_scored_weeks_note', { range: formatDateRange(seasonOwnRange.from, seasonOwnRange.to, locale) })
+      : null;
+
   const leaderRow = overallResult.rows.find((r) => r.overallRank === 1) ?? null;
   const myRow = viewAsMemberId ? (overallResult.rows.find((r) => r.member.id === viewAsMemberId) ?? null) : null;
   const rankedTotal = overallResult.rows.filter((r) => r.overallRank != null).length;
@@ -159,6 +169,7 @@ export function SeasonPanel({
 
       <div className={styles.metaRow}>
         <span className={styles.range}>{formatDateRange(matchedSeason?.startISO ?? filters.fromISO, matchedSeason?.endISO ?? filters.toISO, locale)}</span>
+        {scoredWeeksNote && <span className={styles.scoredWeeksNote}>{scoredWeeksNote}</span>}
 
         {status === 'current' && countdown && (
           <span className={styles.countdownInline}>

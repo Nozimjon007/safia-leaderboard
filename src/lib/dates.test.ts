@@ -51,9 +51,9 @@ describe('formatShortDate / formatDateRange', () => {
     expect(formatShortDate('2026-06-08')).toBe('08.06');
   });
   it('omits the year on the start when both ends share a year', () => {
-    expect(formatDateRange('2026-06-08', '2026-06-14', 'en')).toBe('8 Jun – 14 Jun 2026');
+    expect(formatDateRange('2026-06-08', '2026-06-14', 'en')).toBe('8 Jun - 14 Jun 2026');
   });
   it('includes both years when the range spans a year boundary', () => {
-    expect(formatDateRange('2025-12-29', '2026-01-04', 'en')).toBe('29 Dec 2025 – 4 Jan 2026');
+    expect(formatDateRange('2025-12-29', '2026-01-04', 'en')).toBe('29 Dec 2025 - 4 Jan 2026');
   });
 });

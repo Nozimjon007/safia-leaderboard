@@ -77,5 +77,5 @@ export function formatShortDate(iso: string): string {
 export function formatDateRange(fromISO: string, toISO_: string, locale: string): string {
   const yFrom = fromISO.slice(0, 4);
   const yTo = toISO_.slice(0, 4);
-  return `${formatDate(fromISO, locale, yFrom !== yTo)} – ${formatDate(toISO_, locale)}`;
+  return `${formatDate(fromISO, locale, yFrom !== yTo)} - ${formatDate(toISO_, locale)}`;
 }

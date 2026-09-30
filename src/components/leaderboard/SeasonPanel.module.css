@@ -157,6 +157,11 @@
   white-space: nowrap;
 }
 
+.scoredWeeksNote {
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
 .countdownInline {
   display: flex;
   align-items: center;
