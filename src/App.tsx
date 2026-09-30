@@ -6,10 +6,12 @@ import { DatasetProvider } from './state/DatasetProvider';
 import { Header } from './components/layout/Header';
 import { LeaderboardPage } from './pages/LeaderboardPage';
 import { MemberProfilePage } from './pages/MemberProfilePage';
+import { MyProgressPage } from './pages/MyProgressPage';
 import { ComparePage } from './pages/ComparePage';
 import { SeasonsPage } from './pages/SeasonsPage';
 import { SeasonDetailPage } from './pages/SeasonDetailPage';
 import { SeasonComparePage } from './pages/SeasonComparePage';
+import { ClansPage } from './pages/ClansPage';
 import { ClanDetailPage } from './pages/ClanDetailPage';
 import { RewardsPage } from './pages/RewardsPage';
 import { ShopPage } from './pages/ShopPage';
@@ -31,6 +33,8 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<LeaderboardPage />} />
       <Route path="/member/:id" element={<MemberProfilePage />} />
+      <Route path="/my-progress" element={<MyProgressPage />} />
+      <Route path="/clans" element={<ClansPage />} />
       <Route path="/clans/:id" element={<ClanDetailPage />} />
       <Route path="/compare" element={<ComparePage />} />
       <Route path="/seasons" element={<SeasonsPage />} />

@@ -82,8 +82,8 @@
   color: var(--accent-strong);
 }
 
-/* The shop is explicitly called out as its own destination (not just another nav item) —
-   a restrained gold tint keeps it findable at a glance without shouting. */
+/* The shop is explicitly called out as its own destination (not just another nav item), a
+   restrained gold tint keeps it findable at a glance without shouting. */
 .navLinkShop {
   color: var(--medal-gold);
   font-weight: 700;
@@ -98,6 +98,46 @@
   gap: 8px;
   align-items: center;
   flex: none;
+}
+
+/* Scoring is deliberately not in .nav's primary six (see the comment above it in Header.tsx) —
+   still one click from anywhere, styled quieter than the primary destinations so it reads as
+   secondary rather than a seventh peer competing with Shop for attention. Shown here on desktop;
+   .scoringLinkMobile (inside .nav, hidden until the mobile menu is open) covers narrow widths, so
+   the link never actually disappears, only where it lives moves. */
+.scoringLink {
+  color: var(--ink-muted);
+  font-size: 12.5px;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 0 4px;
+}
+
+.scoringLink:hover {
+  color: var(--ink-secondary);
+  text-decoration: underline;
+}
+
+.scoringLinkMobile {
+  display: none;
+}
+
+.menuToggle {
+  display: none;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  color: var(--ink);
+  flex: none;
+}
+
+.menuToggle:hover {
+  border-color: var(--border-strong);
 }
 
 .select,
@@ -122,12 +162,10 @@
   border-color: var(--border-strong);
 }
 
-/* The nav can hold up to five items ("My Progress" only appears once a demo viewer is
-   picked), so the squeeze starts well above typical phone widths — this tier covers
-   small laptops/tablets, not just phones. Nav items shrink and "How ranking works" is
-   dropped together here, since it stays reachable via the in-page link on the
-   leaderboard and by URL. `.navLink`'s `flex-shrink: 0` (above) means anything that
-   still doesn't fit degrades to a clean horizontal scroll instead of clipping mid-word. */
+/* All six primary destinations stay reachable at every width — none of them are optional, so
+   none get silently dropped. Below this width they just shrink first; `.navLink`'s
+   `flex-shrink: 0` combined with `.nav`'s own `overflow-x: auto` (above) means whatever still
+   doesn't fit becomes a horizontal scroll with a fade at the edge, not a hidden or clipped item. */
 @media (max-width: 1100px) {
   .inner {
     gap: 10px;
@@ -137,17 +175,65 @@
     padding: 7px 9px;
     font-size: 13.5px;
   }
-  .nav a:last-child {
-    display: none;
-  }
 }
 
-@media (max-width: 700px) {
+/* Six required destinations, a language picker, and a theme toggle genuinely don't fit one phone-
+   width row without squeezing something to the point of uselessness — below this width the primary
+   nav becomes a toggled dropdown instead. This is the "suitable mobile navigation pattern": every
+   item stays fully reachable, none of them get silently dropped or truncated to illegibility. */
+@media (max-width: 768px) {
   .brandName {
     display: none;
   }
   .inner {
     gap: 8px;
+  }
+  .nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 8px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    mask-image: none;
+    -webkit-mask-image: none;
+    max-height: calc(100vh - var(--header-h));
+    overflow-y: auto;
+  }
+  .nav[data-mobile-open] {
+    display: flex;
+  }
+  .navLink,
+  .navLinkActive,
+  .navLinkShop {
+    width: 100%;
+    padding: 11px 12px;
+  }
+  .scoringLinkMobile {
+    display: block;
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--ink-secondary);
+    font-size: 14px;
+    text-decoration: none;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+  }
+  .scoringLinkMobile:hover {
+    background: var(--surface-sunken);
+  }
+  .scoringLink {
+    display: none;
+  }
+  .menuToggle {
+    display: inline-flex;
   }
 }
 
@@ -161,11 +247,6 @@
   .inner {
     gap: 6px;
   }
-  .navLink,
-  .navLinkActive {
-    padding: 7px 8px;
-    font-size: 13px;
-  }
   .select,
   .themeBtn {
     padding: 0 7px;
@@ -173,14 +254,5 @@
   }
   .tools {
     gap: 5px;
-  }
-  /* At phone width, even "Leaderboard" + "Compare" + "Seasons" alone can outgrow the
-     available space once a signed-in viewer's "My Progress" is also present. Drop both
-     shortcuts: every member card/row already links to their own profile, and the
-     leaderboard's season panel links to the seasons archive in-page, so nothing becomes
-     unreachable — a viewer can always get back to either from the leaderboard tab. */
-  .nav [data-nav-progress],
-  .nav [data-nav-seasons] {
-    display: none;
   }
 }

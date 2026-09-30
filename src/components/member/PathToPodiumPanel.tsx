@@ -38,7 +38,7 @@ export function PathToPodiumPanel({ rank, gapToNext, gapToLeader, strongest, wee
                 ? t('progress_no_rank_yet')
                 : gapToNext != null
                   ? t('progress_distance_to_next', { n: formatScore(gapToNext, locale), rank: rank - 1 })
-                  : '—'}
+                  : '-'}
           </span>
         </div>
         <div className={styles.stat}>
@@ -50,13 +50,13 @@ export function PathToPodiumPanel({ rank, gapToNext, gapToLeader, strongest, wee
                 ? t('progress_no_rank_yet')
                 : gapToLeader != null
                   ? t('path_to_podium_gap_leader_value', { n: formatScore(gapToLeader, locale) })
-                  : '—'}
+                  : '-'}
           </span>
         </div>
         <div className={styles.stat}>
           <span className={styles.statLabel}>{t('path_to_podium_strongest_label')}</span>
           <span className={styles.statValue}>
-            {strongest ? t('highlight_strong', { category: categoryLabel(t, strongest.category), value: Math.round(strongest.value) }) : '—'}
+            {strongest ? t('highlight_strong', { category: categoryLabel(t, strongest.category), value: Math.round(strongest.value) }) : '-'}
           </span>
         </div>
       </div>

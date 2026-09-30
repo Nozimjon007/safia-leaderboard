@@ -55,7 +55,7 @@ export function JobPanel({ member, clanId, overallRank, overallScore, compact, s
         <div className={styles.soloStat}>
           <span className={styles.soloLabel}>{t('job_panel_solo_label')}</span>
           <span className={`${styles.soloValue} tabular`}>
-            {overallRank != null ? `#${overallRank}` : '—'} <span className={styles.soloScore}>· {formatScore(overallScore, locale)}</span>
+            {overallRank != null ? `#${overallRank}` : '-'} <span className={styles.soloScore}>· {formatScore(overallScore, locale)}</span>
           </span>
         </div>
       )}

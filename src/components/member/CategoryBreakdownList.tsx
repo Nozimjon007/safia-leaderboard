@@ -40,7 +40,7 @@ export function CategoryBreakdownList({
         return (
           <li key={c} className={styles.item}>
             <span className={styles.name}>{categoryLabel(t, c)}</span>
-            <span className={`${styles.value} tabular`}>{v == null ? '—' : formatPercent(v)}</span>
+            <span className={`${styles.value} tabular`}>{v == null ? '-' : formatPercent(v)}</span>
             <div className={styles.barWrap}>
               <Meter value={v} zone={zone} markerValue={teamVal} />
             </div>
@@ -59,7 +59,7 @@ export function CategoryBreakdownList({
                 </span>
               </span>
               <span>
-                {t('category_rank')}: {catRank ?? '—'}
+                {t('category_rank')}: {catRank ?? '-'}
                 {catRank ? ` / ${rankedCountFor(c)}` : ''}
               </span>
             </div>

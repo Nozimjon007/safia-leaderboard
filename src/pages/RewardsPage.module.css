@@ -27,6 +27,35 @@
   max-width: 75ch;
 }
 
+.shopConnect {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--medal-gold-bg);
+  border: 1px solid var(--medal-gold);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-top: 12px;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 13.5px;
+  text-decoration: none;
+}
+
+.shopConnect:hover {
+  border-color: var(--accent-strong);
+}
+
+.shopConnect > span:first-child {
+  color: var(--medal-gold);
+  font-size: 16px;
+}
+
+.shopConnect > span:last-child {
+  margin-left: auto;
+  color: var(--ink-muted);
+}
+
 .proposedBanner {
   background: var(--status-critical-bg);
   border-left: 4px solid var(--status-critical);

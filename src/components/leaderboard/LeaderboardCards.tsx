@@ -175,7 +175,7 @@ function MemberCard({ row, team, compareSelected, onToggleCompare, earned, highl
                 <span className={styles.miniLabel}>{categoryLabel(t, c)}</span>
                 <Meter value={v} zone={zz} markerValue={team.categoryAverages[c]} />
                 <span className={styles.miniValue} style={{ color: zoneColorVar(zz) }}>
-                  {v == null ? '—' : formatPercent(v)}
+                  {v == null ? '-' : formatPercent(v)}
                 </span>
               </li>
             );

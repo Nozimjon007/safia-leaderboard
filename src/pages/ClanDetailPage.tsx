@@ -255,7 +255,7 @@ function RosterRow({ contribution, soloRow }: RosterRowProps) {
             <span>{t('clan_roster_points_col')}</span>
           </div>
           <div className={styles.rowStat}>
-            <b className="tabular">{soloRow?.overallRank != null ? `#${soloRow.overallRank}` : '—'}</b>
+            <b className="tabular">{soloRow?.overallRank != null ? `#${soloRow.overallRank}` : '-'}</b>
             <span>{t('clan_roster_solo_rank_col')}</span>
           </div>
         </div>

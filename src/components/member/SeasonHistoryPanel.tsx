@@ -34,7 +34,7 @@ export function SeasonHistoryPanel({ entries, dataset }: SeasonHistoryPanelProps
                 {t('season_current_badge')}
               </span>
               <span className={styles.rank}>
-                {entry.rank == null ? '—' : `#${entry.rank}${entry.rankedCount ? ` / ${entry.rankedCount}` : ''}`}
+                {entry.rank == null ? '-' : `#${entry.rank}${entry.rankedCount ? ` / ${entry.rankedCount}` : ''}`}
               </span>
               <span className={`${styles.score} tabular`}>{formatScore(entry.overall, locale)}</span>
             </li>

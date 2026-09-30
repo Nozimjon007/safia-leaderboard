@@ -96,9 +96,9 @@ export function RadarChart({ seriesA, seriesB, categoryLabels, ariaLabel, missin
               <text x={lx} y={ly + dy + 7} textAnchor={anchor} className={styles.axisValue}>
                 {/* Inline value stays short (a dash for "no data") so it never overflows the chart's edge; the full
                     word is still in the figure's aria-label, and the numeric breakdown alongside the chart has it too. */}
-                <tspan fill={seriesA.color}>{av == null ? '—' : formatValue(av)}</tspan>
+                <tspan fill={seriesA.color}>{av == null ? '-' : formatValue(av)}</tspan>
                 <tspan className={styles.axisSep}> / </tspan>
-                <tspan fill={seriesB.color}>{bv == null ? '—' : formatValue(bv)}</tspan>
+                <tspan fill={seriesB.color}>{bv == null ? '-' : formatValue(bv)}</tspan>
               </text>
             </g>
           );

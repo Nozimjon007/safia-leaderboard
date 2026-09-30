@@ -49,7 +49,7 @@ export function CompareIdentityCard({ member, stats, color, rank, rankedCount, i
         {inCurrentView ? (
           <>
             <span className={styles.rankLabel}>{t('compare_rank_in_view')}:</span>{' '}
-            {rank == null ? '—' : <span className="tabular">{`#${rank} / ${rankedCount}`}</span>}
+            {rank == null ? '-' : <span className="tabular">{`#${rank} / ${rankedCount}`}</span>}
             <MoveBadge move={move} className={styles.moveBadge} />
           </>
         ) : (

@@ -45,7 +45,7 @@ export function ScoreReceiptPanel({ receipt, locale }: ScoreReceiptPanelProps) {
                   <th scope="row">{categoryLabel(t, row.category)}</th>
                   <td>{row.value != null ? `${formatScore(row.value, locale)}%` : t('missing_value')}</td>
                   <td>{row.contribution != null ? `${row.weight} / ${receipt.weightTotal}` : t('score_receipt_excluded')}</td>
-                  <td>{row.contribution != null ? formatScore(row.contribution, locale) : '—'}</td>
+                  <td>{row.contribution != null ? formatScore(row.contribution, locale) : '-'}</td>
                 </tr>
               ))}
             </tbody>

@@ -128,7 +128,7 @@ export function PodiumCard({ row, place, metric, metricLabel, emblem, compareSel
             return (
               <div key={c}>
                 <b className="tabular" title={v == null ? t('missing_value') : undefined}>
-                  {v == null ? '—' : Math.round(v)}
+                  {v == null ? '-' : Math.round(v)}
                 </b>
                 <span>{categoryLabel(t, c)}</span>
               </div>

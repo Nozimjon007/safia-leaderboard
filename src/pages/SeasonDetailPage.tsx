@@ -1,25 +1,28 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { CATEGORY_KEYS, type LeaderboardDataset, type Member, type MetricKey, type ScoringConfig, type SortDirection, type SortKey } from '../data/types';
-import { categoryLabel, roleLabel, seasonQuarterLabel, useI18n } from '../i18n';
+import { categoryLabel, clanName, roleLabel, seasonQuarterLabel, useI18n } from '../i18n';
 import { useDatasetContext } from '../state/DatasetProvider';
 import { useScoringConfig } from '../state/ScoringConfigProvider';
 import { buildLeaderboard, filterRowsByQuery, sortRows, zoneOf, type LeaderboardRow } from '../lib/scoring';
 import { computeAllAchievements, ACHIEVEMENT_GLYPHS, earnedAchievementTypes, countOf } from '../lib/achievements';
 import { computeSeasonRewards } from '../lib/rewards';
 import { seasonWeeks, snapshotAt, computeWeekChanges, deriveCaption } from '../lib/timeMachine';
-import { parseSeasonId, seasonOf, seasonStatus, type Quarter, type Season, type SeasonStatus } from '../lib/seasons';
+import { parseSeasonId, seasonOf, seasonStatus, seasonWeekRange, type Quarter, type Season, type SeasonStatus } from '../lib/seasons';
 import { computeSeasonDistinctions, type SeasonDistinction } from '../lib/craftPaths';
 import { formatDateRange, weekEndISO, weekIndexesInRange, weekStartISO, formatShortDate } from '../lib/dates';
 import { formatScore, formatSigned } from '../lib/format';
 import { zoneColorVar } from '../lib/zoneStyle';
-import type { ClanId } from '../lib/clans';
+import { CLAN_IDS, type ClanId } from '../lib/clans';
+import { computeClanStandings } from '../lib/clanPoints';
 import { useClanAssignments } from '../hooks/useClans';
 import { useCoinLedger, type CoinLedger } from '../hooks/useCoinLedger';
+import { useViewAsMemberId } from '../hooks/useViewAsMember';
 import { DemoBanner } from '../components/common/DemoBanner';
 import { StateMessage } from '../components/common/StateMessage';
 import { LeaderboardSkeleton } from '../components/leaderboard/LeaderboardSkeleton';
 import { Avatar } from '../components/common/Avatar';
+import { ClanCrest } from '../components/common/ClanCrest';
 import { MoveBadge } from '../components/common/MoveBadge';
 import { CoinAwardsReveal } from '../components/season/CoinAwardsReveal';
 import { Podium } from '../components/leaderboard/Podium';
@@ -252,6 +255,7 @@ function SeasonDetailContent({ dataset, config, season, statusValue, now, tab, s
             seasonSearch={seasonSearch}
             compareIds={compareIds}
             onToggleCompare={toggleCompare}
+            clanAssignments={clanAssignments}
           />
         )}
         {tab === 'standings' && (
@@ -299,6 +303,7 @@ function OverviewTab({
   seasonSearch,
   compareIds,
   onToggleCompare,
+  clanAssignments,
 }: TabCommonProps & {
   config: ScoringConfig;
   season: Season;
@@ -308,8 +313,10 @@ function OverviewTab({
   seasonSearch: string;
   compareIds: string[];
   onToggleCompare: (id: string) => void;
+  clanAssignments: Record<string, ClanId>;
 }) {
   const { t, locale } = useI18n();
+  const [viewAsMemberId] = useViewAsMemberId(null);
 
   if (statusValue === 'upcoming') {
     return <StateMessage title={t('season_tab_overview')} body={t('season_upcoming_note')} />;
@@ -321,6 +328,21 @@ function OverviewTab({
           delta: formatSigned(result.team.average - result.team.previousAverage, locale),
         })
       : t('season_detail_key_changes_none');
+
+  // Only meaningful once the season is actually finalized — same "no winners before approval" gate
+  // every other clan-points consumer already follows (see lib/clanPoints.ts's module docs).
+  const winningClan =
+    statusValue === 'approved' ? computeClanStandings(dataset, config, clanAssignments, CLAN_IDS, season, null).find((s) => s.rank === 1) : null;
+
+  const myRow = viewAsMemberId ? (result.rows.find((r) => r.member.id === viewAsMemberId) ?? null) : null;
+
+  // Podium flags whatever range it's given as a "custom period" unless it matches the season's own
+  // week-snapped range exactly (see Podium.tsx) — passing the season's raw calendar dates here would
+  // make this page's own canonical Top Three read as a "custom period" of itself (R6 again, just in
+  // a different component than SeasonPanel's).
+  const weekSnapped = seasonWeekRange(dataset, season);
+  const podiumFrom = weekSnapped?.from ?? season.startISO;
+  const podiumTo = weekSnapped?.to ?? season.endISO;
 
   return (
     <div className={styles.tabBody}>
@@ -335,8 +357,29 @@ function OverviewTab({
               {t('season_hall_of_fame_line', { name: rankedTop3[0].member.name, season: seasonQuarterLabel(t, season) })}
             </p>
           </div>
+          {winningClan && (
+            <Link className={styles.winningClan} to={{ pathname: `/clans/${winningClan.clanId}`, search: seasonSearch }}>
+              <ClanCrest clanId={winningClan.clanId} size={30} />
+              <span>{t('season_winning_clan_line', { clan: clanName(t, winningClan.clanId) })}</span>
+            </Link>
+          )}
         </div>
       )}
+
+      {myRow && (
+        <div className={styles.myRecap}>
+          <p className={styles.myRecapLabel}>{t('season_my_recap_label')}</p>
+          <p className={styles.myRecapLine}>
+            {myRow.rank != null
+              ? t('season_my_recap_ranked', { name: myRow.member.name, rank: myRow.rank, score: formatScore(myRow.current.overall, locale) })
+              : t('season_my_recap_unranked', { name: myRow.member.name })}
+          </p>
+          <Link className={styles.viewLink} to={{ pathname: `/member/${myRow.member.id}`, search: seasonSearch }}>
+            {t('season_my_recap_link')} →
+          </Link>
+        </div>
+      )}
+
       {rankedTop3.length > 0 ? (
         <Podium
           rows={rankedTop3}
@@ -346,8 +389,8 @@ function OverviewTab({
           dataset={dataset}
           config={config}
           seasons={[season]}
-          periodFromISO={season.startISO}
-          periodToISO={season.endISO}
+          periodFromISO={podiumFrom}
+          periodToISO={podiumTo}
           compareIds={compareIds}
           onToggleCompare={onToggleCompare}
         />

@@ -100,7 +100,7 @@ export function MyNextMove({
       <div className={styles.grid}>
         <Link to={memberHref} className={styles.tile}>
           <span className={styles.tileLabel}>{t('my_next_move_rank_label')}</span>
-          <span className={styles.tileValue}>{row?.overallRank != null ? `#${row.overallRank}` : '—'}</span>
+          <span className={styles.tileValue}>{row?.overallRank != null ? `#${row.overallRank}` : '-'}</span>
           <MoveBadge move={row?.overallMove ?? null} />
         </Link>
 

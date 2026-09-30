@@ -4,7 +4,10 @@ import { seasonQuarterLabel, useI18n } from '../i18n';
 import { useDatasetContext } from '../state/DatasetProvider';
 import { useSeasons } from '../hooks/useSeasons';
 import { useScoringConfig } from '../state/ScoringConfigProvider';
+import { useCoinLedger } from '../hooks/useCoinLedger';
+import { useViewAsMemberId } from '../hooks/useViewAsMember';
 import { computeAllSeasonRewards, REWARD_IDS } from '../lib/rewards';
+import { balanceForMember } from '../lib/coins';
 import { isSeasonApproved } from '../lib/seasons';
 import type { RewardId } from '../data/types';
 import { DemoBanner } from '../components/common/DemoBanner';
@@ -27,6 +30,10 @@ export function RewardsPage() {
   const { status, dataset, error, reload } = useDatasetContext();
   const { config } = useScoringConfig();
   const seasonsInfo = useSeasons(dataset);
+  const coinLedger = useCoinLedger();
+  const [viewAsMemberId] = useViewAsMemberId(null);
+  const viewer = dataset?.members.find((m) => m.id === viewAsMemberId) ?? null;
+  const viewerBalance = viewer ? balanceForMember(coinLedger.transactions, viewer.id) : null;
 
   const allRewards = useMemo(() => {
     if (!dataset || !seasonsInfo) return [];
@@ -84,6 +91,16 @@ export function RewardsPage() {
       <div className={styles.proposedBanner} role="note">
         {t('rewards_proposed_banner')}
       </div>
+
+      <Link className={styles.shopConnect} to="/shop">
+        <span aria-hidden="true">◈</span>
+        <span>
+          {viewer && viewerBalance != null
+            ? t('rewards_shop_connect_balance', { name: viewer.name, n: viewerBalance.toLocaleString() })
+            : t('rewards_shop_connect_generic')}
+        </span>
+        <span aria-hidden="true">→</span>
+      </Link>
 
       <section className={styles.catalog} aria-labelledby="reward-catalog-heading">
         <h2 id="reward-catalog-heading" className="visually-hidden">

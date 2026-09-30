@@ -29,7 +29,7 @@ export function CompareCategoryRow({ entry, colorA, colorB, nameA, nameB }: Comp
         ? t('compare_tie_label')
         : t('compare_leads_by', { name: leader === 'a' ? nameA : nameB, n: diff });
   // Compact on-screen tag (avoids truncating a long name); the full sentence is always available via the title attribute.
-  const shortTag = leader === 'na' ? '—' : leader === 'tie' ? t('compare_tie_label') : `+${diff}`;
+  const shortTag = leader === 'na' ? '-' : leader === 'tie' ? t('compare_tie_label') : `+${diff}`;
   const leaderColor = leader === 'a' ? colorA : leader === 'b' ? colorB : undefined;
 
   return (
@@ -37,7 +37,7 @@ export function CompareCategoryRow({ entry, colorA, colorB, nameA, nameB }: Comp
       <div className={styles.label}>{label}</div>
       <div className={styles.valueA} style={{ color: colorA }}>
         <span className={styles.name}>{nameA}</span>
-        {a == null ? '—' : formatPercent(a)}
+        {a == null ? '-' : formatPercent(a)}
       </div>
       <div className={styles.track} aria-hidden="true">
         {lo != null && hi != null && <div className={styles.connector} style={{ left: `${lo}%`, width: `${hi - lo}%` }} />}
@@ -46,7 +46,7 @@ export function CompareCategoryRow({ entry, colorA, colorB, nameA, nameB }: Comp
       </div>
       <div className={styles.valueB} style={{ color: colorB }}>
         <span className={styles.name}>{nameB}</span>
-        {b == null ? '—' : formatPercent(b)}
+        {b == null ? '-' : formatPercent(b)}
       </div>
       <div className={styles.leaderTag} data-leader={leader} style={leaderColor ? { color: leaderColor } : undefined} title={fullSentence}>
         <span className="visually-hidden">{fullSentence}</span>

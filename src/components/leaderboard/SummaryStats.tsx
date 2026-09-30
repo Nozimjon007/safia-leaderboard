@@ -67,7 +67,7 @@ export function SummaryStats({ team, topImprovement, weekCount, hasPreviousPerio
               <span aria-hidden="true">▲</span> {topImprovement.move} <small className={styles.unit}>{t('rank_label')}</small>
             </span>
           ) : (
-            '—'
+            '-'
           )
         }
         delta={

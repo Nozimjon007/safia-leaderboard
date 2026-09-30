@@ -315,10 +315,10 @@ function MemberProfileContent({
           <div className={styles.stat}>
             <div className={styles.statKey}>{t('rank_now', { metric: metricLabel })}</div>
             <div className={`${styles.statValue} tabular`}>
-              {row.rank ?? '—'} {row.rank != null && <small>/ {rankedCountForMetric}</small>}
+              {row.rank ?? '-'} {row.rank != null && <small>/ {rankedCountForMetric}</small>}
             </div>
             <div className={styles.statKey}>
-              {t('previous_rank')}: {row.previousRank ?? '—'}
+              {t('previous_rank')}: {row.previousRank ?? '-'}
             </div>
             <div className={styles.distanceNote}>
               {row.rank === 1

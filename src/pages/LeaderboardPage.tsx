@@ -346,7 +346,7 @@ export function LeaderboardPage() {
             shift: shiftLabel,
             area: areaLabelText,
             n: result.rows.length,
-            prev: prevText ?? '—',
+            prev: prevText ?? '-',
           })}
           {!prevText && ' ' + t('ctx_no_prev')}
         </p>
