@@ -74,7 +74,7 @@ export function ChampionFeature({ row, clanId, emblem, compareSelected, onToggle
           {row.member.fullBodyPhoto ? (
             <img src={row.member.fullBodyPhoto} alt="" className={styles.photo} />
           ) : (
-            <PortraitFallback name={row.member.name} clanId={clanId} className={styles.portraitFallback} />
+            <PortraitFallback id={row.member.id} name={row.member.name} className={styles.portraitFallback} />
           )}
           {emblem && emblemGlyph && (
             <span className={styles.emblem} title={emblemTitle ?? undefined}>

@@ -5,11 +5,13 @@
   flex: none;
   display: grid;
   place-items: center;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-weight: 600;
   overflow: hidden;
-  background: hsl(var(--av-h) 55% var(--av-l));
-  color: hsl(var(--av-h) 60% var(--av-tl));
+  background: radial-gradient(120% 130% at 30% 20%, hsl(var(--av-h) 62% calc(var(--av-l) + 4%)) 0%, hsl(var(--av-h) 48% calc(var(--av-l) - 10%)) 100%);
+  color: hsl(var(--av-h) 42% var(--av-tl));
   line-height: 1;
+  box-shadow: inset 0 0 0 1px hsl(var(--av-h) 40% calc(var(--av-l) - 18%) / 0.35);
 }
 
 .avatar img {
@@ -20,12 +22,12 @@
 
 :root[data-theme='dark'] .avatar {
   --av-l: 26%;
-  --av-tl: 86%;
+  --av-tl: 90%;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .avatar {
     --av-l: 26%;
-    --av-tl: 86%;
+    --av-tl: 90%;
   }
 }

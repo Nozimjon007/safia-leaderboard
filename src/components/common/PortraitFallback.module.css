@@ -1,4 +1,6 @@
 .fallback {
+  --av-l: 88%;
+  --av-tl: 30%;
   container-type: inline-size;
   position: relative;
   width: 100%;
@@ -6,7 +8,22 @@
   overflow: hidden;
   display: grid;
   place-items: center;
-  background: radial-gradient(135% 135% at 28% 18%, color-mix(in srgb, var(--portrait-color) 26%, var(--surface-raised)) 0%, var(--surface-sunken) 78%);
+  background: radial-gradient(
+    130% 140% at 28% 16%,
+    hsl(var(--av-h) 58% calc(var(--av-l) + 3%)) 0%,
+    hsl(var(--av-h) 46% calc(var(--av-l) - 14%)) 100%
+  );
+}
+
+:root[data-theme='dark'] .fallback {
+  --av-l: 26%;
+  --av-tl: 90%;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .fallback {
+    --av-l: 26%;
+    --av-tl: 90%;
+  }
 }
 
 /* A soft, restrained "flour dust" texture — small repeating dots, low opacity, never busy enough to
@@ -14,35 +31,48 @@
 .grain {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(color-mix(in srgb, var(--portrait-color) 50%, transparent) 1px, transparent 1.6px);
+  background-image: radial-gradient(hsl(var(--av-h) 50% calc(var(--av-l) - 30%) / 0.45) 1px, transparent 1.6px);
   background-size: 16px 16px;
-  opacity: 0.16;
+  opacity: 0.12;
 }
 
+/* A double-ring "medallion" border — evokes a bakery seal/stamp rather than a plain circle crop. */
 .ring {
   position: absolute;
-  width: 72cqw;
-  height: 72cqw;
+  width: 78cqw;
+  height: 78cqw;
   border-radius: 50%;
-  border: 1.5px solid color-mix(in srgb, var(--portrait-color) 45%, transparent);
-  opacity: 0.55;
+  border: 1.5px solid hsl(var(--av-h) 45% calc(var(--av-l) - 20%) / 0.4);
+}
+
+.ringInner {
+  position: absolute;
+  width: 68cqw;
+  height: 68cqw;
+  border-radius: 50%;
+  border: 1px solid hsl(var(--av-h) 45% calc(var(--av-l) - 20%) / 0.25);
 }
 
 .initials {
   position: relative;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 34cqw;
+  font-size: 32cqw;
   line-height: 1;
   letter-spacing: -0.02em;
-  color: color-mix(in srgb, var(--portrait-color) 78%, var(--ink) 22%);
+  color: hsl(var(--av-h) 42% var(--av-tl));
+  transform: translateY(-6%);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .initials {
-    color: color-mix(in srgb, var(--portrait-color) 88%, var(--ink) 12%);
-  }
-}
-:root[data-theme='dark'] .initials {
-  color: color-mix(in srgb, var(--portrait-color) 88%, var(--ink) 12%);
+/* A small, restrained wheat-sprig mark under the monogram — the one deliberate nod to "this is a
+   bakery," kept quiet enough that it reads as a maker's-mark detail, not a logo. */
+.sprig {
+  position: absolute;
+  bottom: 14%;
+  width: 34cqw;
+  height: auto;
+  fill: none;
+  stroke: hsl(var(--av-h) 40% var(--av-tl) / 0.55);
+  stroke-width: 1.4;
+  stroke-linecap: round;
 }

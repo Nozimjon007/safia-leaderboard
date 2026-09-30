@@ -9,7 +9,10 @@ interface AvatarProps {
   className?: string;
 }
 
-function hashHue(seed: string): number {
+/** Every member gets one stable hue from their id, reused everywhere a portrait might fall back to
+ * an illustrated identity (this avatar and the larger PortraitFallback) — so the same person always
+ * reads as the same person around the app, not just within one component. */
+export function hashHue(seed: string): number {
   let h = 0;
   for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) % 360;
   return h;

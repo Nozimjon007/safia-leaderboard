@@ -49,7 +49,7 @@ export function ContenderCard({ row, clanId, emblem, compareSelected, onToggleCo
           {row.member.fullBodyPhoto ? (
             <img src={row.member.fullBodyPhoto} alt="" className={styles.photo} />
           ) : (
-            <PortraitFallback name={row.member.name} clanId={clanId} className={styles.portraitFallback} />
+            <PortraitFallback id={row.member.id} name={row.member.name} className={styles.portraitFallback} />
           )}
           <span className={`${styles.rankNum} tabular`} data-medal={medalFor(row.overallRank)}>
             <span className="visually-hidden">{t('rank_label')} </span>#{row.overallRank}
