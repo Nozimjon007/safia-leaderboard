@@ -141,7 +141,7 @@ export function ComparePage() {
             <option value="">{t('compare_select_placeholder')}</option>
             {sortedMembers.map((m) => (
               <option key={m.id} value={m.id}>
-                {m.name} — {roleLabel(t, m.role)}
+                {m.name} · {roleLabel(t, m.role)}
               </option>
             ))}
           </select>
@@ -152,7 +152,7 @@ export function ComparePage() {
             <option value="">{t('compare_select_placeholder')}</option>
             {bOptions.map((m) => (
               <option key={m.id} value={m.id}>
-                {m.name} — {roleLabel(t, m.role)}
+                {m.name} · {roleLabel(t, m.role)}
               </option>
             ))}
           </select>

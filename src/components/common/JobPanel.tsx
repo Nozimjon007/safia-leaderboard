@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import type { Member } from '../../data/types';
 import type { ClanId } from '../../lib/clans';
-import { areaLabel, clanName, roleDescription, roleIcon, roleLabel, shiftLabel, useI18n } from '../../i18n';
+import { areaLabel, clanName, leadershipStory, roleIcon, roleLabel, shiftLabel, useI18n } from '../../i18n';
 import { formatScore } from '../../lib/format';
 import { ClanCrest } from './ClanCrest';
 import styles from './JobPanel.module.css';
@@ -20,14 +20,15 @@ interface JobPanelProps {
 }
 
 /**
- * "Understand the employee's work without opening their profile" — job title, a real one-sentence
- * description (never "Works at Safia" filler, see i18n's roleDescription), site/team, and which
- * clan they belong to. Reused at every size from the top-five centerpiece down to a table row.
+ * "Understand the leader's work without opening their profile": role, a varied one-sentence
+ * leadership story grounded in their real site and shift (never the same sentence twice, see i18n's
+ * leadershipStory), site/team, and which clan they belong to. Reused at every size from the top-five
+ * centerpiece down to a table row.
  */
 export function JobPanel({ member, clanId, overallRank, overallScore, compact, showSoloStat = true }: JobPanelProps) {
   const { t, locale } = useI18n();
   const location = useLocation();
-  const description = roleDescription(t, member.role);
+  const description = leadershipStory(t, member);
 
   return (
     <div className={styles.panel} data-compact={compact || undefined}>

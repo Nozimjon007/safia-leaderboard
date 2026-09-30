@@ -26,14 +26,14 @@ function setWeeks(scores: MemberScores, category: CategoryKey, weeks: number[], 
   (scores as Record<CategoryKey, (number | null)[]>)[category] = arr;
 }
 
-function member(id: string, role = 'Baker'): Member {
+function member(id: string, role = 'Team Leader'): Member {
   return { id, name: id, area: 'Site 1', shift: 'S1', role, avatarPhoto: null, fullBodyPhoto: null };
 }
 
 describe('computeClanContributionEvents — craft-mission points', () => {
   const weekCount = 6;
   const season = seasonOf(2026, 3); // Q3 2026
-  const alice = member('alice', 'Baker'); // Baker thresholds: output=4, precision=4, kaizen=3, attendance=4
+  const alice = member('alice'); // Team Leader thresholds: output=4, precision=4, kaizen=3, attendance=4
 
   const scores = flatScores(weekCount, 50);
   setWeeks(scores, 'load', [0, 1, 2, 3], 95); // completes the output mission (non-kaizen)
@@ -79,7 +79,7 @@ describe('computeClanContributionEvents — craft-mission points', () => {
 describe('computeClanContributionEvents — weekly clan mission cap', () => {
   const weekCount = 6;
   const season = seasonOf(2026, 3);
-  const bob = member('bob', 'Baker');
+  const bob = member('bob');
 
   const scores = flatScores(weekCount, 50);
   // Week 0: both missions qualify (clean_sweep needs concern>=85; steady_output needs load>=88 + concern>=70).

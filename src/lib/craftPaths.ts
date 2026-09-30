@@ -61,57 +61,26 @@ function mission(role: string, concept: CraftConcept, threshold: number): CraftM
   return { id: `${role.toLowerCase().replace(/\s+/g, '_')}_${concept}`, concept, threshold };
 }
 
-/** One path per role actually present in the demo roster (see data/demoData.ts) — adapted, not
- * invented: each path picks the 4 concepts that most plausibly matter for that job, at a threshold
- * that's meaningful but reachable within one ~13-week season. */
+/**
+ * One Leadership Mastery path for the one role this product ranks (see data/demoData.ts's scope
+ * note: team leaders only). Every mission maps to a scoring category a team leader can actually
+ * influence directly, reusing the same five categories and thresholds the rest of the app already
+ * scores on, nothing here changes a real business formula:
+ *  - output (Workload)   -> shift coordination and handover: keeping the shift's own output steady.
+ *  - precision (Supervision) -> coaching and team development: this category IS oversight of others.
+ *  - kaizen (Kaizen)      -> approved process improvements: unchanged, already exactly this.
+ *  - vigilance (Concern)  -> quality and safety oversight: unchanged concept, leadership framing.
+ *  - attendance (Attendance) -> reliable presence for a dependable handover.
+ */
 export const CRAFT_PATHS: readonly CraftPathDef[] = [
   {
-    role: 'Baker',
-    missions: [mission('Baker', 'output', 4), mission('Baker', 'precision', 4), mission('Baker', 'kaizen', 3), mission('Baker', 'attendance', 4)],
-  },
-  {
-    role: 'Decorator',
+    role: 'Team Leader',
     missions: [
-      mission('Decorator', 'precision', 4),
-      mission('Decorator', 'kaizen', 3),
-      mission('Decorator', 'vigilance', 3),
-      mission('Decorator', 'attendance', 4),
-    ],
-  },
-  {
-    role: 'Shift Lead',
-    missions: [
-      mission('Shift Lead', 'vigilance', 4),
-      mission('Shift Lead', 'kaizen', 4),
-      mission('Shift Lead', 'attendance', 4),
-      mission('Shift Lead', 'output', 3),
-    ],
-  },
-  {
-    role: 'Packer',
-    missions: [
-      mission('Packer', 'output', 4),
-      mission('Packer', 'precision', 4),
-      mission('Packer', 'vigilance', 3),
-      mission('Packer', 'attendance', 4),
-    ],
-  },
-  {
-    role: 'Cashier',
-    missions: [
-      mission('Cashier', 'precision', 4),
-      mission('Cashier', 'vigilance', 4),
-      mission('Cashier', 'kaizen', 3),
-      mission('Cashier', 'attendance', 4),
-    ],
-  },
-  {
-    role: 'Delivery',
-    missions: [
-      mission('Delivery', 'output', 4),
-      mission('Delivery', 'vigilance', 4),
-      mission('Delivery', 'kaizen', 3),
-      mission('Delivery', 'attendance', 4),
+      mission('Team Leader', 'output', 4),
+      mission('Team Leader', 'precision', 4),
+      mission('Team Leader', 'kaizen', 3),
+      mission('Team Leader', 'vigilance', 4),
+      mission('Team Leader', 'attendance', 4),
     ],
   },
 ] as const;

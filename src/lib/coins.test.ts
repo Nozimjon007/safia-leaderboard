@@ -12,7 +12,7 @@ function flatScores(weekCount: number, value: number | null): MemberScores {
   return out;
 }
 
-function member(id: string, role = 'Baker'): Member {
+function member(id: string, role = 'Team Leader'): Member {
   return { id, name: id, area: 'Site 1', shift: 'S1', role, avatarPhoto: null, fullBodyPhoto: null };
 }
 

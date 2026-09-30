@@ -14,8 +14,8 @@ describe('computeAllAchievements (against the real demo dataset)', () => {
     for (const m of dataset.members) expect(byMember[m.id]).toBeDefined();
   });
 
-  it('never awards anything to a member with no data at all (aziz)', () => {
-    expect(byMember.aziz).toEqual([]);
+  it('never awards anything to a member with no data at all (lead001)', () => {
+    expect(byMember.lead001).toEqual([]);
   });
 
   it('awards exactly one champion per completed season, across the whole roster', () => {

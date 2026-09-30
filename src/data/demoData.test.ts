@@ -26,21 +26,25 @@ describe('buildDemoDataset', () => {
     }
   });
 
-  it('has at least 100 demo members, each with a role and a shift', () => {
-    expect(dataset.members.length).toBeGreaterThanOrEqual(100);
+  // Safia League ranks team leaders only (a mentor scope correction, see demoData.ts's module docs) —
+  // one per site per shift, not padded to any round number, so this checks the real derived count
+  // (nine sites x two shifts = 18) instead of asserting a minimum that no longer applies.
+  it('has exactly one team leader per site per shift, every member a real leader with a shift', () => {
+    expect(dataset.members.length).toBe(18);
+    const seen = new Set<string>();
     for (const m of dataset.members) {
-      expect(m.role.length).toBeGreaterThan(0);
+      expect(m.role).toBe('Team Leader');
       expect(['S1', 'S2']).toContain(m.shift);
+      const slot = `${m.area}|${m.shift}`;
+      expect(seen.has(slot)).toBe(false); // exactly one leader per site/shift slot
+      seen.add(slot);
     }
   });
 
-  it('keeps the 12 hand-authored members intact, by id, alongside the generated roster', () => {
-    const HAND_AUTHORED_IDS = [
-      'madina', 'otabek', 'zarina', 'jahongir', 'kamronbek', 'aziz',
-      'nodira', 'gulbahor', 'shahnoza', 'dilnoza', 'sardor', 'feruza',
-    ];
+  it('keeps the two hand-authored leaders intact, by id, alongside the generated roster', () => {
     const ids = new Set(dataset.members.map((m) => m.id));
-    for (const id of HAND_AUTHORED_IDS) expect(ids.has(id)).toBe(true);
+    expect(ids.has('otabek')).toBe(true);
+    expect(ids.has('nodira')).toBe(true);
   });
 
   it('has no duplicate member ids or names across the full roster', () => {
@@ -50,13 +54,10 @@ describe('buildDemoDataset', () => {
     expect(new Set(names).size).toBe(names.length);
   });
 
-  it('gives the generated roster (beyond the original 12) a null photo — the UI initials-fallback, not a missing asset', () => {
-    const HAND_AUTHORED_IDS = new Set([
-      'madina', 'otabek', 'zarina', 'jahongir', 'kamronbek', 'aziz',
-      'nodira', 'gulbahor', 'shahnoza', 'dilnoza', 'sardor', 'feruza',
-    ]);
+  it('gives the generated roster (beyond the two hand-authored leaders) a null photo — the UI initials-fallback, not a missing asset', () => {
+    const HAND_AUTHORED_IDS = new Set(['otabek', 'nodira']);
     const generated = dataset.members.filter((m) => !HAND_AUTHORED_IDS.has(m.id));
-    expect(generated.length).toBeGreaterThanOrEqual(88);
+    expect(generated.length).toBe(16);
     for (const m of generated) {
       expect(m.avatarPhoto).toBeNull();
       expect(m.fullBodyPhoto).toBeNull();
@@ -67,23 +68,20 @@ describe('buildDemoDataset', () => {
     const again = buildDemoDataset();
     expect(again.members.map((m) => m.id)).toEqual(dataset.members.map((m) => m.id));
     expect(again.members.map((m) => m.name)).toEqual(dataset.members.map((m) => m.name));
-    expect(again.scores['emp050']).toEqual(dataset.scores['emp050']);
-    expect(again.scores.madina).toEqual(dataset.scores.madina);
+    expect(again.scores.lead005).toEqual(dataset.scores.lead005);
+    expect(again.scores.otabek).toEqual(dataset.scores.otabek);
   });
 
-  it('spreads members across more than one role (needed for the same-role comparison default)', () => {
+  it('gives every leader a same-role comparison partner (everyone shares the one Team Leader role)', () => {
     const roles = new Set(dataset.members.map((m) => m.role));
-    expect(roles.size).toBeGreaterThan(1);
-    for (const role of roles) {
-      const count = dataset.members.filter((m) => m.role === role).length;
-      expect(count).toBeGreaterThanOrEqual(2); // every role has at least one same-role comparison partner
-    }
+    expect(roles.size).toBe(1);
+    expect(dataset.members.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('keeps the deliberate "no data at all" member (aziz) null in every category and week', () => {
-    const aziz = dataset.scores.aziz;
+  it('keeps the deliberate "no data at all" member null in every category and week', () => {
+    const brandNew = dataset.scores.lead001;
     for (const c of CATEGORY_KEYS) {
-      expect(aziz[c].every((v) => v == null)).toBe(true);
+      expect(brandNew[c].every((v) => v == null)).toBe(true);
     }
   });
 

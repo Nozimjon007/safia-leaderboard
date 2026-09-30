@@ -36,7 +36,7 @@ describe('computeAllSeasonRewards (against the real demo dataset)', () => {
   });
 
   it('never rewards the member with no data at all', () => {
-    expect(rewardsForMember(rewards, 'aziz')).toEqual([]);
+    expect(rewardsForMember(rewards, 'lead001')).toEqual([]);
   });
 
   it('excludes a season still inside its approval grace window, even though its numbers are frozen', () => {

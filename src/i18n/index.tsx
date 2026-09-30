@@ -79,6 +79,10 @@ export function categoryOriginalLabel(t: TFunction, category: CategoryKey): stri
 // CategoryKey, so it needs an explicit lookup rather than a `role_${role}` template — that also
 // means an unrecognized role degrades to showing the raw string instead of a missing-key crash.
 const ROLE_LABEL_KEYS: Record<string, TranslationKey> = {
+  'Team Leader': 'role_team_leader',
+  // The five below are no current member's role (see demoData.ts's scope note: team leaders only) —
+  // kept only so a career-history entry like "promoted from Baker" still translates correctly in the
+  // Craft Journal / career timeline instead of falling back to a raw English string.
   Baker: 'role_baker',
   'Shift Lead': 'role_shift_lead',
   Decorator: 'role_decorator',
@@ -95,6 +99,7 @@ export function roleLabel(t: TFunction, role: string): string {
 // See lib/craftPaths.ts's CRAFT_PATHS — one path per role, named separately from the plain role
 // label (e.g. "Baker's Path" vs. "Baker") since it's shown right alongside the role itself.
 const CRAFT_PATH_NAME_KEYS: Record<string, TranslationKey> = {
+  'Team Leader': 'craft_path_name_team_leader',
   Baker: 'craft_path_name_baker',
   'Shift Lead': 'craft_path_name_shift_lead',
   Decorator: 'craft_path_name_decorator',
@@ -109,6 +114,7 @@ export function craftPathLabel(t: TFunction, role: string): string {
 }
 
 const ROLE_DESC_KEYS: Record<string, TranslationKey> = {
+  'Team Leader': 'role_team_leader_desc',
   Baker: 'role_baker_desc',
   'Shift Lead': 'role_shift_lead_desc',
   Decorator: 'role_decorator_desc',
@@ -124,9 +130,31 @@ export function roleDescription(t: TFunction, role: string): string {
   return key ? t(key) : '';
 }
 
+const LEADERSHIP_STORY_KEYS: readonly TranslationKey[] = [
+  'leadership_story_1',
+  'leadership_story_2',
+  'leadership_story_3',
+  'leadership_story_4',
+  'leadership_story_5',
+  'leadership_story_6',
+];
+
+/** Every competitor here is a Team Leader (see demoData.ts's scope note), so a flat role description
+ * would read as the same sentence on every card — the thing the brief specifically asked to avoid.
+ * Picks one of a handful of leadership-story templates, deterministically per member (stable across
+ * renders, never random), and fills it with that member's own real shift and site rather than
+ * inventing a team size, tenure, or specialization the data doesn't have. */
+export function leadershipStory(t: TFunction, member: { id: string; area: string; shift: string }): string {
+  let h = 0;
+  for (let i = 0; i < member.id.length; i++) h = (h * 31 + member.id.charCodeAt(i)) >>> 0;
+  const key = LEADERSHIP_STORY_KEYS[h % LEADERSHIP_STORY_KEYS.length];
+  return t(key, { shift: shiftLabel(t, member.shift), site: areaLabel(t, member.area) });
+}
+
 /** A plain, deliberately non-colorful icon per job — the bakery-specific ones (bread, cake) are
  * on-brand; kept simple and consistent with the rest of the app's icon language elsewhere. */
 const ROLE_ICON: Record<string, string> = {
+  'Team Leader': '🧭',
   Baker: '🍞',
   'Shift Lead': '🧭',
   Decorator: '🎂',

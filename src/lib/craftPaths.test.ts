@@ -35,7 +35,7 @@ describe('qualifyingWeeks', () => {
   setWeeks(scores, 'load', [0, 1, 2, 3], 95);
   setWeeks(scores, 'concern', [0, 1, 2], 80);
   setWeeks(scores, 'concern', [3], 50); // stays below the floor
-  const dataset: LeaderboardDataset = { sourceLabel: 'Demo', firstWeekStart: '2026-07-06', weekCount, members: [member('alice', 'Baker')], scores: { alice: scores } };
+  const dataset: LeaderboardDataset = { sourceLabel: 'Demo', firstWeekStart: '2026-07-06', weekCount, members: [member('alice', 'Team Leader')], scores: { alice: scores } };
 
   it('counts a strong-output week only when paired with a safety/vigilance floor (anti-gaming)', () => {
     const weeks = qualifyingWeeks(dataset, 'alice', [0, 1, 2, 3, 4, 5], 'output');
@@ -57,7 +57,7 @@ describe('computeCraftPathProgress', () => {
   setWeeks(scores, 'load', [0, 1, 2, 3, 4], 95); // 5 strong-load weeks
   setWeeks(scores, 'concern', [0, 1, 2, 4], 80); // but only 4 of those are safety-paired (week 3 stays low)
   setWeeks(scores, 'attendance', [0, 1, 2, 3, 4], 99); // 5 reliable weeks
-  const alice = member('alice', 'Baker');
+  const alice = member('alice', 'Team Leader');
   const season = seasonOf(2026, 3);
   const dataset: LeaderboardDataset = {
     sourceLabel: 'Demo',
@@ -68,7 +68,7 @@ describe('computeCraftPathProgress', () => {
   };
 
   it("resolves the member's path from their role", () => {
-    expect(craftPathForRole('Baker')?.role).toBe('Baker');
+    expect(craftPathForRole('Team Leader')?.role).toBe('Team Leader');
     expect(craftPathForRole('Nonexistent Role')).toBeNull();
   });
 
@@ -91,7 +91,7 @@ describe('computeCraftPathProgress', () => {
 
   it('caps starsEarned/starsPossible to the path’s own mission count', () => {
     const progress = computeCraftPathProgress(dataset, alice, season)!;
-    expect(progress.starsPossible).toBe(4);
+    expect(progress.starsPossible).toBe(5);
     expect(progress.starsEarned).toBe(2); // output + attendance only
   });
 
@@ -111,7 +111,7 @@ describe('computeCraftMastery', () => {
     sourceLabel: 'Demo',
     firstWeekStart: '2026-01-05', // a Monday at/near the start of Q1 2026
     weekCount,
-    members: [member('alice', 'Baker')],
+    members: [member('alice', 'Team Leader')],
     scores: { alice: scores },
   };
   const q1 = seasonOf(2026, 1); // approved relative to the fixed "now" below
@@ -127,12 +127,12 @@ describe('computeCraftMastery', () => {
     setWeeks(withStars, 'concern', [26, 27, 28, 29], 80);
     const ds: LeaderboardDataset = { ...dataset, scores: { alice: withStars } };
 
-    const mastery = computeCraftMastery(ds, member('alice', 'Baker'), [q1, q3], fixedNowMs);
+    const mastery = computeCraftMastery(ds, member('alice', 'Team Leader'), [q1, q3], fixedNowMs);
     expect(mastery.totalStars).toBe(1); // Q1's output star only — Q3's is real progress but not yet "career"
   });
 
   it('has no stars, bronze tier, with nothing earned', () => {
-    const mastery = computeCraftMastery(dataset, member('alice', 'Baker'), [q1, q3], fixedNowMs);
+    const mastery = computeCraftMastery(dataset, member('alice', 'Team Leader'), [q1, q3], fixedNowMs);
     expect(mastery.totalStars).toBe(0);
     expect(mastery.tier).toBe('bronze');
     expect(mastery.toNextTier).toBe(5);
@@ -198,7 +198,7 @@ describe('computeSeasonDistinctions', () => {
       sourceLabel: 'Demo',
       firstWeekStart: '2026-01-05',
       weekCount,
-      members: [member('grower', 'Baker')],
+      members: [member('grower', 'Team Leader')],
       scores: { grower: scores },
     };
     const prev = seasonOf(2026, 1);
