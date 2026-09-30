@@ -182,6 +182,7 @@ export function SeasonPanel({
       <div className={styles.links}>
         <Link to={{ pathname: '/seasons', search: location.search }}>{t('season_view_past')}</Link>
         <Link to={{ pathname: '/rewards', search: location.search }}>{t('season_view_rewards')}</Link>
+        <Link to="/shop">{t('shop_title')}</Link>
       </div>
     </section>
   );

@@ -108,6 +108,85 @@ export function craftPathLabel(t: TFunction, role: string): string {
   return key ? t(key) : t('craft_path_heading');
 }
 
+const ROLE_DESC_KEYS: Record<string, TranslationKey> = {
+  Baker: 'role_baker_desc',
+  'Shift Lead': 'role_shift_lead_desc',
+  Decorator: 'role_decorator_desc',
+  Packer: 'role_packer_desc',
+  Cashier: 'role_cashier_desc',
+  Delivery: 'role_delivery_desc',
+};
+
+/** A one-sentence "what this job actually does" — see JobPanel. Configurable in one place (this
+ * map + the role_*_desc dictionary entries), never a generic "Works at Safia" filler. */
+export function roleDescription(t: TFunction, role: string): string {
+  const key = ROLE_DESC_KEYS[role];
+  return key ? t(key) : '';
+}
+
+/** A plain, deliberately non-colorful icon per job — the bakery-specific ones (bread, cake) are
+ * on-brand; kept simple and consistent with the rest of the app's icon language elsewhere. */
+const ROLE_ICON: Record<string, string> = {
+  Baker: '🍞',
+  'Shift Lead': '🧭',
+  Decorator: '🎂',
+  Packer: '📦',
+  Cashier: '💳',
+  Delivery: '🚚',
+};
+
+export function roleIcon(role: string): string {
+  return ROLE_ICON[role] ?? '💼';
+}
+
+const CLAN_NAME_KEYS: Record<string, TranslationKey> = {
+  golden_crust: 'clan_name_golden_crust',
+  saffron_rise: 'clan_name_saffron_rise',
+  cinnamon_hearth: 'clan_name_cinnamon_hearth',
+  honey_bloom: 'clan_name_honey_bloom',
+};
+
+const CLAN_IDENTITY_KEYS: Record<string, TranslationKey> = {
+  golden_crust: 'clan_identity_golden_crust',
+  saffron_rise: 'clan_identity_saffron_rise',
+  cinnamon_hearth: 'clan_identity_cinnamon_hearth',
+  honey_bloom: 'clan_identity_honey_bloom',
+};
+
+export function clanName(t: TFunction, clanId: string): string {
+  const key = CLAN_NAME_KEYS[clanId];
+  return key ? t(key) : clanId;
+}
+
+/** A short one-line tagline — "steady hands, golden loaves" — not a full description. */
+export function clanIdentity(t: TFunction, clanId: string): string {
+  const key = CLAN_IDENTITY_KEYS[clanId];
+  return key ? t(key) : '';
+}
+
+// The Safia Rewards Shop's catalog ids and enum values already match their translation keys'
+// naming convention exactly (see lib/shop.ts and the shop_* dictionary entries), so these build the
+// key directly rather than keeping a second, redundant id->key map in sync with the catalog.
+export function shopItemName(t: TFunction, itemId: string): string {
+  return t(`shop_item_${itemId}_name` as TranslationKey);
+}
+
+export function shopItemDescription(t: TFunction, itemId: string): string {
+  return t(`shop_item_${itemId}_desc` as TranslationKey);
+}
+
+export function shopCategoryLabel(t: TFunction, category: string): string {
+  return t(`shop_category_${category}` as TranslationKey);
+}
+
+export function shopPendingReasonLabel(t: TFunction, reason: string): string {
+  return t(`shop_pending_${reason}` as TranslationKey);
+}
+
+export function shopStatusLabel(t: TFunction, status: string): string {
+  return t(`shop_status_${status}` as TranslationKey);
+}
+
 /** "Q3 2026" / "3 кв. 2026" / "2026 йил, 3-чорак" — compact quarter label, locale-aware. */
 export function seasonQuarterLabel(t: TFunction, season: { year: number; quarter: number }): string {
   return t('season_quarter_label', { quarter: season.quarter, year: season.year });

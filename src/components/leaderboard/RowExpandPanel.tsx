@@ -5,11 +5,20 @@ import { strengthsAndWeaknesses } from '../../lib/scoring';
 import { formatPercent } from '../../lib/format';
 import { CATEGORY_KEYS, type CategoryKey } from '../../data/types';
 import type { CraftPreview } from '../../lib/craftPaths';
+import type { ClanId } from '../../lib/clans';
 import { RadarChart } from '../charts/RadarChart';
+import { JobPanel } from '../common/JobPanel';
 import { StrengthsList } from './StrengthsList';
 import styles from './RowExpandPanel.module.css';
 
-export function RowExpandPanel({ row, team, craftPreview }: { row: LeaderboardRow; team: TeamStats; craftPreview?: CraftPreview | null }) {
+interface RowExpandPanelProps {
+  row: LeaderboardRow;
+  team: TeamStats;
+  craftPreview?: CraftPreview | null;
+  clanId?: ClanId | null;
+}
+
+export function RowExpandPanel({ row, team, craftPreview, clanId }: RowExpandPanelProps) {
   const { t } = useI18n();
   const location = useLocation();
   const { strengths, weaknesses } = strengthsAndWeaknesses(row.current.categories, team.categoryAverages);
@@ -33,6 +42,9 @@ export function RowExpandPanel({ row, team, craftPreview }: { row: LeaderboardRo
           formatValue={formatPercent}
         />
         <div>
+          <div className={styles.jobWrap}>
+            <JobPanel member={row.member} clanId={clanId ?? null} overallRank={row.overallRank} overallScore={row.current.overall} compact showSoloStat={false} />
+          </div>
           <StrengthsList strengths={strengths} weaknesses={weaknesses} compact />
           <p className={styles.openWrap}>
             <Link className="btn btnPrimary" to={{ pathname: `/member/${row.member.id}`, search: location.search }}>

@@ -13,11 +13,15 @@ import { computeSeasonDistinctions, type SeasonDistinction } from '../lib/craftP
 import { formatDateRange, weekEndISO, weekIndexesInRange, weekStartISO, formatShortDate } from '../lib/dates';
 import { formatScore, formatSigned } from '../lib/format';
 import { zoneColorVar } from '../lib/zoneStyle';
+import type { ClanId } from '../lib/clans';
+import { useClanAssignments } from '../hooks/useClans';
+import { useCoinLedger, type CoinLedger } from '../hooks/useCoinLedger';
 import { DemoBanner } from '../components/common/DemoBanner';
 import { StateMessage } from '../components/common/StateMessage';
 import { LeaderboardSkeleton } from '../components/leaderboard/LeaderboardSkeleton';
 import { Avatar } from '../components/common/Avatar';
 import { MoveBadge } from '../components/common/MoveBadge';
+import { CoinAwardsReveal } from '../components/season/CoinAwardsReveal';
 import { Podium } from '../components/leaderboard/Podium';
 import { SummaryStats } from '../components/leaderboard/SummaryStats';
 import { LeaderboardTable } from '../components/leaderboard/LeaderboardTable';
@@ -144,6 +148,8 @@ function previousSeasonOf(season: Season): Season {
 
 function SeasonDetailContent({ dataset, config, season, statusValue, now, tab, setTab, backHref }: SeasonDetailContentProps) {
   const { t, locale } = useI18n();
+  const clanAssignments = useClanAssignments(dataset);
+  const coinLedger = useCoinLedger();
 
   const weekIndexes = useMemo(
     () => (statusValue === 'upcoming' ? [] : weekIndexesInRange(dataset.firstWeekStart, dataset.weekCount, season.startISO, season.endISO)),
@@ -255,12 +261,16 @@ function SeasonDetailContent({ dataset, config, season, statusValue, now, tab, s
         {tab === 'awards' && (
           <AwardsTab
             dataset={dataset}
+            config={config}
             season={season}
             statusValue={statusValue}
             rewards={rewards}
             achievementsByMember={achievementsByMember}
             distinctions={distinctions}
             seasonSearch={seasonSearch}
+            clanAssignments={clanAssignments}
+            coinLedger={coinLedger}
+            now={now}
           />
         )}
         {tab === 'insights' && <InsightsTab dataset={dataset} config={config} result={result} statusValue={statusValue} seasonSearch={seasonSearch} />}
@@ -394,6 +404,7 @@ function StandingsTab({
     sortKey: 'rank',
     sortDir: 'asc',
     view: 'table',
+    board: 'solo',
   });
 
   function updateLocal(patch: Partial<Record<keyof LeaderboardFilters, string>>) {
@@ -563,20 +574,29 @@ function TimelineTab({ dataset, config, season, statusValue }: TabCommonProps & 
 
 function AwardsTab({
   dataset,
+  config,
   season,
   statusValue,
   rewards,
   achievementsByMember,
   distinctions,
   seasonSearch,
+  clanAssignments,
+  coinLedger,
+  now,
 }: TabCommonProps & {
+  config: ScoringConfig;
   season: Season;
   rewards: ReturnType<typeof computeSeasonRewards>;
   achievementsByMember: ReturnType<typeof computeAllAchievements>;
   distinctions: SeasonDistinction[];
   seasonSearch: string;
+  clanAssignments: Record<string, ClanId>;
+  coinLedger: CoinLedger;
+  now: number;
 }) {
   const { t } = useI18n();
+  const [revealPlayKey, setRevealPlayKey] = useState(0);
 
   if (statusValue === 'upcoming') {
     return <StateMessage title={t('season_tab_awards')} body={t('season_upcoming_note')} />;
@@ -647,6 +667,43 @@ function AwardsTab({
                 ))}
               </ul>
             )}
+          </>
+        )}
+      </section>
+
+      <section className={styles.panel}>
+        <h2>{t('coins_awarded_heading')}</h2>
+        <p className={styles.sub}>{t('coins_disclaimer')}</p>
+        {statusValue !== 'approved' ? (
+          <p className={styles.sub}>{t('coins_pending_note')}</p>
+        ) : !coinLedger.isSeasonFinalized(season.id) ? (
+          <>
+            <p className={styles.sub}>{t('coins_finalize_help')}</p>
+            <button
+              type="button"
+              className="btn btnPrimary"
+              onClick={() => {
+                coinLedger.finalizeSeason(dataset, config, clanAssignments, season, previousSeasonOf(season), now);
+                setRevealPlayKey((k) => k + 1);
+              }}
+            >
+              {t('coins_finalize_button')}
+            </button>
+          </>
+        ) : (
+          <>
+            <p className={styles.sub}>
+              {t('coins_finalized_note')}{' '}
+              <button type="button" className={styles.linkBtn} onClick={() => setRevealPlayKey((k) => k + 1)}>
+                {t('coins_replay_reveal')}
+              </button>
+            </p>
+            <CoinAwardsReveal
+              season={season}
+              dataset={dataset}
+              transactions={coinLedger.transactions.filter((tx) => tx.seasonId === season.id)}
+              playKey={`${season.id}:${revealPlayKey}`}
+            />
           </>
         )}
       </section>

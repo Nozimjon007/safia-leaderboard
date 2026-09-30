@@ -8,6 +8,7 @@ import { formatPercent, formatScore } from '../../lib/format';
 import { useScoringConfig } from '../../state/ScoringConfigProvider';
 import { medalFor, zoneColorVar, zoneGlyph } from '../../lib/zoneStyle';
 import type { CraftPreview } from '../../lib/craftPaths';
+import type { ClanId } from '../../lib/clans';
 import { Avatar } from '../common/Avatar';
 import { MoveBadge } from '../common/MoveBadge';
 import { ZoneBadge } from '../common/ZoneBadge';
@@ -30,11 +31,22 @@ interface LeaderboardTableProps {
   /** This season's Craft Path preview, keyed by member id — see LeaderboardPage. Only ever populated
    * for the rows actually being rendered. */
   craftPreviewByMember?: Record<string, CraftPreview>;
+  clanAssignments?: Record<string, ClanId>;
 }
 
 const COLUMN_COUNT = 4 + CATEGORY_KEYS.length + 2;
 
-export function LeaderboardTable({ rows, team, filters, onChange, compareIds, onToggleCompare, highlightedId, craftPreviewByMember }: LeaderboardTableProps) {
+export function LeaderboardTable({
+  rows,
+  team,
+  filters,
+  onChange,
+  compareIds,
+  onToggleCompare,
+  highlightedId,
+  craftPreviewByMember,
+  clanAssignments,
+}: LeaderboardTableProps) {
   const { t } = useI18n();
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set());
 
@@ -91,6 +103,7 @@ export function LeaderboardTable({ rows, team, filters, onChange, compareIds, on
               onToggleCompare={() => onToggleCompare(row.member.id)}
               highlighted={highlightedId === row.member.id}
               craftPreview={craftPreviewByMember?.[row.member.id] ?? null}
+              clanId={clanAssignments?.[row.member.id] ?? null}
             />
           ))}
         </tbody>
@@ -108,10 +121,11 @@ interface TableRowProps {
   compareSelected: boolean;
   onToggleCompare: () => void;
   highlighted: boolean;
+  clanId: ClanId | null;
   craftPreview: CraftPreview | null;
 }
 
-function TableRow({ row, team, metric, isOpen, onToggle, compareSelected, onToggleCompare, highlighted, craftPreview }: TableRowProps) {
+function TableRow({ row, team, metric, isOpen, onToggle, compareSelected, onToggleCompare, highlighted, craftPreview, clanId }: TableRowProps) {
   const { t, locale } = useI18n();
   const { config } = useScoringConfig();
   const location: Location = useLocation();
@@ -233,7 +247,7 @@ function TableRow({ row, team, metric, isOpen, onToggle, compareSelected, onTogg
       {isOpen && (
         <tr className={styles.expandRow} id={`expand-${row.member.id}`}>
           <td colSpan={COLUMN_COUNT}>
-            <RowExpandPanel row={row} team={team} craftPreview={craftPreview} />
+            <RowExpandPanel row={row} team={team} craftPreview={craftPreview} clanId={clanId} />
           </td>
         </tr>
       )}

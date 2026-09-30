@@ -6,6 +6,7 @@ import { useDatasetContext } from '../state/DatasetProvider';
 import { useLeaderboardFilters } from '../hooks/useLeaderboardFilters';
 import { useAreaOptions, useLeaderboardResult, useOverallLeaderboardResult, useRoleOptions } from '../hooks/useLeaderboardResult';
 import { usePageParam } from '../hooks/usePageParam';
+import { useClanAssignments } from '../hooks/useClans';
 import { useSeasonReveal } from '../hooks/useSeasonReveal';
 import { useSeasons } from '../hooks/useSeasons';
 import { useTimeMachine } from '../hooks/useTimeMachine';
@@ -14,6 +15,8 @@ import { useScoringConfig } from '../state/ScoringConfigProvider';
 import { filterRowsByQuery, sortRows } from '../lib/scoring';
 import { computeAllAchievements } from '../lib/achievements';
 import { computeCraftPathProgress, craftPathForRole, type CraftPreview } from '../lib/craftPaths';
+import { CLAN_IDS } from '../lib/clans';
+import { computeClanStandings } from '../lib/clanPoints';
 import { buildLeaderboardCsv, downloadCsv } from '../lib/csv';
 import { formatDateRange, weekEndISO, weekStartISO } from '../lib/dates';
 import { findContainingSeason } from '../lib/seasons';
@@ -22,6 +25,9 @@ import { StateMessage } from '../components/common/StateMessage';
 import { SeasonPanel } from '../components/leaderboard/SeasonPanel';
 import { TimeMachineControl } from '../components/leaderboard/TimeMachineControl';
 import { TopFive } from '../components/leaderboard/TopFive';
+import { BoardModeToggle } from '../components/leaderboard/BoardModeToggle';
+import { ClanStandingsPreview } from '../components/leaderboard/ClanStandingsPreview';
+import { ClanStandingsPanel } from '../components/leaderboard/ClanStandingsPanel';
 import { SummaryStats } from '../components/leaderboard/SummaryStats';
 import { FiltersBar } from '../components/leaderboard/FiltersBar';
 import { BoardToolbar } from '../components/leaderboard/BoardToolbar';
@@ -50,6 +56,7 @@ export function LeaderboardPage() {
   const areaOptions = useAreaOptions(dataset);
   const roleOptions = useRoleOptions(dataset);
   const seasonsInfo = useSeasons(dataset);
+  const clanAssignments = useClanAssignments(dataset);
   const tm = useTimeMachine(dataset, config, seasonsInfo?.currentSeason ?? null);
   const [viewAsMemberId, setViewAsMemberId] = useViewAsMemberId(null);
   // Computed here (ahead of the loading/error guards below) purely so usePageParam — a hook, so it
@@ -70,6 +77,19 @@ export function LeaderboardPage() {
     () => (dataset && seasonsInfo ? computeAllAchievements(dataset, config, seasonsInfo.seasons) : {}),
     [dataset, config, seasonsInfo],
   );
+  // Clan standings only make sense for a real season (achievements/coaching points are season-scoped
+  // everywhere else in this app too — see TopFive's own reward-badge gating) — a custom period that
+  // matches no season simply shows the solo board alone, same as the reveal/approval features already do.
+  const previousSeasonForClans = useMemo(() => {
+    if (!seasonsInfo || !matchedSeason) return null;
+    const idx = seasonsInfo.seasons.findIndex((s) => s.id === matchedSeason.id);
+    return idx > 0 ? seasonsInfo.seasons[idx - 1] : null;
+  }, [seasonsInfo, matchedSeason]);
+  const clanStandings = useMemo(
+    () => (dataset && matchedSeason ? computeClanStandings(dataset, config, clanAssignments, CLAN_IDS, matchedSeason, previousSeasonForClans) : null),
+    [dataset, config, clanAssignments, matchedSeason, previousSeasonForClans],
+  );
+  const memberById = useMemo(() => Object.fromEntries((dataset?.members ?? []).map((m) => [m.id, m])), [dataset]);
 
   function toggleCompare(id: string) {
     setCompareIds((prev) => {
@@ -234,18 +254,32 @@ export function LeaderboardPage() {
         />
       )}
 
-      <TopFive
-        rows={rankedTop5}
-        dataset={dataset}
-        config={config}
-        matchedSeason={matchedSeason}
-        achievementsByMember={achievementsByMember}
-        filterLabel={narrowedLabel}
-        compareIds={compareIds}
-        onToggleCompare={toggleCompare}
-        shouldAnimateReveal={seasonReveal.shouldAnimate}
-        playKey={seasonReveal.playKey}
-      />
+      {clanStandings && (
+        <div className={styles.boardModeRow}>
+          <BoardModeToggle mode={filters.board} onChange={(board) => updateFilters({ board })} />
+        </div>
+      )}
+
+      {filters.board === 'clans' && clanStandings ? (
+        <ClanStandingsPanel standings={clanStandings} memberById={memberById} filterLabel={narrowedLabel} />
+      ) : (
+        <>
+          <TopFive
+            rows={rankedTop5}
+            dataset={dataset}
+            config={config}
+            matchedSeason={matchedSeason}
+            achievementsByMember={achievementsByMember}
+            clanAssignments={clanAssignments}
+            filterLabel={narrowedLabel}
+            compareIds={compareIds}
+            onToggleCompare={toggleCompare}
+            shouldAnimateReveal={seasonReveal.shouldAnimate}
+            playKey={seasonReveal.playKey}
+          />
+          {clanStandings && <ClanStandingsPreview standings={clanStandings} memberById={memberById} />}
+        </>
+      )}
 
       <div className={styles.head}>
         <p className={styles.ctx}>
@@ -319,6 +353,7 @@ export function LeaderboardPage() {
                     onToggleCompare={toggleCompare}
                     highlightedId={highlightedId}
                     craftPreviewByMember={craftPreviewByMember}
+                    clanAssignments={clanAssignments}
                   />
                 </div>
                 <div className={styles.mobileOnly}>
@@ -330,6 +365,7 @@ export function LeaderboardPage() {
                     achievementsByMember={achievementsByMember}
                     highlightedId={highlightedId}
                     craftPreviewByMember={craftPreviewByMember}
+                    clanAssignments={clanAssignments}
                   />
                 </div>
               </>
@@ -342,6 +378,7 @@ export function LeaderboardPage() {
                 achievementsByMember={achievementsByMember}
                 highlightedId={highlightedId}
                 craftPreviewByMember={craftPreviewByMember}
+                clanAssignments={clanAssignments}
               />
             )}
             <Pagination page={page} pageSize={PAGE_SIZE} totalItems={shown.length} onChange={setPage} />

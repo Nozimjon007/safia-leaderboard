@@ -10,7 +10,9 @@ import { ComparePage } from './pages/ComparePage';
 import { SeasonsPage } from './pages/SeasonsPage';
 import { SeasonDetailPage } from './pages/SeasonDetailPage';
 import { SeasonComparePage } from './pages/SeasonComparePage';
+import { ClanDetailPage } from './pages/ClanDetailPage';
 import { RewardsPage } from './pages/RewardsPage';
+import { ShopPage } from './pages/ShopPage';
 import { ScoringPage } from './pages/ScoringPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import styles from './App.module.css';
@@ -29,11 +31,13 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<LeaderboardPage />} />
       <Route path="/member/:id" element={<MemberProfilePage />} />
+      <Route path="/clans/:id" element={<ClanDetailPage />} />
       <Route path="/compare" element={<ComparePage />} />
       <Route path="/seasons" element={<SeasonsPage />} />
       <Route path="/seasons/compare" element={<SeasonComparePage />} />
       <Route path="/seasons/:id" element={<SeasonDetailPage />} />
       <Route path="/rewards" element={<RewardsPage />} />
+      <Route path="/shop" element={<ShopPage />} />
       <Route path="/scoring" element={<ScoringPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

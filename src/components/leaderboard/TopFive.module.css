@@ -25,6 +25,26 @@
 .centerpiece {
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.championJob {
+  flex: 1 1 220px;
+  max-width: 260px;
+  padding: 18px 4px;
+}
+
+@media (max-width: 760px) {
+  .centerpiece {
+    flex-direction: column;
+  }
+  .championJob {
+    width: 100%;
+    max-width: 340px;
+    padding: 4px 12px 0;
+  }
 }
 
 .supportGrid {
@@ -159,15 +179,10 @@
   white-space: nowrap;
 }
 
-.sub {
-  color: var(--ink-muted);
-  font-size: 11px;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-top: 2px;
-  margin-bottom: 8px;
+.supportJob {
+  border-top: 1px dashed var(--border-strong);
+  margin: 8px 12px 12px;
+  padding-top: 8px;
 }
 
 .scoreRow {

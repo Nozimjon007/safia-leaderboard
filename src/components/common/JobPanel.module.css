@@ -1,0 +1,148 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.roleIcon {
+  font-size: 22px;
+  line-height: 1;
+  flex: none;
+}
+
+.roleTitle {
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.roleDesc {
+  color: var(--ink-secondary);
+  font-size: 13px;
+  line-height: 1.4;
+  max-width: 32ch;
+}
+
+.siteLine {
+  color: var(--ink-muted);
+  font-size: 12.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shiftTag {
+  display: inline-block;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 5px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.clanRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+  color: var(--ink);
+  padding: 4px 8px 4px 4px;
+  border-radius: var(--radius-full);
+  background: var(--clan-bg, var(--surface-sunken));
+  width: fit-content;
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.1s ease;
+}
+
+.clanRow:hover {
+  box-shadow: inset 0 0 0 1px var(--clan-color, var(--border-strong));
+}
+
+.clanRow:active {
+  transform: scale(0.97);
+}
+
+.clanName {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--clan-color, var(--ink));
+}
+
+.soloStat {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  border-top: 1px dashed var(--border-strong);
+  padding-top: 8px;
+  margin-top: 2px;
+}
+
+.soloLabel {
+  font-size: 11px;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.soloValue {
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--accent-strong);
+}
+
+.soloScore {
+  font-weight: 600;
+  color: var(--ink-secondary);
+  font-size: 13px;
+}
+
+/* ---- Compact mode: table rows, supporting cards — same information, smaller footprint. ---- */
+.panel[data-compact] {
+  gap: 4px;
+}
+
+.panel[data-compact] .roleIcon {
+  font-size: 15px;
+}
+
+.panel[data-compact] .roleTitle {
+  font-size: 13px;
+}
+
+.panel[data-compact] .roleDesc {
+  font-size: 11px;
+  max-width: 26ch;
+}
+
+.panel[data-compact] .siteLine {
+  font-size: 11px;
+}
+
+.panel[data-compact] .clanRow {
+  padding: 2px 7px 2px 3px;
+}
+
+.panel[data-compact] .clanName {
+  font-size: 11px;
+}
+
+.panel[data-compact] .soloStat {
+  padding-top: 5px;
+}
+
+.panel[data-compact] .soloValue {
+  font-size: 12.5px;
+}
+
+.panel[data-compact] .soloScore {
+  font-size: 11px;
+}

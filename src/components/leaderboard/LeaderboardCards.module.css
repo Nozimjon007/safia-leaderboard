@@ -91,11 +91,6 @@
   text-decoration: underline;
 }
 
-.who small {
-  color: var(--ink-muted);
-  font-size: 12.5px;
-}
-
 .rank {
   margin-left: auto;
   text-align: right;
@@ -243,6 +238,11 @@
 .craftPreview span[aria-hidden] {
   color: var(--medal-gold);
   letter-spacing: 1px;
+}
+
+.cardJob {
+  border-top: 1px dashed var(--border-strong);
+  padding-top: 10px;
 }
 
 .badges {

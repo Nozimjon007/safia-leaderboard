@@ -8,11 +8,13 @@ import { computeSeasonRewards } from '../../lib/rewards';
 import { medalFor } from '../../lib/zoneStyle';
 import type { Season } from '../../lib/seasons';
 import { isSeasonApproved } from '../../lib/seasons';
-import { categoryLabel, roleLabel, useI18n } from '../../i18n';
+import type { ClanId } from '../../lib/clans';
+import { categoryLabel, useI18n } from '../../i18n';
 import type { TranslationKey } from '../../i18n/locales/en';
 import { formatScore } from '../../lib/format';
 import { Avatar } from '../common/Avatar';
 import { MoveBadge } from '../common/MoveBadge';
+import { JobPanel } from '../common/JobPanel';
 import { CompareToggle } from './CompareToggle';
 import { PodiumCard, type PodiumEmblem } from './PodiumCard';
 import { ACHIEVEMENT_GLYPHS } from '../../lib/achievements';
@@ -27,6 +29,7 @@ interface TopFiveProps {
   config: ScoringConfig;
   matchedSeason: Season | null;
   achievementsByMember?: Record<string, EarnedAchievement[]>;
+  clanAssignments: Record<string, ClanId>;
   /** e.g. "Site 2" or "Shift 1" when a shift/area filter narrows who's eligible — shown in the heading
    * so a narrowed top five is never mistaken for the whole season's winners. */
   filterLabel: string | null;
@@ -62,6 +65,7 @@ export function TopFive({
   config,
   matchedSeason,
   achievementsByMember,
+  clanAssignments,
   filterLabel,
   compareIds,
   onToggleCompare,
@@ -128,6 +132,14 @@ export function TopFive({
             onToggleCompare={() => onToggleCompare(first.member.id)}
             celebrateDelay={playEntrance ? championDelay + 0.45 : undefined}
           />
+          <div className={styles.championJob}>
+            <JobPanel
+              member={first.member}
+              clanId={clanAssignments[first.member.id] ?? null}
+              overallRank={first.overallRank}
+              overallScore={first.current.overall}
+            />
+          </div>
         </motion.div>
 
         {rest.length > 0 && (
@@ -144,6 +156,7 @@ export function TopFive({
                 >
                   <SupportingCard
                     row={row}
+                    clanId={clanAssignments[row.member.id] ?? null}
                     emblem={emblemFor(row.member.id)}
                     compareSelected={compareIds.includes(row.member.id)}
                     onToggleCompare={() => onToggleCompare(row.member.id)}
@@ -160,12 +173,13 @@ export function TopFive({
 
 interface SupportingCardProps {
   row: LeaderboardRow;
+  clanId: ClanId | null;
   emblem: PodiumEmblem;
   compareSelected: boolean;
   onToggleCompare: () => void;
 }
 
-function SupportingCard({ row, emblem, compareSelected, onToggleCompare }: SupportingCardProps) {
+function SupportingCard({ row, clanId, emblem, compareSelected, onToggleCompare }: SupportingCardProps) {
   const { t, locale } = useI18n();
   const location = useLocation();
   const highlight = computeHighlight(row.current, row.previous);
@@ -198,9 +212,6 @@ function SupportingCard({ row, emblem, compareSelected, onToggleCompare }: Suppo
         </div>
 
         <h3 className={styles.name}>{row.member.name}</h3>
-        <p className={styles.sub}>
-          {roleLabel(t, row.member.role)} · {row.member.area} · {row.member.shift}
-        </p>
 
         <div className={styles.scoreRow}>
           <b className="tabular">{formatScore(row.current.overall, locale)}</b>
@@ -214,6 +225,12 @@ function SupportingCard({ row, emblem, compareSelected, onToggleCompare }: Suppo
             : t('highlight_none')}
         </p>
       </Link>
+
+      {/* Outside the profile Link on purpose — JobPanel's own clan-crest link would be an invalid
+          nested <a> otherwise. */}
+      <div className={styles.supportJob}>
+        <JobPanel member={row.member} clanId={clanId} overallRank={row.overallRank} overallScore={row.current.overall} compact showSoloStat={false} />
+      </div>
     </article>
   );
 }

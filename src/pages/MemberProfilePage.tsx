@@ -5,6 +5,8 @@ import { categoryLabel, roleLabel, useI18n } from '../i18n';
 import { useDatasetContext } from '../state/DatasetProvider';
 import { useLeaderboardFilters, type LeaderboardFilters } from '../hooks/useLeaderboardFilters';
 import { useLeaderboardResult } from '../hooks/useLeaderboardResult';
+import { useClanAssignments } from '../hooks/useClans';
+import { useCoinLedger } from '../hooks/useCoinLedger';
 import { useSeasons } from '../hooks/useSeasons';
 import { useTimeMachine } from '../hooks/useTimeMachine';
 import { useMemberProgress } from '../hooks/useMemberProgress';
@@ -25,9 +27,12 @@ import { formatScore } from '../lib/format';
 import { zoneColorVar } from '../lib/zoneStyle';
 import { computeXpTier, pointsToNextTier } from '../lib/xpTier';
 import type { Season } from '../lib/seasons';
+import type { ClanId } from '../lib/clans';
 import { DemoBanner } from '../components/common/DemoBanner';
 import { StateMessage } from '../components/common/StateMessage';
 import { Avatar } from '../components/common/Avatar';
+import { JobPanel } from '../components/common/JobPanel';
+import { CoinsPanel } from '../components/member/CoinsPanel';
 import { MoveBadge } from '../components/common/MoveBadge';
 import { ZoneBadge } from '../components/common/ZoneBadge';
 import { RadarChart } from '../components/charts/RadarChart';
@@ -55,6 +60,7 @@ export function MemberProfilePage() {
   const { config } = useScoringConfig();
   const result = useLeaderboardResult(dataset, filters, config);
   const seasonsInfo = useSeasons(dataset);
+  const clanAssignments = useClanAssignments(dataset);
   const backHref = { pathname: '/', search: location.search };
 
   if (status === 'error') {
@@ -114,6 +120,7 @@ export function MemberProfilePage() {
       backHref={backHref}
       seasons={seasonsInfo?.seasons ?? null}
       currentSeason={seasonsInfo?.currentSeason ?? null}
+      clanId={clanAssignments[row.member.id] ?? null}
     />
   );
 }
@@ -129,6 +136,7 @@ interface MemberProfileContentProps {
   backHref: { pathname: string; search: string };
   seasons: readonly Season[] | null;
   currentSeason: Season | null;
+  clanId: ClanId | null;
 }
 
 function MemberProfileContent({
@@ -142,10 +150,12 @@ function MemberProfileContent({
   backHref,
   seasons,
   currentSeason,
+  clanId,
 }: MemberProfileContentProps) {
   const { t, locale } = useI18n();
   const { config } = useScoringConfig();
   const location = useLocation();
+  const coinLedger = useCoinLedger();
   const progress = useMemberProgress(dataset, config, seasons, row.member.id);
   const tm = useTimeMachine(dataset, config, currentSeason);
   const myWeekChange = tm?.changes.find((c) => c.memberId === row.member.id) ?? null;
@@ -328,6 +338,13 @@ function MemberProfileContent({
         </div>
       </section>
 
+      <section className={styles.panel} aria-labelledby="job-panel-heading">
+        <h2 id="job-panel-heading" className="visually-hidden">
+          {t('job_panel_heading')}
+        </h2>
+        <JobPanel member={row.member} clanId={clanId} overallRank={row.overallRank} overallScore={row.current.overall} showSoloStat={false} />
+      </section>
+
       {progress && (
         <CareerCard
           member={row.member}
@@ -340,6 +357,8 @@ function MemberProfileContent({
           rewardCount={progress.myRewards.length}
         />
       )}
+
+      <CoinsPanel memberId={row.member.id} transactions={coinLedger.transactions} />
 
       <CraftPathPanel
         member={row.member}

@@ -16,6 +16,12 @@
   font-size: 12.5px;
 }
 
+.boardModeRow {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
 .board {
   background: var(--surface);
   border: 1px solid var(--border);

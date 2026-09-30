@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import { CATEGORY_KEYS, type EarnedAchievement, type Zone } from '../../data/types';
-import { categoryLabel, craftPathLabel, roleLabel, useI18n } from '../../i18n';
+import { categoryLabel, craftPathLabel, useI18n } from '../../i18n';
 import type { TranslationKey } from '../../i18n/locales/en';
 import { computeHighlight, trendDirection, zoneOf, type LeaderboardRow, type TeamStats } from '../../lib/scoring';
 import { formatPercent, formatScore, formatSigned } from '../../lib/format';
@@ -9,9 +9,11 @@ import { ACHIEVEMENT_GLYPHS, countOf, earnedAchievementTypes } from '../../lib/a
 import { useScoringConfig } from '../../state/ScoringConfigProvider';
 import { medalFor, zoneColorVar } from '../../lib/zoneStyle';
 import type { CraftPreview } from '../../lib/craftPaths';
+import type { ClanId } from '../../lib/clans';
 import { Avatar } from '../common/Avatar';
 import { MoveBadge } from '../common/MoveBadge';
 import { ZoneBadge } from '../common/ZoneBadge';
+import { JobPanel } from '../common/JobPanel';
 import { Meter } from '../charts/Meter';
 import { Sparkline } from '../charts/Sparkline';
 import { CompareToggle } from './CompareToggle';
@@ -27,9 +29,10 @@ interface LeaderboardCardsProps {
   highlightedId?: string | null;
   /** This season's Craft Path preview, keyed by member id — see LeaderboardPage. */
   craftPreviewByMember?: Record<string, CraftPreview>;
+  clanAssignments?: Record<string, ClanId>;
 }
 
-export function LeaderboardCards({ rows, team, compareIds, onToggleCompare, achievementsByMember, highlightedId, craftPreviewByMember }: LeaderboardCardsProps) {
+export function LeaderboardCards({ rows, team, compareIds, onToggleCompare, achievementsByMember, highlightedId, craftPreviewByMember, clanAssignments }: LeaderboardCardsProps) {
   return (
     <div className={styles.grid}>
       {rows.map((row) => (
@@ -42,6 +45,7 @@ export function LeaderboardCards({ rows, team, compareIds, onToggleCompare, achi
           earned={achievementsByMember?.[row.member.id] ?? []}
           highlighted={highlightedId === row.member.id}
           craftPreview={craftPreviewByMember?.[row.member.id] ?? null}
+          clanId={clanAssignments?.[row.member.id] ?? null}
         />
       ))}
     </div>
@@ -56,9 +60,10 @@ interface MemberCardProps {
   earned: EarnedAchievement[];
   highlighted: boolean;
   craftPreview: CraftPreview | null;
+  clanId: ClanId | null;
 }
 
-function MemberCard({ row, team, compareSelected, onToggleCompare, earned, highlighted, craftPreview }: MemberCardProps) {
+function MemberCard({ row, team, compareSelected, onToggleCompare, earned, highlighted, craftPreview, clanId }: MemberCardProps) {
   const { t, locale } = useI18n();
   const { config } = useScoringConfig();
   const location = useLocation();
@@ -95,9 +100,6 @@ function MemberCard({ row, team, compareSelected, onToggleCompare, earned, highl
           <h3>
             <Link to={memberHref}>{row.member.name}</Link>
           </h3>
-          <small>
-            {roleLabel(t, row.member.role)} · {row.member.area} · {row.member.shift}
-          </small>
         </div>
         <div className={styles.rank} title={t('season_rank_note')}>
           {row.overallRank == null ? (
@@ -157,6 +159,10 @@ function MemberCard({ row, team, compareSelected, onToggleCompare, earned, highl
           <span className="visually-hidden"> · {t('craft_stars_of', { earned: craftPreview.stars, possible: craftPreview.possible })}</span>
         </p>
       )}
+
+      <div className={styles.cardJob}>
+        <JobPanel member={row.member} clanId={clanId} overallRank={row.overallRank} overallScore={row.current.overall} compact showSoloStat={false} />
+      </div>
 
       <details className={styles.details}>
         <summary>{t('card_show_categories')}</summary>

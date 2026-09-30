@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { CATEGORY_KEYS, type LeaderboardDataset, type LeaderboardView, type MetricKey, type SortDirection, type SortKey } from '../data/types';
+import { CATEGORY_KEYS, type BoardMode, type LeaderboardDataset, type LeaderboardView, type MetricKey, type SortDirection, type SortKey } from '../data/types';
 import { mondayOfISO, sundayOfISO, weekEndISO, weekIndexesInRange, weekStartISO } from '../lib/dates';
 import { currentSeasonIndex, listSeasons } from '../lib/seasons';
 
@@ -17,6 +17,7 @@ export interface LeaderboardFilters {
   sortKey: SortKey;
   sortDir: SortDirection;
   view: LeaderboardView;
+  board: BoardMode;
 }
 
 export function presetRangeFor(dataset: LeaderboardDataset, weeks: number): { from: string; to: string } {
@@ -85,8 +86,9 @@ export function useLeaderboardFilters(dataset: LeaderboardDataset | null): {
     const sortKey: SortKey = isSortKey(sortKeyRaw) ? (sortKeyRaw as SortKey) : 'rank';
     const sortDir: SortDirection = params.get('sortDir') === 'desc' ? 'desc' : 'asc';
     const view: LeaderboardView = params.get('view') === 'cards' ? 'cards' : 'table';
+    const board: BoardMode = params.get('board') === 'clans' ? 'clans' : 'solo';
 
-    return { fromISO, toISO, shift, area, role, metric, query, sortKey, sortDir, view };
+    return { fromISO, toISO, shift, area, role, metric, query, sortKey, sortDir, view, board };
   }, [params, dataset, rawFrom, rawTo]);
 
   const updateFilters = useCallback(
@@ -105,6 +107,7 @@ export function useLeaderboardFilters(dataset: LeaderboardDataset | null): {
             sortKey: 'sortKey',
             sortDir: 'sortDir',
             view: 'view',
+            board: 'board',
           };
           for (const [k, v] of Object.entries(patch)) {
             const paramKey = keyMap[k] ?? k;

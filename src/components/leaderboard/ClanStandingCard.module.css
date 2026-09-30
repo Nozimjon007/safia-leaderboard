@@ -1,0 +1,195 @@
+.card {
+  position: relative;
+  height: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--clan-color, var(--border));
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.card:hover,
+.card:focus-within {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+  .card:hover,
+  .card:focus-within {
+    transform: none;
+  }
+}
+
+.link {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 14px 16px 16px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.who {
+  min-width: 0;
+}
+
+.rankNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  box-shadow: inset 0 0 0 1px var(--border);
+  color: var(--ink-secondary);
+  font-weight: 800;
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.rankNum[data-medal='gold'] {
+  background: var(--medal-gold);
+  color: var(--on-accent);
+  box-shadow: none;
+}
+.rankNum[data-medal='silver'] {
+  background: var(--medal-silver);
+  color: var(--on-accent);
+  box-shadow: none;
+}
+.rankNum[data-medal='bronze'] {
+  background: var(--medal-bronze);
+  color: var(--on-accent);
+  box-shadow: none;
+}
+
+.name {
+  font-size: 15px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identity {
+  font-size: 11.5px;
+  color: var(--ink-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.points {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.pointsMain {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.pointsMain b {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--clan-color, var(--accent-strong));
+}
+
+.pointsUnit {
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+.total {
+  font-size: 12px;
+  color: var(--ink-secondary);
+  margin-top: -4px;
+}
+
+.contributors {
+  border-top: 1px dashed var(--border);
+  padding-top: 8px;
+  margin-top: 2px;
+}
+
+.contributorsLabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+  margin-bottom: 4px;
+}
+
+.contributors ol {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.contributors li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+}
+
+.contributorName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.cta {
+  margin-top: auto;
+  padding-top: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent-strong);
+}
+
+.card[data-compact] .link {
+  padding: 10px 12px;
+  gap: 6px;
+}
+
+.card[data-compact] .name {
+  font-size: 13px;
+}
+
+.card[data-compact] .pointsMain b {
+  font-size: 17px;
+}

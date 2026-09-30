@@ -113,6 +113,9 @@ export type MetricKey = 'overall' | CategoryKey;
 
 export type LeaderboardView = 'table' | 'cards';
 
+/** The season-results hero's Solo/Clans toggle — see components/leaderboard/BoardModeToggle. */
+export type BoardMode = 'solo' | 'clans';
+
 /**
  * Achievement/badge and reward definitions.
  *

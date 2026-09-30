@@ -1,0 +1,47 @@
+/**
+ * Safia Clans — accent colors. Golden Crust and Cinnamon Hearth deliberately reuse the podium's
+ * already-validated --medal-gold/--medal-bronze tokens (see tokens.css) rather than inventing new
+ * ones; only Saffron Rise and Honey Bloom need their own. Demo proposal, not an official palette —
+ * exact hues should go through the same six-checks contrast validator as the rest of tokens.css
+ * before any real rollout.
+ */
+:root {
+  --clan-saffron-rise: #d17a1f;
+  --clan-saffron-rise-bg: #faeacf;
+  --clan-honey-bloom: #bd7568;
+  --clan-honey-bloom-bg: #f6e3df;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --clan-saffron-rise: #e0923a;
+    --clan-saffron-rise-bg: rgba(224, 146, 58, 0.18);
+    --clan-honey-bloom: #d99a90;
+    --clan-honey-bloom-bg: rgba(217, 154, 144, 0.18);
+  }
+}
+:root[data-theme='dark'] {
+  --clan-saffron-rise: #e0923a;
+  --clan-saffron-rise-bg: rgba(224, 146, 58, 0.18);
+  --clan-honey-bloom: #d99a90;
+  --clan-honey-bloom-bg: rgba(217, 154, 144, 0.18);
+}
+
+/* A shared, themeable pair any clan-aware component can consume via var(--clan-color)/var(--clan-bg)
+   once it sets data-clan on an ancestor — the single source of truth for "which color is this clan". */
+[data-clan='golden_crust'] {
+  --clan-color: var(--medal-gold);
+  --clan-bg: var(--medal-gold-bg);
+}
+[data-clan='saffron_rise'] {
+  --clan-color: var(--clan-saffron-rise);
+  --clan-bg: var(--clan-saffron-rise-bg);
+}
+[data-clan='cinnamon_hearth'] {
+  --clan-color: var(--medal-bronze);
+  --clan-bg: var(--medal-bronze-bg);
+}
+[data-clan='honey_bloom'] {
+  --clan-color: var(--clan-honey-bloom);
+  --clan-bg: var(--clan-honey-bloom-bg);
+}

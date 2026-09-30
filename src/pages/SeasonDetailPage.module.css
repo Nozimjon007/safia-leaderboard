@@ -189,6 +189,21 @@
   margin-top: 4px;
 }
 
+.linkBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--accent-strong);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.linkBtn:hover {
+  text-decoration: underline;
+}
+
 .linkRow {
   display: flex;
   flex-wrap: wrap;
