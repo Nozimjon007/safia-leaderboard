@@ -64,6 +64,14 @@
   --medal-silver-bg: #ece7dd;
   --medal-bronze: #b0703b;
   --medal-bronze-bg: #f3e2d1;
+  /* Text on a solid medal chip (gold/silver/bronze): --on-accent (tuned for --accent) only clears
+     ~2.5:1 on gold, ~3.3:1 on silver, ~3.9:1 on bronze in light mode — all three fail WCAG AA's
+     4.5:1, gold worst since it's lighter/more yellow than the caramel accent --on-accent was tuned
+     for. A fixed dark ink (reusing dark mode's own --on-accent value, not a new color) instead of a
+     themed token, since all three medal colors stay light-to-mid in both themes: 7.0/5.3/4.5:1 in
+     light mode, all comfortably higher in dark — deliberately not re-declared in the dark-mode
+     blocks below. */
+  --on-medal: #1c140c;
 
   --radius-sm: 8px;
   --radius-md: 14px;

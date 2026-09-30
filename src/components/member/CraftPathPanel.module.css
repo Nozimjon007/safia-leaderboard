@@ -215,12 +215,15 @@
 
 .mastery[data-tier='bronze'] .masteryTier {
   background: var(--medal-bronze);
+  color: var(--on-medal);
 }
 .mastery[data-tier='silver'] .masteryTier {
   background: var(--medal-silver);
+  color: var(--on-medal);
 }
 .mastery[data-tier='gold'] .masteryTier {
   background: var(--medal-gold);
+  color: var(--on-medal);
 }
 .mastery[data-tier='platinum'] .masteryTier {
   background: var(--accent-strong);

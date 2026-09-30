@@ -71,17 +71,17 @@
 
 .rankNum[data-medal='gold'] {
   background: var(--medal-gold);
-  color: var(--on-accent);
+  color: var(--on-medal);
   box-shadow: none;
 }
 .rankNum[data-medal='silver'] {
   background: var(--medal-silver);
-  color: var(--on-accent);
+  color: var(--on-medal);
   box-shadow: none;
 }
 .rankNum[data-medal='bronze'] {
   background: var(--medal-bronze);
-  color: var(--on-accent);
+  color: var(--on-medal);
   box-shadow: none;
 }
 

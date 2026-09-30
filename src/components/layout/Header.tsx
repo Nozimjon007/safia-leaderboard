@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { LOCALES, LOCALE_NAMES, useI18n, type Locale } from '../../i18n';
 import { useTheme } from '../../theme/ThemeProvider';
+import { SeasonPulse } from './SeasonPulse';
 import styles from './Header.module.css';
 
 export function Header() {
@@ -84,6 +85,7 @@ export function Header() {
         </nav>
 
         <div className={styles.tools}>
+          <SeasonPulse />
           <NavLink to={{ pathname: '/scoring', search }} className={styles.scoringLink}>
             {t('nav_scoring')}
           </NavLink>

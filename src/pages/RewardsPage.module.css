@@ -99,12 +99,15 @@
 
 .catalogItem[data-reward='place_1'] .catalogGlyph {
   background: var(--medal-gold);
+  color: var(--on-medal);
 }
 .catalogItem[data-reward='place_2'] .catalogGlyph {
   background: var(--medal-silver);
+  color: var(--on-medal);
 }
 .catalogItem[data-reward='place_3'] .catalogGlyph {
   background: var(--medal-bronze);
+  color: var(--on-medal);
 }
 .catalogItem[data-reward='most_improved'] .catalogGlyph {
   background: var(--accent);

@@ -7,9 +7,11 @@ import { useCoinLedger } from '../hooks/useCoinLedger';
 import { useShopRedemptions } from '../hooks/useShopRedemptions';
 import { useClanAssignments } from '../hooks/useClans';
 import { useSeasons } from '../hooks/useSeasons';
-import { balanceForMember, computeSeasonCoinAwards } from '../lib/coins';
+import { balanceForMember, computeSeasonCoinAwards, transactionsForMember } from '../lib/coins';
 import { hasOpenRedemption, nextSavingsGoal, redemptionsForMember, SHOP_CATALOG, SHOP_CATEGORIES, type Redemption, type ShopCategory, type ShopItem } from '../lib/shop';
 import { shopCategoryLabel, shopItemName, shopStatusLabel, useI18n } from '../i18n';
+import type { TranslationKey } from '../i18n/locales/en';
+import { formatShortDate } from '../lib/dates';
 import { DemoBanner } from '../components/common/DemoBanner';
 import { StateMessage } from '../components/common/StateMessage';
 import { LeaderboardSkeleton } from '../components/leaderboard/LeaderboardSkeleton';
@@ -105,6 +107,12 @@ export function ShopPage() {
   const goal = member ? nextSavingsGoal(balance) : null;
   const pendingCoins = member ? (pendingByMember[member.id] ?? 0) : 0;
   const myRedemptions = member ? redemptionsForMember(shopStore.redemptions, member.id) : [];
+  // Earn-only view of the ledger (never redemption/refund rows — those already have their own
+  // request-history section below) — see shop_earned_note: always a real, already-approved season's
+  // awards, never a still-open one (the pending-coins preview above is never written here).
+  const earnHistory = member
+    ? transactionsForMember(coinLedger.transactions, member.id).filter((tx) => tx.reason !== 'shop_redemption' && tx.reason !== 'shop_refund')
+    : [];
   const reservedCoins = myRedemptions.filter((r) => r.status === 'pending' || r.status === 'approved').reduce((sum, r) => sum + r.coinsSpent, 0);
   const items = category === 'all' ? SHOP_CATALOG : SHOP_CATALOG.filter((i) => i.category === category);
 
@@ -200,6 +208,26 @@ export function ShopPage() {
           <p className={styles.pickNote}>{t('shop_pick_viewer_note')}</p>
         )}
       </section>
+
+      {member && (
+        <section className={styles.earned} aria-labelledby="shop-earned-heading">
+          <h2 id="shop-earned-heading">{t('shop_earned_heading')}</h2>
+          <p className={styles.earnedNote}>{t('shop_earned_note')}</p>
+          {earnHistory.length === 0 ? (
+            <p className={styles.pickNote}>{t('coins_history_empty')}</p>
+          ) : (
+            <ul className={styles.earnedList}>
+              {earnHistory.map((tx) => (
+                <li key={tx.id} className={styles.earnedRow}>
+                  <span className={styles.earnedReason}>{t(`coin_reason_${tx.reason}` as TranslationKey)}</span>
+                  <span className={`${styles.earnedCoins} tabular`}>+{tx.amount.toLocaleString(locale)}</span>
+                  <span className={styles.historyDate}>{formatShortDate(tx.dateISO)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       {member &&
         (goal ? (

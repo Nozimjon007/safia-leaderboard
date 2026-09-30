@@ -325,6 +325,7 @@ export function LeaderboardPage() {
               dataset={dataset}
               config={config}
               matchedSeason={matchedSeason}
+              team={overallResult.team}
               achievementsByMember={achievementsByMember}
               clanAssignments={clanAssignments}
               filterLabel={narrowedLabel}

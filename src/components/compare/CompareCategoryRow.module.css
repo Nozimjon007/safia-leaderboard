@@ -48,6 +48,12 @@
   bottom: 0;
   background: var(--border-strong);
   border-radius: var(--radius-full);
+  /* The dots either side already glide (.dot's own transition below) — without this, the bar
+     connecting them used to snap instantly, reading as two smooth dots dragging a broken line
+     between them whenever a comparison member changes. */
+  transition:
+    left 0.25s ease,
+    width 0.25s ease;
 }
 
 .dot {

@@ -109,17 +109,17 @@
 .rankNum[data-medal='gold'] {
   background: var(--medal-gold);
   border-color: var(--medal-gold);
-  color: var(--on-accent);
+  color: var(--on-medal);
 }
 .rankNum[data-medal='silver'] {
   background: var(--medal-silver);
   border-color: var(--medal-silver);
-  color: var(--on-accent);
+  color: var(--on-medal);
 }
 .rankNum[data-medal='bronze'] {
   background: var(--medal-bronze);
   border-color: var(--medal-bronze);
-  color: var(--on-accent);
+  color: var(--on-medal);
 }
 
 .rankCell {

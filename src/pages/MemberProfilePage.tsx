@@ -477,7 +477,7 @@ function MemberProfileContent({
         </p>
       </section>
 
-      {progress && seasons && <BadgesPanel earned={progress.earnedAchievements} seasons={seasons} />}
+      {progress && seasons && <BadgesPanel memberId={row.member.id} earned={progress.earnedAchievements} seasons={seasons} />}
 
       {progress && (
         <div className={styles.twoCol}>

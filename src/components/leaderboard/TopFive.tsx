@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from 'motion/react';
 import type { EarnedAchievement, LeaderboardDataset, RewardId, ScoringConfig } from '../../data/types';
-import type { LeaderboardRow } from '../../lib/scoring';
+import type { LeaderboardRow, TeamStats } from '../../lib/scoring';
 import { bestAchievement } from '../../lib/achievements';
 import { computeSeasonRewards } from '../../lib/rewards';
 import type { Season } from '../../lib/seasons';
@@ -18,6 +18,9 @@ interface TopFiveProps {
   dataset: LeaderboardDataset;
   config: ScoringConfig;
   matchedSeason: Season | null;
+  /** The same overall-ranked pool's team stats (see useOverallLeaderboardResult) — powers each
+   * card's "Why this rank?" category comparison, never a metric-filtered subset. */
+  team: TeamStats;
   achievementsByMember?: Record<string, EarnedAchievement[]>;
   clanAssignments: Record<string, ClanId>;
   /** e.g. "Site 2" or "Shift 1" when a shift/area filter narrows who's eligible — shown in the heading
@@ -54,6 +57,7 @@ export function TopFive({
   dataset,
   config,
   matchedSeason,
+  team,
   achievementsByMember,
   clanAssignments,
   filterLabel,
@@ -116,6 +120,8 @@ export function TopFive({
             row={first}
             clanId={clanAssignments[first.member.id] ?? null}
             emblem={emblemFor(first.member.id)}
+            team={team}
+            achievements={achievementsByMember?.[first.member.id] ?? []}
             compareSelected={compareIds.includes(first.member.id)}
             onToggleCompare={() => onToggleCompare(first.member.id)}
             celebrateDelay={playEntrance ? championDelay + 0.45 : undefined}
@@ -138,6 +144,8 @@ export function TopFive({
                     row={row}
                     clanId={clanAssignments[row.member.id] ?? null}
                     emblem={emblemFor(row.member.id)}
+                    team={team}
+                    achievements={achievementsByMember?.[row.member.id] ?? []}
                     compareSelected={compareIds.includes(row.member.id)}
                     onToggleCompare={() => onToggleCompare(row.member.id)}
                   />

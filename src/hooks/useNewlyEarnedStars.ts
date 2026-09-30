@@ -45,3 +45,44 @@ export function useNewlyEarnedMissionIds(memberId: string, completedMissionIds: 
 
   return newIds;
 }
+
+const ACHIEVEMENTS_STORAGE_KEY = 'lb_achievements_seen';
+
+function readAchievementsSeenMap(): Record<string, string[]> {
+  try {
+    return JSON.parse(localStorage.getItem(ACHIEVEMENTS_STORAGE_KEY) || '{}') as Record<string, string[]>;
+  } catch {
+    return {};
+  }
+}
+
+function writeAchievementsSeenMap(map: Record<string, string[]>) {
+  try {
+    localStorage.setItem(ACHIEVEMENTS_STORAGE_KEY, JSON.stringify(map));
+  } catch {
+    // private mode / quota — worst case a badge celebrates again next visit, never a crash
+  }
+}
+
+/**
+ * Same contract as useNewlyEarnedMissionIds, for the profile's achievement badges (BadgesPanel)
+ * instead of Craft Path missions — a separate storage key since they're unrelated data. `earnedIds`
+ * should already be de-duplicated to one entry per achievement id (a member can earn e.g. "podium"
+ * in several seasons; only the very first unlock is the celebratory moment).
+ */
+export function useNewlyEarnedAchievementIds(memberId: string, earnedIds: readonly string[]): ReadonlySet<string> {
+  const [newIds] = useState<ReadonlySet<string>>(() => {
+    const seenMap = readAchievementsSeenMap();
+    const wasTracked = memberId in seenMap;
+    const previouslySeen = new Set(seenMap[memberId] ?? []);
+    return wasTracked ? new Set(earnedIds.filter((id) => !previouslySeen.has(id))) : new Set();
+  });
+
+  useEffect(() => {
+    const seenMap = readAchievementsSeenMap();
+    seenMap[memberId] = [...earnedIds];
+    writeAchievementsSeenMap(seenMap);
+  }, [memberId, earnedIds]);
+
+  return newIds;
+}

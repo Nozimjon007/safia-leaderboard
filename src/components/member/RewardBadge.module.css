@@ -17,7 +17,9 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  color: var(--on-accent);
+  /* Always a medal color (gold/silver/bronze below), never the plain --accent --on-accent was
+     tuned for — see tokens.css's --on-medal comment. */
+  color: var(--on-medal);
   font-weight: 700;
 }
 

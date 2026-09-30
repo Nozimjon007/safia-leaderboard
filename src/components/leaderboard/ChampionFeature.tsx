@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { CATEGORY_KEYS, type AchievementId, type RewardId } from '../../data/types';
-import type { LeaderboardRow } from '../../lib/scoring';
+import { CATEGORY_KEYS, type AchievementId, type EarnedAchievement, type RewardId } from '../../data/types';
+import type { LeaderboardRow, TeamStats } from '../../lib/scoring';
 import type { ClanId } from '../../lib/clans';
 import { ACHIEVEMENT_GLYPHS } from '../../lib/achievements';
 import { REWARD_GLYPHS } from '../member/RewardBadge';
@@ -13,6 +13,7 @@ import { MoveBadge } from '../common/MoveBadge';
 import { PortraitFallback } from '../common/PortraitFallback';
 import { JobPanel } from '../common/JobPanel';
 import { CompareToggle } from './CompareToggle';
+import { WhyThisRank } from './WhyThisRank';
 import styles from './ChampionFeature.module.css';
 
 export type ChampionEmblem = { kind: 'reward'; id: RewardId } | { kind: 'achievement'; id: AchievementId } | null;
@@ -21,6 +22,8 @@ interface ChampionFeatureProps {
   row: LeaderboardRow;
   clanId: ClanId | null;
   emblem: ChampionEmblem;
+  team: TeamStats;
+  achievements: EarnedAchievement[];
   compareSelected: boolean;
   onToggleCompare: () => void;
   /** Seconds to wait before playing a one-time restrained sheen sweep, timed to land exactly when
@@ -35,7 +38,7 @@ interface ChampionFeatureProps {
  * of spilling below it. Real photo when available; otherwise PortraitFallback fills the frame with
  * an intentional design, never an empty cavity or a generic silhouette.
  */
-export function ChampionFeature({ row, clanId, emblem, compareSelected, onToggleCompare, celebrateDelay }: ChampionFeatureProps) {
+export function ChampionFeature({ row, clanId, emblem, team, achievements, compareSelected, onToggleCompare, celebrateDelay }: ChampionFeatureProps) {
   const { t, locale } = useI18n();
   const location = useLocation();
   const tiltRef = usePointerTilt<HTMLElement>();
@@ -57,11 +60,14 @@ export function ChampionFeature({ row, clanId, emblem, compareSelected, onToggle
         className={styles.link}
         aria-label={`${t('open_profile')}: ${row.member.name}, ${t('rank_label')} 1, ${formatScore(row.current.overall, locale)}/100`}
       >
-        <span className={styles.medalTag}>{t('podium_gold')}</span>
-
         <div className={styles.portrait}>
           <span className={styles.facets} aria-hidden="true" />
           <span className={styles.sheen} aria-hidden="true" />
+          {/* A true child of .portrait (not a sibling positioned over it): always anchors to the
+              portrait's own corner at any size, and its z-index is authored against the portrait's
+              own facets/sheen/photo stack below, not guessed against an unrelated scope — see the
+              CSS, which is what actually fixes it painting under the photo. */}
+          <span className={styles.medalTag}>{t('podium_gold')}</span>
           {celebrateDelay != null && (
             <motion.span
               className={styles.celebrateSweep}
@@ -118,6 +124,7 @@ export function ChampionFeature({ row, clanId, emblem, compareSelected, onToggle
           nested <a> otherwise (see TopFive's SupportingCard for the same pattern). */}
       <div className={styles.jobWrap}>
         <JobPanel member={row.member} clanId={clanId} overallRank={row.overallRank} overallScore={row.current.overall} showSoloStat={false} />
+        <WhyThisRank row={row} team={team} achievements={achievements} />
       </div>
     </article>
   );

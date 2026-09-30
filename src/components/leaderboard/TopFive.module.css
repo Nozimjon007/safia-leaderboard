@@ -29,26 +29,24 @@
   width: 100%;
 }
 
+/* Two-up by default (was four), so #2-5 get real room for a prominent portrait and full category
+   numbers instead of four cramped mini cards — the champion above stays the only wide, one-of-a-kind
+   layout. align-items:start so one card's "Why this rank?" expanding never stretches its row-mate. */
 .supportGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 16px;
   width: 100%;
-  max-width: 1100px;
+  max-width: 900px;
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-@media (max-width: 900px) {
-  .supportGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .supportGrid {
     grid-template-columns: 1fr;
-    max-width: 320px;
+    max-width: 420px;
   }
 }

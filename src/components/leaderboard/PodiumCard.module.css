@@ -81,7 +81,8 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--on-accent);
+  /* Always a medal color (gold/silver/bronze below) — see tokens.css's --on-medal comment. */
+  color: var(--on-medal);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
@@ -124,17 +125,17 @@
 
 .card[data-place='1'] .rankNum {
   background: var(--medal-gold);
-  color: var(--on-accent);
+  color: var(--on-medal);
   box-shadow: none;
 }
 .card[data-place='2'] .rankNum {
   background: var(--medal-silver);
-  color: var(--on-accent);
+  color: var(--on-medal);
   box-shadow: none;
 }
 .card[data-place='3'] .rankNum {
   background: var(--medal-bronze);
-  color: var(--on-accent);
+  color: var(--on-medal);
   box-shadow: none;
 }
 
@@ -326,6 +327,7 @@
 
 .card[data-place='1'] .emblem {
   background: var(--medal-gold);
+  color: var(--on-medal);
 }
 
 /* ---- Zone 3+4: name, role/team/shift ---- */

@@ -49,9 +49,15 @@
 
 .medalTag {
   position: absolute;
+  /* Inset from .portrait's own corner (it's a child of .portrait now — see the JSX), mirroring
+     .emblem's top:10/right:10 on the opposite side. */
   top: 10px;
-  left: 14px;
-  z-index: 2;
+  left: 10px;
+  /* Above .photo/.portraitFallback (z-index 4) and .emblem (5) — was 2, which put it UNDER the
+     portrait photo in paint order despite coming first in the DOM, hiding most of the pill behind
+     whatever the portrait painted (see the bug this fixes: "Gold" was clipped by the portrait,
+     not just low-contrast). */
+  z-index: 6;
   display: inline-flex;
   border-radius: var(--radius-full);
   padding: 2px 11px;
@@ -59,9 +65,16 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--on-accent);
+  /* --on-accent (tuned for the caramel --accent) is only ~2.5:1 on --medal-gold, failing WCAG AA —
+     see tokens.css's --on-medal comment. */
+  color: var(--on-medal);
   background: var(--medal-gold);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  /* A light outer ring in addition to the drop shadow, so the pill reads as a distinct object at a
+     glance even against a real photo with light tones right at that corner, not just the portrait
+     fallback's own gradient. */
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.55),
+    0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* ---- Portrait: a designed frame, not a tall empty stage — real photo covers it, and
@@ -162,7 +175,7 @@
   height: 30px;
   border-radius: 50%;
   font-size: 14px;
-  color: var(--on-accent);
+  color: var(--on-medal);
   background: var(--medal-gold);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.24);
 }
@@ -201,7 +214,7 @@
   padding: 0 8px;
   border-radius: var(--radius-sm);
   background: var(--medal-gold);
-  color: var(--on-accent);
+  color: var(--on-medal);
   font-weight: 800;
   font-size: 13px;
 }
