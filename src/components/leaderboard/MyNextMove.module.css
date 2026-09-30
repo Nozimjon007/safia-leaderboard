@@ -1,0 +1,133 @@
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  margin-bottom: 18px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.head h2,
+.section > h2 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.pickPrompt {
+  color: var(--ink-secondary);
+  font-size: 13.5px;
+  margin: 4px 0 10px;
+}
+
+.switchField select {
+  height: 32px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 0 8px;
+  font-size: 13px;
+  color: var(--ink);
+  max-width: 220px;
+}
+
+.switchField select:hover {
+  border-color: var(--border-strong);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.tile:hover {
+  box-shadow: 0 0 0 1px var(--accent);
+  transform: translateY(-1px);
+}
+
+.tile:active {
+  transform: translateY(0) scale(0.99);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile {
+    transition: none;
+  }
+  .tile:hover,
+  .tile:active {
+    transform: none;
+  }
+}
+
+.tileLabel {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink-muted);
+}
+
+.tileValue {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+  /* Deliberately allowed to wrap, not truncated — a couple of these tiles (the exact Craft star
+     task, the clan gap) carry the one number the whole tile exists to show; an ellipsis here would
+     cut off precisely the "exact verified task" detail this feature promises. */
+  overflow-wrap: break-word;
+}
+
+.tileValue small {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+.tileSub {
+  font-size: 11px;
+  color: var(--ink-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tileValue {
+    white-space: normal;
+  }
+}

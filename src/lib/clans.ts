@@ -11,20 +11,23 @@ export type ClanId = 'golden_crust' | 'saffron_rise' | 'cinnamon_hearth' | 'hone
 
 export const CLAN_IDS: readonly ClanId[] = ['golden_crust', 'saffron_rise', 'cinnamon_hearth', 'honey_bloom'];
 
-/** Which CSS custom properties (see src/styles/clans.css) carry each clan's accent color — reused,
- * not reinvented, for Golden Crust/Cinnamon Hearth, which map onto the same warm gold/copper tones
- * the podium's medal finish already uses and has validated for contrast. */
+/** Which CSS custom properties (see src/styles/clans.css) carry each clan's accent color — every
+ * clan gets its own dedicated token, deliberately never one of the podium's --medal-gold/--medal-
+ * bronze tokens. An earlier revision had Golden Crust/Cinnamon Hearth reuse those two directly; the
+ * bug that caused was that a clan's crest color would then silently imply a specific *rank* (gold =
+ * 1st, bronze = 3rd) no matter what that clan's real standing was that season. Rank color and clan
+ * identity color must stay on two separate variables. */
 export const CLAN_COLOR_VAR: Record<ClanId, string> = {
-  golden_crust: '--medal-gold',
+  golden_crust: '--clan-golden-crust',
   saffron_rise: '--clan-saffron-rise',
-  cinnamon_hearth: '--medal-bronze',
+  cinnamon_hearth: '--clan-cinnamon-hearth',
   honey_bloom: '--clan-honey-bloom',
 };
 
 export const CLAN_BG_VAR: Record<ClanId, string> = {
-  golden_crust: '--medal-gold-bg',
+  golden_crust: '--clan-golden-crust-bg',
   saffron_rise: '--clan-saffron-rise-bg',
-  cinnamon_hearth: '--medal-bronze-bg',
+  cinnamon_hearth: '--clan-cinnamon-hearth-bg',
   honey_bloom: '--clan-honey-bloom-bg',
 };
 

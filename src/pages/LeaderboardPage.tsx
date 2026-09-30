@@ -26,6 +26,7 @@ import { findContainingSeason, seasonWeekRange, type Season } from '../lib/seaso
 import { DemoBanner } from '../components/common/DemoBanner';
 import { StateMessage } from '../components/common/StateMessage';
 import { SeasonPanel, seasonDefaultRange } from '../components/leaderboard/SeasonPanel';
+import { MyNextMove } from '../components/leaderboard/MyNextMove';
 import { TimeMachineControl } from '../components/leaderboard/TimeMachineControl';
 import { TopFive } from '../components/leaderboard/TopFive';
 import { BoardModeToggle } from '../components/leaderboard/BoardModeToggle';
@@ -284,6 +285,17 @@ export function LeaderboardPage() {
         />
       )}
 
+      <MyNextMove
+        dataset={dataset}
+        overallResult={overallResult}
+        memberId={viewAsMemberId}
+        onSelectMember={setViewAsMemberId}
+        clanAssignments={clanAssignments}
+        clanStandings={clanStandings}
+        currentSeason={seasonsInfo?.currentSeason ?? null}
+        coinTransactions={coinLedger.transactions}
+      />
+
       {clanStandings && (
         <div className={styles.boardModeRow}>
           <BoardModeToggle mode={filters.board} onChange={(board) => updateFilters({ board })} />
@@ -297,7 +309,15 @@ export function LeaderboardPage() {
         transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
       >
         {filters.board === 'clans' && clanStandings ? (
-          <ClanStandingsPanel standings={clanStandings} memberById={memberById} filterLabel={narrowedLabel} />
+          <ClanStandingsPanel
+            standings={clanStandings}
+            memberById={memberById}
+            filterLabel={narrowedLabel}
+            dataset={dataset}
+            config={config}
+            clanAssignments={clanAssignments}
+            season={matchedSeason}
+          />
         ) : (
           <>
             <TopFive

@@ -16,6 +16,11 @@
   transform: translateY(-2px);
 }
 
+.card[data-goal] {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .card {
     transition: none;
@@ -62,6 +67,21 @@
   font-weight: 700;
   color: var(--medal-gold);
   background: var(--medal-gold-bg);
+  border-radius: var(--radius-sm);
+  padding: 3px 7px;
+  white-space: nowrap;
+}
+
+.goalBadge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--accent-strong);
+  background: var(--accent-wash-strong);
   border-radius: var(--radius-sm);
   padding: 3px 7px;
   white-space: nowrap;

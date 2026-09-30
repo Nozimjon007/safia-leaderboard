@@ -1,28 +1,44 @@
 /**
- * Safia Clans — accent colors. Golden Crust and Cinnamon Hearth deliberately reuse the podium's
- * already-validated --medal-gold/--medal-bronze tokens (see tokens.css) rather than inventing new
- * ones; only Saffron Rise and Honey Bloom need their own. Demo proposal, not an official palette —
- * exact hues should go through the same six-checks contrast validator as the rest of tokens.css
- * before any real rollout.
+ * Safia Clans — accent colors. All four get their own dedicated token, deliberately distinct from
+ * --medal-gold/--medal-bronze (tokens.css): an earlier revision had Golden Crust/Cinnamon Hearth
+ * reuse those two medal tokens directly, which meant a clan's own crest color would silently imply
+ * a specific *rank* (gold = 1st, bronze = 3rd) regardless of that clan's *actual* standing that
+ * season — e.g. Cinnamon Hearth sitting in 1st place would still render bronze-colored everywhere,
+ * reading as if it were in 3rd. Rank color (medal) and clan identity color must never be the same
+ * variable. Demo proposal, not an official palette — hues were contrast-checked against the light/
+ * dark surfaces (all ≥4.4:1) and checked for perceptual distance from the medal tokens and each
+ * other; a real rollout should still run these through Safia's own brand review.
  */
 :root {
+  --clan-golden-crust: #6b5518;
+  --clan-golden-crust-bg: #eee7cc;
   --clan-saffron-rise: #d17a1f;
   --clan-saffron-rise-bg: #faeacf;
+  --clan-cinnamon-hearth: #7a2f14;
+  --clan-cinnamon-hearth-bg: #f3ddd2;
   --clan-honey-bloom: #bd7568;
   --clan-honey-bloom-bg: #f6e3df;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
+    --clan-golden-crust: #a7b65d;
+    --clan-golden-crust-bg: rgba(167, 182, 93, 0.18);
     --clan-saffron-rise: #e0923a;
     --clan-saffron-rise-bg: rgba(224, 146, 58, 0.18);
+    --clan-cinnamon-hearth: #dd5a4b;
+    --clan-cinnamon-hearth-bg: rgba(221, 90, 75, 0.18);
     --clan-honey-bloom: #d99a90;
     --clan-honey-bloom-bg: rgba(217, 154, 144, 0.18);
   }
 }
 :root[data-theme='dark'] {
+  --clan-golden-crust: #a7b65d;
+  --clan-golden-crust-bg: rgba(167, 182, 93, 0.18);
   --clan-saffron-rise: #e0923a;
   --clan-saffron-rise-bg: rgba(224, 146, 58, 0.18);
+  --clan-cinnamon-hearth: #dd5a4b;
+  --clan-cinnamon-hearth-bg: rgba(221, 90, 75, 0.18);
   --clan-honey-bloom: #d99a90;
   --clan-honey-bloom-bg: rgba(217, 154, 144, 0.18);
 }
@@ -30,16 +46,16 @@
 /* A shared, themeable pair any clan-aware component can consume via var(--clan-color)/var(--clan-bg)
    once it sets data-clan on an ancestor — the single source of truth for "which color is this clan". */
 [data-clan='golden_crust'] {
-  --clan-color: var(--medal-gold);
-  --clan-bg: var(--medal-gold-bg);
+  --clan-color: var(--clan-golden-crust);
+  --clan-bg: var(--clan-golden-crust-bg);
 }
 [data-clan='saffron_rise'] {
   --clan-color: var(--clan-saffron-rise);
   --clan-bg: var(--clan-saffron-rise-bg);
 }
 [data-clan='cinnamon_hearth'] {
-  --clan-color: var(--medal-bronze);
-  --clan-bg: var(--medal-bronze-bg);
+  --clan-color: var(--clan-cinnamon-hearth);
+  --clan-bg: var(--clan-cinnamon-hearth-bg);
 }
 [data-clan='honey_bloom'] {
   --clan-color: var(--clan-honey-bloom);

@@ -61,3 +61,13 @@ export function redemptionsForMember(redemptions: readonly Redemption[], memberI
     .filter((r) => r.memberId === memberId)
     .sort((a, b) => b.requestedDateISO.localeCompare(a.requestedDateISO) || b.id.localeCompare(a.id));
 }
+
+/** The cheapest catalog item a member can't yet afford — a concrete "what you're saving toward"
+ * next milestone (My Next Move, the shop's own savings-goal banner). Null once a member can already
+ * afford the whole catalog. Deliberately balance-only, not eligibility-aware: every item is already
+ * open to "any current employee with sufficient balance" (see shop_eligibility_note), so price is
+ * the only real gate today. */
+export function nextSavingsGoal(balance: number): ShopItem | null {
+  const unaffordable = [...SHOP_CATALOG].filter((i) => i.priceCoins > balance).sort((a, b) => a.priceCoins - b.priceCoins);
+  return unaffordable[0] ?? null;
+}

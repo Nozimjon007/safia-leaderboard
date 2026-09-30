@@ -74,8 +74,8 @@
   --shadow-md: 0 10px 28px rgba(42, 27, 15, 0.12);
 
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  /* Safia League's editorial display face — warm literary serif, used only for hero headlines and
-     champion/contender names, never body copy or UI chrome (see README on the "Safia League"
+  /* Safia Atelier's editorial display face — warm literary serif, used only for hero headlines and
+     champion/contender names, never body copy or UI chrome (see README on the "Safia Atelier"
      direction: strong typography + restrained crystal/gold detail over the existing brand palette).
      Chosen specifically for full Cyrillic coverage — Fraunces was the first pick but has Latin/
      Vietnamese glyphs only (verified via document.fonts), which would silently fall back to a

@@ -4,7 +4,7 @@
  * in by `t()` at call time.
  */
 export const en = {
-  app_title: 'Safia League',
+  app_title: 'Safia Atelier',
   skip_to_content: 'Skip to content',
   nav_leaderboard: 'Leaderboard',
   nav_scoring: 'How scoring works',
@@ -261,7 +261,7 @@ export const en = {
 
   season_quarter_label: 'Q{quarter} {year}',
   season_panel_title: 'Current season',
-  safia_league_kicker: 'Safia League',
+  safia_atelier_kicker: 'Safia Atelier',
   season_selector_hero_label: 'Jump to season',
   season_selector_custom_option: 'Custom period',
   season_panel_more: 'About this data',
@@ -555,6 +555,9 @@ export const en = {
   clan_points_total_label: 'Total points',
   clan_points_avg_label: 'Avg / member',
   clan_points_avg_note: 'Ranked by average points per member, so a bigger clan can never win on headcount alone.',
+  clan_progress_chart_heading: 'Season progress',
+  clan_progress_chart_subtitle: 'Average clan points per member, added up week by week — the same fair measure the standings below use.',
+  clan_progress_chart_title: 'Clan season progress: average points per member, by week',
   clan_members_count: '{n} members',
   clan_leading_contributors_label: 'Leading contributors',
   clan_view_roster: 'View roster →',
@@ -580,6 +583,24 @@ export const en = {
   clan_reason_clan_mission: 'Weekly clan mission',
   clan_mission_clean_sweep_name: 'Clean Sweep Week',
   clan_mission_steady_output_name: 'Steady Output Week',
+
+  // ---- Craft Journal ----
+  craft_journal_heading: 'Craft Journal',
+  craft_journal_intro: "A season-by-season record of verified work, earned stars, and clan contributions — written for you, not for a file.",
+  craft_journal_empty: 'No journal entries yet — they will appear here as this season\'s scored weeks come in.',
+  craft_journal_show_more: 'Show {n} earlier entries',
+  craft_journal_kind_craft_star: 'Craft star',
+  craft_journal_kind_clan_summary: 'Clan contribution',
+  craft_journal_kind_achievement: 'Achievement',
+  craft_journal_kind_team_mentor: 'Distinction',
+  craft_journal_kind_season_result: 'Season result',
+  craft_journal_star_1: 'Earned a Craft star in {category} after {n} strong week.',
+  craft_journal_star_n: 'Earned a Craft star in {category} after {n} strong weeks.',
+  craft_journal_clan_summary_1: 'Contributed to 1 clan mission this season — +{points} clan points.',
+  craft_journal_clan_summary_n: 'Contributed to {n} clan missions this season — +{points} clan points total.',
+  craft_journal_achievement: 'Earned the "{title}" achievement.',
+  craft_journal_team_mentor: "Recognized as this season's Team Mentor for steady, dependable performance.",
+  craft_journal_season_result: '{season} results: finished #{rank} of {rankedCount}.',
 
   // ---- Safia Coins ----
   coins_disclaimer: 'Configurable demo coin values and eligibility rules — not official Safia policy.',
@@ -621,6 +642,7 @@ export const en = {
   shop_category_experiences: 'Experiences',
   shop_eligibility_note: 'Available to any current Safia employee with sufficient balance.',
   shop_limited_badge: 'Limited availability',
+  shop_goal_badge: 'Your goal',
   shop_pending_fulfillment: 'Ships after your request is processed.',
   shop_pending_scheduling: 'Scheduled with you after your request is processed.',
   shop_pending_approval: 'Requires management approval after your request.',
@@ -660,6 +682,21 @@ export const en = {
   shop_item_ceo_conversation_desc: 'A one-on-one conversation with Safia’s CEO.',
   shop_item_dinner_with_leadership_name: 'Dinner with Leadership',
   shop_item_dinner_with_leadership_desc: 'A dinner with the Safia leadership team.',
+
+  // ---- My Next Move ----
+  my_next_move_heading: 'My Next Move',
+  my_next_move_pick_prompt: 'Pick a demo employee to see their next move.',
+  my_next_move_rank_label: 'Solo rank',
+  my_next_move_star_label: 'Next Craft star',
+  my_next_move_star_detail_1: '1 more {category} week ≥{threshold}%',
+  my_next_move_star_detail_n: '{n} more {category} weeks ≥{threshold}%',
+  my_next_move_star_complete: 'All stars earned this season',
+  my_next_move_clan_label: 'Clan position',
+  my_next_move_clan_gap: '{gap} avg pts behind {next}',
+  my_next_move_clan_leading: 'Leading the standings',
+  my_next_move_saving_label: 'Saving for',
+  my_next_move_saving_gap: '{n} coins to go',
+  my_next_move_saving_done: 'Can afford the whole catalog',
 } as const;
 
 export type TranslationKey = keyof typeof en;

@@ -31,7 +31,7 @@ export const CRAFT_CONCEPT_CATEGORY: Record<CraftConcept, CategoryKey> = {
 };
 
 /** A qualifying week's score threshold, per concept. */
-const CONCEPT_THRESHOLD: Record<CraftConcept, number> = {
+export const CONCEPT_THRESHOLD: Record<CraftConcept, number> = {
   output: 90,
   precision: 90,
   kaizen: 88,
@@ -179,6 +179,14 @@ export function computeCraftPathProgress(dataset: LeaderboardDataset, member: Me
   });
 
   return { role: path.role, missions, starsEarned: missions.filter((m) => m.complete).length, starsPossible: missions.length };
+}
+
+/** The one concrete, verified task standing between a member and their next Craft Path star — the
+ * first incomplete mission in path order, or null once every mission this season is already
+ * complete. "Exact" and "verified" in the sense My Next Move promises: current/threshold both come
+ * straight from real qualifying weeks already counted above, never an estimate. */
+export function nextCraftMissionGoal(progress: CraftPathProgress | null): CraftMissionProgress | null {
+  return progress?.missions.find((m) => !m.complete) ?? null;
 }
 
 export interface CraftMastery {

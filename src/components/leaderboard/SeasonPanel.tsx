@@ -45,7 +45,7 @@ interface SeasonPanelProps {
 }
 
 /**
- * The Safia League season banner — deliberately compact (a single, unmistakable strip, not a tall
+ * The Safia Atelier season banner — deliberately compact (a single, unmistakable strip, not a tall
  * block) so the top-five showcase right below it is what a visitor actually scrolls to first.
  * Reflects whichever season the current filters fall inside (by containment, not exact match, so a
  * Time Machine week or a preset like "last 4 weeks" still headlines the right season), never just
@@ -108,7 +108,7 @@ export function SeasonPanel({
 
   return (
     <section className={styles.panel} data-status={status ?? 'custom'} aria-labelledby="season-panel-heading">
-      <p className={styles.brandKicker}>{t('safia_league_kicker')}</p>
+      <p className={styles.brandKicker}>{t('safia_atelier_kicker')}</p>
 
       <div className={styles.top}>
         <div className={styles.headWrap}>

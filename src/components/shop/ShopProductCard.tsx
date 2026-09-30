@@ -12,6 +12,10 @@ interface ShopProductCardProps {
   shortfall: number;
   confirming: boolean;
   balance: number;
+  /** True for the one item the savings-goal callout above the grid is pointing at — see ShopPage's
+   * nextSavingsGoal() call, the same helper My Next Move uses so the two pages never name different
+   * items as "what you're saving for". */
+  isGoal?: boolean;
   onRequestClick: () => void;
   onConfirm: () => void;
   onCancel: () => void;
@@ -28,6 +32,7 @@ export function ShopProductCard({
   shortfall,
   confirming,
   balance,
+  isGoal = false,
   onRequestClick,
   onConfirm,
   onCancel,
@@ -35,12 +40,13 @@ export function ShopProductCard({
   const { t, locale } = useI18n();
 
   return (
-    <li className={styles.card} data-category={item.category}>
+    <li id={`shop-item-${item.id}`} className={styles.card} data-category={item.category} data-goal={isGoal || undefined}>
       <div className={styles.imageBand} style={{ '--product-accent': `var(${CATEGORY_ACCENT_VAR[item.category]})` } as CSSProperties}>
         <span className={styles.imageGrain} aria-hidden="true" />
         <span className={styles.icon}>
           <ShopIcon itemId={item.id} />
         </span>
+        {isGoal && <span className={styles.goalBadge}>{t('shop_goal_badge')}</span>}
         {item.limitedAvailability && <span className={styles.limited}>{t('shop_limited_badge')}</span>}
       </div>
 

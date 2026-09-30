@@ -11,7 +11,7 @@ interface PortraitFallbackProps {
 /**
  * The deliberate answer to "never leave an empty photo cavity": for a demo employee without a
  * licensed portrait, this fills the whole reserved space with a real, intentional design — bold
- * monogram initials in the Safia League display face over a warm per-person gradient, a fine
+ * monogram initials in the Safia Atelier display face over a warm per-person gradient, a fine
  * medallion ring, a soft grain texture, and a small wheat-sprig mark — never a shrunken generic icon
  * floating in white space, and never a fabricated photo of a real person standing in for someone
  * who doesn't exist.

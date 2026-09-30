@@ -260,3 +260,79 @@ export function computeClanStandings(
 
   return standings.sort((a, b) => a.rank - b.rank);
 }
+
+export interface ClanGap {
+  next: ClanStanding;
+  /** next.averagePoints - mine.averagePoints, always > 0 — how much the fair per-member average
+   * needs to close to overtake the clan directly ahead. */
+  gap: number;
+}
+
+/** How far a clan is from overtaking whoever's directly ahead of it — null for the clan already in
+ * 1st (nothing to close) or one not found in the given standings. Used by My Next Move so "gap to
+ * next clan" is always a real, computed number, never a vague "keep going". */
+export function gapToNextClan(standings: readonly ClanStanding[], clanId: ClanId): ClanGap | null {
+  const mine = standings.find((s) => s.clanId === clanId);
+  if (!mine || mine.rank <= 1) return null;
+  const next = standings.find((s) => s.rank === mine.rank - 1);
+  if (!next) return null;
+  return { next, gap: next.averagePoints - mine.averagePoints };
+}
+
+export interface ClanSeasonProgress {
+  /** One entry per scored week in the season, oldest first. */
+  weekIndexes: number[];
+  /** Each clan's cumulative average-points-per-member *through* that week — the same fair measure
+   * standings are ranked by, just as a running total instead of a single end value. */
+  averageByClan: Record<ClanId, number[]>;
+}
+
+/**
+ * The shared "how did we get here" visual for the four clans: each clan's fair average-points
+ * running total, week by week, all on one timeline — built from the exact same event stream
+ * computeClanStandings itself sums, so this can never disagree with the standings cards next to it.
+ * Achievement/Team-Mentor points (season.endISO, weekIndex null) only ever resolve once a season is
+ * approved, so they land on the season's final scored week — the same moment computeClanStandings
+ * would first reflect them too.
+ */
+export function computeClanSeasonProgress(
+  dataset: LeaderboardDataset,
+  config: ScoringConfig,
+  clanAssignments: Record<string, ClanId>,
+  clanIds: readonly ClanId[],
+  season: Season,
+  nowMs: number = Date.now(),
+): ClanSeasonProgress {
+  const weekIndexes = weekIndexesInRange(dataset.firstWeekStart, dataset.weekCount, season.startISO, season.endISO);
+  const lastWeek = weekIndexes[weekIndexes.length - 1] ?? null;
+  const eventsByMember = computeClanContributionEvents(dataset, config, season, nowMs);
+
+  const memberCountByClan = new Map<ClanId, number>(clanIds.map((id) => [id, 0]));
+  const clanOfMember = new Map<string, ClanId>();
+  for (const member of dataset.members) {
+    const clanId = clanAssignments[member.id];
+    if (!clanId) continue;
+    clanOfMember.set(member.id, clanId);
+    memberCountByClan.set(clanId, (memberCountByClan.get(clanId) ?? 0) + 1);
+  }
+
+  const averageByClan = Object.fromEntries(clanIds.map((id) => [id, [] as number[]])) as Record<ClanId, number[]>;
+
+  for (const w of weekIndexes) {
+    const totalByClan = new Map<ClanId, number>(clanIds.map((id) => [id, 0]));
+    for (const [memberId, events] of Object.entries(eventsByMember)) {
+      const clanId = clanOfMember.get(memberId);
+      if (!clanId) continue;
+      for (const e of events) {
+        const counted = e.weekIndex != null ? e.weekIndex <= w : w === lastWeek;
+        if (counted) totalByClan.set(clanId, (totalByClan.get(clanId) ?? 0) + e.points);
+      }
+    }
+    for (const id of clanIds) {
+      const count = memberCountByClan.get(id) ?? 0;
+      averageByClan[id].push(count ? (totalByClan.get(id) ?? 0) / count : 0);
+    }
+  }
+
+  return { weekIndexes, averageByClan };
+}

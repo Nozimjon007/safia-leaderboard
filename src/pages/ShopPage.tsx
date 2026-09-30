@@ -8,7 +8,7 @@ import { useShopRedemptions } from '../hooks/useShopRedemptions';
 import { useClanAssignments } from '../hooks/useClans';
 import { useSeasons } from '../hooks/useSeasons';
 import { balanceForMember, computeSeasonCoinAwards } from '../lib/coins';
-import { hasOpenRedemption, redemptionsForMember, SHOP_CATALOG, SHOP_CATEGORIES, type Redemption, type ShopCategory, type ShopItem } from '../lib/shop';
+import { hasOpenRedemption, nextSavingsGoal, redemptionsForMember, SHOP_CATALOG, SHOP_CATEGORIES, type Redemption, type ShopCategory, type ShopItem } from '../lib/shop';
 import { shopCategoryLabel, shopItemName, shopStatusLabel, useI18n } from '../i18n';
 import { DemoBanner } from '../components/common/DemoBanner';
 import { StateMessage } from '../components/common/StateMessage';
@@ -102,6 +102,7 @@ export function ShopPage() {
 
   const member = viewAsMemberId ? (dataset.members.find((m) => m.id === viewAsMemberId) ?? null) : null;
   const balance = member ? balanceForMember(coinLedger.transactions, member.id) : 0;
+  const goal = member ? nextSavingsGoal(balance) : null;
   const pendingCoins = member ? (pendingByMember[member.id] ?? 0) : 0;
   const myRedemptions = member ? redemptionsForMember(shopStore.redemptions, member.id) : [];
   const reservedCoins = myRedemptions.filter((r) => r.status === 'pending' || r.status === 'approved').reduce((sum, r) => sum + r.coinsSpent, 0);
@@ -200,6 +201,22 @@ export function ShopPage() {
         )}
       </section>
 
+      {member &&
+        (goal ? (
+          <a href={`#shop-item-${goal.id}`} className={styles.goalCallout}>
+            <div className={styles.goalText}>
+              <span className={styles.goalLabel}>{t('my_next_move_saving_label')}</span>
+              <span className={styles.goalName}>{shopItemName(t, goal.id)}</span>
+              <span className={styles.goalGap}>{t('my_next_move_saving_gap', { n: Math.max(0, goal.priceCoins - balance).toLocaleString(locale) })}</span>
+            </div>
+            <div className={styles.goalBar} role="presentation">
+              <div className={styles.goalBarFill} style={{ width: `${Math.min(100, (balance / goal.priceCoins) * 100)}%` }} />
+            </div>
+          </a>
+        ) : (
+          <p className={styles.goalDone}>{t('my_next_move_saving_done')}</p>
+        ))}
+
       <div className={styles.categoryRow}>
         <div className="segment" role="group" aria-label={t('shop_category_all')}>
           <button type="button" aria-pressed={category === 'all'} onClick={() => setCategory('all')}>
@@ -229,6 +246,7 @@ export function ShopPage() {
               shortfall={member ? Math.max(0, item.priceCoins - balance) : 0}
               confirming={confirmingItemId === item.id}
               balance={balance}
+              isGoal={goal?.id === item.id}
               onRequestClick={() => setConfirmingItemId(item.id)}
               onConfirm={() => requestItem(item)}
               onCancel={() => setConfirmingItemId(null)}

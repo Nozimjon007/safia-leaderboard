@@ -1,7 +1,7 @@
 import type { TranslationDict } from './en';
 
 export const ru: TranslationDict = {
-  app_title: 'Safia League',
+  app_title: 'Safia Atelier',
   skip_to_content: 'Перейти к содержимому',
   nav_leaderboard: 'Рейтинг',
   nav_scoring: 'Как считаются баллы',
@@ -263,7 +263,7 @@ export const ru: TranslationDict = {
 
   season_quarter_label: '{quarter} кв. {year}',
   season_panel_title: 'Текущий сезон',
-  safia_league_kicker: 'Safia League',
+  safia_atelier_kicker: 'Safia Atelier',
   season_selector_hero_label: 'Перейти к сезону',
   season_selector_custom_option: 'Произвольный период',
   season_panel_more: 'Об этих данных',
@@ -567,6 +567,9 @@ export const ru: TranslationDict = {
   clan_points_total_label: 'Всего очков',
   clan_points_avg_label: 'Среднее / участник',
   clan_points_avg_note: 'Ранжирование по среднему количеству очков на участника — численность клана сама по себе не решает исход.',
+  clan_progress_chart_heading: 'Прогресс сезона',
+  clan_progress_chart_subtitle: 'Среднее количество очков клана на участника, нарастающим итогом по неделям — та же справедливая мера, что и в рейтинге ниже.',
+  clan_progress_chart_title: 'Прогресс сезона по кланам: среднее очков на участника по неделям',
   clan_members_count: '{n} участников',
   clan_leading_contributors_label: 'Лучшие участники',
   clan_view_roster: 'Состав клана →',
@@ -592,6 +595,24 @@ export const ru: TranslationDict = {
   clan_reason_clan_mission: 'Еженедельная миссия клана',
   clan_mission_clean_sweep_name: 'Неделя чистоты',
   clan_mission_steady_output_name: 'Неделя стабильной выработки',
+
+  // ---- Дневник мастерства ----
+  craft_journal_heading: 'Дневник мастерства',
+  craft_journal_intro: 'Хроника подтверждённой работы, заработанных звёзд и вклада в клан — для вас, а не для личного дела.',
+  craft_journal_empty: 'Записей пока нет — они появятся здесь по мере того, как будут засчитаны недели этого сезона.',
+  craft_journal_show_more: 'Показать ещё {n}',
+  craft_journal_kind_craft_star: 'Звезда мастерства',
+  craft_journal_kind_clan_summary: 'Вклад в клан',
+  craft_journal_kind_achievement: 'Достижение',
+  craft_journal_kind_team_mentor: 'Отличие',
+  craft_journal_kind_season_result: 'Итоги сезона',
+  craft_journal_star_1: 'Заработана звезда мастерства в категории «{category}» за {n} сильную неделю.',
+  craft_journal_star_n: 'Заработана звезда мастерства в категории «{category}»: серия из {n} сильных недель.',
+  craft_journal_clan_summary_1: 'Внесён вклад в 1 клановую миссию в этом сезоне — +{points} очков клана.',
+  craft_journal_clan_summary_n: 'Внесён вклад в {n} клановых миссий в этом сезоне — +{points} очков клана суммарно.',
+  craft_journal_achievement: 'Получено достижение «{title}».',
+  craft_journal_team_mentor: 'Получено звание «Наставник сезона» за стабильные, надёжные результаты.',
+  craft_journal_season_result: '{season}: итог — #{rank} из {rankedCount}.',
 
   // ---- Монеты Safia ----
   coins_disclaimer: 'Настраиваемые демонстрационные номиналы и правила начисления — не официальная политика Safia.',
@@ -633,6 +654,7 @@ export const ru: TranslationDict = {
   shop_category_experiences: 'Впечатления',
   shop_eligibility_note: 'Доступно любому действующему сотруднику Safia при достаточном балансе.',
   shop_limited_badge: 'Ограниченная доступность',
+  shop_goal_badge: 'Ваша цель',
   shop_pending_fulfillment: 'Отправляется после обработки заявки.',
   shop_pending_scheduling: 'Согласуется с вами после обработки заявки.',
   shop_pending_approval: 'Требует утверждения руководством после заявки.',
@@ -672,4 +694,19 @@ export const ru: TranslationDict = {
   shop_item_ceo_conversation_desc: 'Личная беседа с генеральным директором Safia.',
   shop_item_dinner_with_leadership_name: 'Ужин с руководством',
   shop_item_dinner_with_leadership_desc: 'Ужин с руководством Safia.',
+
+  // ---- Мой следующий шаг ----
+  my_next_move_heading: 'Мой следующий шаг',
+  my_next_move_pick_prompt: 'Выберите демо-сотрудника, чтобы увидеть его следующий шаг.',
+  my_next_move_rank_label: 'Личное место',
+  my_next_move_star_label: 'До следующей звезды',
+  my_next_move_star_detail_1: 'ещё 1 неделя с {category} ≥{threshold}%',
+  my_next_move_star_detail_n: 'ещё {n} недель(и) с {category} ≥{threshold}%',
+  my_next_move_star_complete: 'Все звёзды сезона получены',
+  my_next_move_clan_label: 'Позиция клана',
+  my_next_move_clan_gap: 'отстаёт на {gap} ср. балла от {next}',
+  my_next_move_clan_leading: 'Возглавляет рейтинг',
+  my_next_move_saving_label: 'Копит на',
+  my_next_move_saving_gap: 'осталось {n} монет',
+  my_next_move_saving_done: 'Хватит на весь каталог',
 };

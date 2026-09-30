@@ -1,7 +1,7 @@
 import type { TranslationDict } from './en';
 
 export const uz: TranslationDict = {
-  app_title: 'Safia League',
+  app_title: 'Safia Atelier',
   skip_to_content: 'Мазмунга ўтиш',
   nav_leaderboard: 'Рейтинг',
   nav_scoring: 'Балл қандай ҳисобланади?',
@@ -263,7 +263,7 @@ export const uz: TranslationDict = {
 
   season_quarter_label: '{year} йил, {quarter}-чорак',
   season_panel_title: 'Жорий мавсум',
-  safia_league_kicker: 'Safia League',
+  safia_atelier_kicker: 'Safia Atelier',
   season_selector_hero_label: 'Мавсумга ўтиш',
   season_selector_custom_option: 'Ихтиёрий давр',
   season_panel_more: 'Бу маълумотлар ҳақида',
@@ -567,6 +567,9 @@ export const uz: TranslationDict = {
   clan_points_total_label: 'Жами очко',
   clan_points_avg_label: 'Ўртача / аъзо',
   clan_points_avg_note: 'Аъзо бошига ўртача очко бўйича сараланади — катта клан фақат сон кўплиги билан ютолмайди.',
+  clan_progress_chart_heading: 'Мавсум жараёни',
+  clan_progress_chart_subtitle: 'Клан аъзоси бошига ўртача очко, ҳафтадан-ҳафтага ортиб борувчи йиғинди — қуйидаги рейтингдаги худди шу адолатли мезон.',
+  clan_progress_chart_title: 'Клан мавсум жараёни: ҳафталар бўйича аъзо бошига ўртача очко',
   clan_members_count: '{n} аъзо',
   clan_leading_contributors_label: 'Етакчи иштирокчилар',
   clan_view_roster: 'Таркибни кўриш →',
@@ -592,6 +595,24 @@ export const uz: TranslationDict = {
   clan_reason_clan_mission: 'Ҳафталик клан вазифаси',
   clan_mission_clean_sweep_name: 'Тозалик ҳафтаси',
   clan_mission_steady_output_name: 'Барқарор ишлаб чиқариш ҳафтаси',
+
+  // ---- Устачилик кундалиги ----
+  craft_journal_heading: 'Устачилик кундалиги',
+  craft_journal_intro: 'Тасдиқланган иш, қозонилган юлдузлар ва клан ҳиссасининг фасл-фасл ёзуви — сиз учун, шахсий иш учун эмас.',
+  craft_journal_empty: 'Ҳозирча ёзувлар йўқ — улар мавсумнинг ҳисобланган ҳафталари келиши билан бу ерда пайдо бўлади.',
+  craft_journal_show_more: 'Яна {n} тани кўрсатиш',
+  craft_journal_kind_craft_star: 'Устачилик юлдузи',
+  craft_journal_kind_clan_summary: 'Клан ҳиссаси',
+  craft_journal_kind_achievement: 'Ютуқ',
+  craft_journal_kind_team_mentor: 'Фарқлов',
+  craft_journal_kind_season_result: 'Мавсум якуни',
+  craft_journal_star_1: '«{category}» йўналишида {n} та кучли ҳафта учун устачилик юлдузи қозонилди.',
+  craft_journal_star_n: '«{category}» йўналишида {n} та кучли ҳафта туфайли устачилик юлдузи қозонилди.',
+  craft_journal_clan_summary_1: 'Бу мавсумда 1 та клан вазифасига ҳисса қўшилди — +{points} клан балли.',
+  craft_journal_clan_summary_n: 'Бу мавсумда {n} та клан вазифасига ҳисса қўшилди — жами +{points} клан балли.',
+  craft_journal_achievement: '«{title}» ютуғи қўлга киритилди.',
+  craft_journal_team_mentor: 'Барқарор, ишончли натижалар учун мавсумнинг «Наставник» унвони берилди.',
+  craft_journal_season_result: '{season}: якун — {rankedCount} тадан #{rank}-ўрин.',
 
   // ---- Safia тангалари ----
   coins_disclaimer: 'Созланадиган намойиш танга қийматлари ва мезонлари — Safia расмий сиёсати эмас.',
@@ -633,6 +654,7 @@ export const uz: TranslationDict = {
   shop_category_experiences: 'Тажрибалар',
   shop_eligibility_note: 'Балансида етарли тангаси бор ҳар қандай Safia ходимига очиқ.',
   shop_limited_badge: 'Чекланган миқдорда',
+  shop_goal_badge: 'Сизнинг мақсадингиз',
   shop_pending_fulfillment: 'Сўров қайта ишлангандан сўнг жўнатилади.',
   shop_pending_scheduling: 'Сўров қайта ишлангандан сўнг сиз билан келишилади.',
   shop_pending_approval: 'Сўровдан сўнг раҳбарият тасдиғи талаб этилади.',
@@ -672,4 +694,19 @@ export const uz: TranslationDict = {
   shop_item_ceo_conversation_desc: 'Safia бош директори билан якка суҳбат.',
   shop_item_dinner_with_leadership_name: 'Раҳбарият билан кечки овқат',
   shop_item_dinner_with_leadership_desc: 'Safia раҳбарияти билан кечки овқат.',
+
+  // ---- Кейинги қадамим ----
+  my_next_move_heading: 'Кейинги қадамим',
+  my_next_move_pick_prompt: 'Кейинги қадамини кўриш учун намойиш ходимини танланг.',
+  my_next_move_rank_label: 'Якка ўрин',
+  my_next_move_star_label: 'Кейинги юлдузгача',
+  my_next_move_star_detail_1: 'яна 1 ҳафта {category} ≥{threshold}%',
+  my_next_move_star_detail_n: 'яна {n} ҳафта {category} ≥{threshold}%',
+  my_next_move_star_complete: 'Бу мавсумда барча юлдузлар олинди',
+  my_next_move_clan_label: 'Клан ўрни',
+  my_next_move_clan_gap: '{next}дан {gap} ўртача балл орқада',
+  my_next_move_clan_leading: 'Рейтингда етакчи',
+  my_next_move_saving_label: 'Учун йиғмоқда',
+  my_next_move_saving_gap: 'яна {n} танга керак',
+  my_next_move_saving_done: 'Бутун каталог учун етарли',
 };

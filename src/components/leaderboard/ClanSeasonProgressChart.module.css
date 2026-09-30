@@ -1,0 +1,17 @@
+.wrap {
+  margin-bottom: 20px;
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+
+.sub {
+  color: var(--ink-secondary);
+  font-size: 12.5px;
+  margin: 0 0 8px;
+}

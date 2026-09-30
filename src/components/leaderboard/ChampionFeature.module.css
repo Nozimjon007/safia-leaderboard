@@ -69,6 +69,12 @@
 
 .portrait {
   position: relative;
+  /* Explicit width, not just a grid-stretch default: every child in here (photo/fallback/facets)
+     is position:absolute, so the box has zero intrinsic content size — without a definite width,
+     aspect-ratio has nothing reliable to compute a height from and the whole frame can collapse to
+     0x0 (seen specifically once the mobile media query below switches this to a single-column grid
+     row, where auto-row sizing has no explicit minmax() floor to fall back on). */
+  width: 100%;
   aspect-ratio: 4 / 5;
   border-radius: var(--radius-md);
   overflow: hidden;
