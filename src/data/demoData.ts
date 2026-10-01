@@ -225,8 +225,6 @@ if (BRAND_NEW_HIRE_ID) {
 
 const ALL_SEED_MEMBERS: readonly SeedMember[] = [...SEED_MEMBERS, ...SYNTHETIC_MEMBERS];
 
-const REAL_PHOTO_IDS: ReadonlySet<string> = new Set(SEED_MEMBERS.map((m) => m.id));
-
 /** The `pastCount` calendar quarters before today's, plus today's own — oldest first. */
 function pastSeasonSequence(todayISO: string, pastCount: number): Array<{ startISO: string; endISO: string }> {
   const { year: curYear, quarter: curQuarter } = quarterOf(todayISO);
@@ -302,20 +300,18 @@ export function buildDemoDataset(): LeaderboardDataset {
   const scores: Record<string, MemberScores> = {};
 
   for (const seedMember of ALL_SEED_MEMBERS) {
-    const hasRealPhoto = REAL_PHOTO_IDS.has(seedMember.id);
     members.push({
       id: seedMember.id,
       name: seedMember.name,
       area: seedMember.area,
       shift: seedMember.shift,
       role: seedMember.role,
-      // Real licensed portraits for the two hand-authored leaders — see public/portraits/README.md.
-      // Everyone else has no sourced/licensed photo, so they render through the UI's initials-
-      // fallback (see components/common/Avatar.tsx) rather than a broken or reused image.
-      avatarPhoto: hasRealPhoto ? `/portraits/${seedMember.id}.jpg` : null,
-      // Full-body stock photography (unrelated models, not the avatarPhoto face above) used only
-      // to preview the full-body card/hero layout — see public/fullbody/README.md for sourcing.
-      fullBodyPhoto: hasRealPhoto ? `/fullbody/${seedMember.id}.jpg` : null,
+      // Every member, including the two hand-authored leaders who previously had real licensed
+      // photos, renders through the UI's own illustrated initials fallback (Avatar.tsx /
+      // PortraitFallback.tsx) — one consistent identity system everywhere a portrait appears,
+      // matching the leaderboard's own gold/silver/bronze card treatment, never a photo.
+      avatarPhoto: null,
+      fullBodyPhoto: null,
       dateJoinedISO: seedMember.dateJoinedISO,
       careerHistory: seedMember.careerHistory,
     });

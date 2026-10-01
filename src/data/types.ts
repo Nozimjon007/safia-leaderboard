@@ -26,23 +26,21 @@ export interface Member {
   role: string;
   /**
    * Compact photo — the small circular avatar (header, cards, table, compare
-   * tray). null renders as an initials circle. The demo dataset's photos are
-   * AI-generated synthetic faces (nobody real) used only to preview the
-   * portrait-focused layout — see public/portraits/README.md for sourcing.
-   * No real Safia employee photos exist; a production data source should
-   * only ever set this from an approved, real staff photo.
+   * tray). The demo dataset always sets this to null by design: every member
+   * renders through the illustrated initials fallback (Avatar.tsx), one
+   * consistent identity system, not a mix of real/AI/stock photos and
+   * initials. A production data source may set this from an approved, real
+   * staff photo; the UI falls back to initials whenever it's null.
    */
   avatarPhoto: string | null;
   /**
    * Full-length (head-to-shoes) photo for the podium cards and the Career
    * Card hero — distinct from `avatarPhoto` because a face crop and a
    * head-to-shoes photo are different assets, not the same image at a
-   * different size. null renders a full-body silhouette placeholder rather
-   * than stretching the avatar crop. The demo dataset's photos are unrelated
-   * stock-photography models (not the person in `avatarPhoto`, not a Safia
-   * employee) — see public/fullbody/README.md for sourcing/licensing. A
-   * production data source should only ever set this from an approved, real
-   * staff photo of the *same* employee as `avatarPhoto`.
+   * different size. The demo dataset always sets this to null (see
+   * avatarPhoto above); null renders the illustrated PortraitFallback. A
+   * production data source may set this from an approved, real staff photo
+   * of the *same* employee as `avatarPhoto`.
    */
   fullBodyPhoto: string | null;
   /** ISO date first hired, e.g. "2019-03-04". Demo data only — see demoData.ts. Omit/null when unknown; never inferred. */

@@ -54,11 +54,9 @@ describe('buildDemoDataset', () => {
     expect(new Set(names).size).toBe(names.length);
   });
 
-  it('gives the generated roster (beyond the two hand-authored leaders) a null photo — the UI initials-fallback, not a missing asset', () => {
-    const HAND_AUTHORED_IDS = new Set(['otabek', 'nodira']);
-    const generated = dataset.members.filter((m) => !HAND_AUTHORED_IDS.has(m.id));
-    expect(generated.length).toBe(16);
-    for (const m of generated) {
+  it('gives every member a null photo, including the two hand-authored leaders — the UI initials-fallback, never a photo', () => {
+    expect(dataset.members.length).toBeGreaterThan(0);
+    for (const m of dataset.members) {
       expect(m.avatarPhoto).toBeNull();
       expect(m.fullBodyPhoto).toBeNull();
     }
