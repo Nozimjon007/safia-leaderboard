@@ -5,6 +5,7 @@ import { bestAchievement } from '../../lib/achievements';
 import { computeSeasonRewards } from '../../lib/rewards';
 import { seasonCountdown, seasonStatus, seasonWeekRange, type Season } from '../../lib/seasons';
 import { formatDateRange } from '../../lib/dates';
+import { readSignatureMap } from '../../hooks/useSignatureAchievement';
 import { seasonCountdownText, seasonQuarterLabel, useI18n } from '../../i18n';
 import { PodiumCard, type PodiumEmblem } from './PodiumCard';
 import styles from './Podium.module.css';
@@ -72,10 +73,15 @@ export function Podium({
     }
   }
 
+  const signatureMap = readSignatureMap();
+
   function emblemFor(memberId: string): PodiumEmblem {
+    const memberEarned = achievementsByMember?.[memberId] ?? [];
+    const signatureId = signatureMap[memberId];
+    if (signatureId && memberEarned.some((e) => e.id === signatureId)) return { kind: 'achievement', id: signatureId };
     const rewardId = rewardByMember[memberId];
     if (rewardId) return { kind: 'reward', id: rewardId };
-    const achievement = bestAchievement(achievementsByMember?.[memberId] ?? []);
+    const achievement = bestAchievement(memberEarned);
     return achievement ? { kind: 'achievement', id: achievement.id } : null;
   }
 

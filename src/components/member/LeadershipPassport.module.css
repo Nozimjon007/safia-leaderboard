@@ -1,0 +1,264 @@
+.panel {
+  background: linear-gradient(165deg, var(--surface-raised) 0%, var(--accent-wash) 220%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  margin-bottom: 22px;
+}
+
+.headRow {
+  margin-bottom: 18px;
+}
+
+.headRow h2 {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: var(--ink-secondary);
+  font-size: 13px;
+  margin-top: 3px;
+  max-width: 70ch;
+}
+
+/* ---- Featured medallion ---- */
+
+.featured {
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  gap: 22px;
+  align-items: start;
+  padding: 18px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 18px;
+}
+
+.featuredBody {
+  min-width: 0;
+}
+
+.featuredTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.featuredTitle {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.tierChip {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 9px;
+  border-radius: var(--radius-full);
+  color: var(--on-medal);
+}
+
+.tierChip[data-tier='bronze'] {
+  background: var(--medal-bronze);
+}
+.tierChip[data-tier='silver'] {
+  background: var(--medal-silver);
+}
+.tierChip[data-tier='gold'] {
+  background: var(--medal-gold);
+}
+.tierChip[data-tier='platinum'] {
+  background: var(--accent-strong);
+  color: var(--on-accent);
+}
+
+.featuredMeta {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  margin-top: 4px;
+}
+
+.featuredDesc {
+  font-size: 13.5px;
+  color: var(--ink-secondary);
+  margin-top: 8px;
+  max-width: 60ch;
+}
+
+.feedsNote {
+  font-size: 11.5px;
+  color: var(--accent-strong);
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.pinRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.pinBtn {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.pinBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+.pinnedTag {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--accent-strong);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pinnedTag::before {
+  content: '◈';
+}
+
+/* ---- Next milestone ---- */
+
+.nextMilestone {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border: 1px dashed var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--accent-wash);
+  margin-bottom: 18px;
+}
+
+.nextMilestoneLabel {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-strong);
+}
+
+.nextMilestoneBody {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.nextMilestoneCta {
+  font-weight: 700;
+  color: var(--accent-strong);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nextMilestoneCta:hover {
+  text-decoration: underline;
+}
+
+/* ---- Season / career collections ---- */
+
+.collections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.collectionHeading {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-muted);
+  margin-bottom: 8px;
+}
+
+.collectionEmpty {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+}
+
+.collectionList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.collectionItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 4px 22px 4px 4px;
+  font-family: inherit;
+  cursor: pointer;
+  color: inherit;
+}
+
+.collectionItem:hover {
+  border-color: var(--accent);
+}
+
+.collectionItem[data-pinned] {
+  border-color: var(--accent-strong);
+  background: var(--accent-wash);
+}
+
+.collectionPinnedDot {
+  position: absolute;
+  top: 2px;
+  right: 6px;
+  font-size: 10px;
+  color: var(--accent-strong);
+}
+
+.collectionLabel {
+  display: flex;
+  flex-direction: column;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.collectionSeason {
+  font-weight: 500;
+  color: var(--ink-muted);
+  font-size: 10px;
+}
+
+@media (max-width: 640px) {
+  .featured {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+  .featuredTitleRow {
+    justify-content: center;
+  }
+  .pinRow {
+    justify-content: center;
+  }
+  .collections {
+    grid-template-columns: 1fr;
+  }
+}

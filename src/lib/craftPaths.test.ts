@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   computeCraftMastery,
   computeCraftPathProgress,
+  computeLeadershipPathsProgress,
   computeRoleRank,
   computeSeasonDistinctions,
   craftPathForRole,
@@ -89,9 +90,9 @@ describe('computeCraftPathProgress', () => {
     expect(precision.earnedWeekIndex).toBeNull();
   });
 
-  it('caps starsEarned/starsPossible to the path’s own mission count', () => {
+  it('caps starsEarned/starsPossible to the full 8-milestone set (4 paths x 2 tiers)', () => {
     const progress = computeCraftPathProgress(dataset, alice, season)!;
-    expect(progress.starsPossible).toBe(5);
+    expect(progress.starsPossible).toBe(8);
     expect(progress.starsEarned).toBe(2); // output + attendance only
   });
 
@@ -135,8 +136,40 @@ describe('computeCraftMastery', () => {
     const mastery = computeCraftMastery(dataset, member('alice', 'Team Leader'), [q1, q3], fixedNowMs);
     expect(mastery.totalStars).toBe(0);
     expect(mastery.tier).toBe('bronze');
-    expect(mastery.toNextTier).toBe(5);
+    expect(mastery.toNextTier).toBe(8);
     expect(mastery.nextTier).toBe('silver');
+  });
+});
+
+describe('computeLeadershipPathsProgress', () => {
+  const weekCount = 13;
+  const scores = flatScores(weekCount, 50);
+  // 3 qualifying precision (Supervision) weeks: clears people_coach's tier-1 (threshold 3) but not
+  // its tier-2 (threshold 6).
+  setWeeks(scores, 'control', [0, 1, 2], 95);
+  const alice = member('alice', 'Team Leader');
+  const season = seasonOf(2026, 3);
+  const dataset: LeaderboardDataset = {
+    sourceLabel: 'Demo',
+    firstWeekStart: '2026-07-06',
+    weekCount,
+    members: [alice],
+    scores: { alice: scores },
+  };
+
+  it('groups the flat 8-milestone set back into its four paths', () => {
+    const paths = computeLeadershipPathsProgress(dataset, alice, season)!;
+    expect(paths.map((p) => p.pathId)).toEqual(['shift_excellence', 'people_coach', 'quality_safety', 'problem_solver']);
+    for (const p of paths) expect(p.starsPossible).toBe(2); // two tiers each
+  });
+
+  it('can complete a path’s easier tier without its harder one, independently of the other three paths', () => {
+    const paths = computeLeadershipPathsProgress(dataset, alice, season)!;
+    const coach = paths.find((p) => p.pathId === 'people_coach')!;
+    expect(coach.starsEarned).toBe(1);
+    expect(coach.missions[0].complete).toBe(true); // threshold 3
+    expect(coach.missions[1].complete).toBe(false); // threshold 6
+    for (const other of paths.filter((p) => p.pathId !== 'people_coach')) expect(other.starsEarned).toBe(0);
   });
 });
 

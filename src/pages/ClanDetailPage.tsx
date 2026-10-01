@@ -16,6 +16,7 @@ import {
   computeClanStandings,
   type ClanContributionEvent,
   type ClanMemberContribution,
+  type ClanPointReason,
 } from '../lib/clanPoints';
 import { clanIdentity, clanName, roleIcon, roleLabel, useI18n, type TFunction } from '../i18n';
 import type { TranslationKey } from '../i18n/locales/en';
@@ -31,6 +32,14 @@ import styles from './ClanDetailPage.module.css';
 function isClanId(v: string | undefined): v is ClanId {
   return v != null && (CLAN_IDS as readonly string[]).includes(v);
 }
+
+const CONTRIBUTION_REASON_ORDER: readonly ClanPointReason[] = [
+  'role_milestone',
+  'process_improvement',
+  'quality_achievement',
+  'coaching_contribution',
+  'clan_mission',
+];
 
 function reasonLabel(t: TFunction, event: ClanContributionEvent): string {
   if (event.reason === 'clan_mission' && event.missionId) return t(`clan_mission_${event.missionId}_name` as TranslationKey);
@@ -137,6 +146,20 @@ function ClanDetailContent({ clanId, season, previousSeason, dataset, config, cl
     return computeClanRoster(dataset, clanAssignments, clanId, events);
   }, [dataset, config, clanAssignments, season, clanId]);
 
+  // A verified, by-rule breakdown of this clan's total — every point already traces to a real event
+  // (see roster's own events), this just rolls those same numbers up by reason instead of by member.
+  const reasonTotals = useMemo(() => {
+    const totals: Record<ClanPointReason, number> = {
+      role_milestone: 0,
+      process_improvement: 0,
+      quality_achievement: 0,
+      coaching_contribution: 0,
+      clan_mission: 0,
+    };
+    for (const r of roster) for (const e of r.events) totals[e.reason] += e.points;
+    return totals;
+  }, [roster]);
+
   const soloRankByMember = useMemo(() => {
     const weekIndexes = weekIndexesInRange(dataset.firstWeekStart, dataset.weekCount, season.startISO, season.endISO);
     const result = buildLeaderboard({ members: dataset.members, scores: dataset.scores, weekIndexes, weekCount: dataset.weekCount, metric: 'overall', config });
@@ -198,6 +221,19 @@ function ClanDetailContent({ clanId, season, previousSeason, dataset, config, cl
         </div>
       </section>
       <p className={styles.pipelineNote}>{t('clan_pipeline_note')}</p>
+
+      <section className={styles.contributionSummary} aria-labelledby="clan-contribution-heading">
+        <h2 id="clan-contribution-heading">{t('clan_contribution_summary_heading')}</h2>
+        <ul className={styles.contributionList}>
+          {CONTRIBUTION_REASON_ORDER.filter((reason) => reasonTotals[reason] > 0).map((reason) => (
+            <li key={reason} className={styles.contributionRow}>
+              <span>{t(`clan_reason_${reason}` as TranslationKey)}</span>
+              <b className="tabular">{reasonTotals[reason].toLocaleString(locale)}</b>
+            </li>
+          ))}
+        </ul>
+        {CONTRIBUTION_REASON_ORDER.every((reason) => reasonTotals[reason] === 0) && <p className={styles.pipelineNote}>{t('clan_contribution_summary_empty')}</p>}
+      </section>
 
       <section aria-labelledby="clan-roster-heading">
         <div className={styles.rosterHead}>

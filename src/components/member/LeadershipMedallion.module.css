@@ -1,0 +1,111 @@
+.medal {
+  --medal-color: var(--ink-muted);
+  --medal-rim: var(--border-strong);
+  --medal-face-text: var(--surface);
+  position: relative;
+  flex: none;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.16));
+}
+
+.large {
+  width: 128px;
+  height: 128px;
+}
+
+.small {
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.medal[data-lit][data-tier='bronze'] {
+  --medal-color: var(--medal-bronze);
+  --medal-face-text: var(--on-medal);
+}
+.medal[data-lit][data-tier='silver'] {
+  --medal-color: var(--medal-silver);
+  --medal-face-text: var(--on-medal);
+}
+.medal[data-lit][data-tier='gold'] {
+  --medal-color: var(--medal-gold);
+  --medal-face-text: var(--on-medal);
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.16)) drop-shadow(0 0 9px color-mix(in srgb, var(--medal-gold) 45%, transparent));
+}
+.medal[data-lit][data-tier='platinum'] {
+  --medal-color: var(--accent-strong);
+  --medal-face-text: var(--on-accent);
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.16)) drop-shadow(0 0 10px color-mix(in srgb, var(--accent-strong) 50%, transparent));
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.bezelOuter {
+  fill: var(--medal-color);
+}
+
+.bezelRim {
+  fill: color-mix(in srgb, var(--medal-color) 78%, white 22%);
+}
+
+.face {
+  fill: var(--medal-color);
+}
+
+.engraveRing {
+  fill: none;
+  stroke: color-mix(in srgb, var(--medal-color) 55%, black 20%);
+  stroke-width: 1.4;
+  stroke-opacity: 0.55;
+}
+
+.rimHighlight {
+  fill: none;
+  stroke: white;
+  stroke-width: 1.2;
+  stroke-opacity: 0.4;
+}
+
+.glyphText {
+  font-size: 30px;
+  fill: var(--medal-face-text);
+  font-weight: 700;
+}
+
+.small .glyphText {
+  font-size: 34px;
+}
+
+.glint {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at var(--glint-x, 38%) var(--glint-y, 30%), rgba(255, 255, 255, 0.75), transparent 55%);
+  mix-blend-mode: soft-light;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.medal[data-lit] .glint {
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .glint {
+    transition:
+      background-position 0.12s ease-out,
+      opacity 0.2s ease;
+  }
+}
+
+.sweep {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.9) 50%, transparent 65%);
+  mix-blend-mode: soft-light;
+}

@@ -7,6 +7,7 @@ import { useDatasetContext } from '../state/DatasetProvider';
 import { useLeaderboardFilters, type LeaderboardFilters } from '../hooks/useLeaderboardFilters';
 import { useLeaderboardResult } from '../hooks/useLeaderboardResult';
 import { useSeasons } from '../hooks/useSeasons';
+import type { Season } from '../lib/seasons';
 import { useTimeMachine } from '../hooks/useTimeMachine';
 import { useScoringConfig } from '../state/ScoringConfigProvider';
 import { compareMembers, weekOverall, type LeaderboardResult } from '../lib/scoring';
@@ -18,6 +19,7 @@ import { RadarChart } from '../components/charts/RadarChart';
 import { LineChart } from '../components/charts/LineChart';
 import { CompareIdentityCard } from '../components/compare/CompareIdentityCard';
 import { CompareCategoryRow } from '../components/compare/CompareCategoryRow';
+import { ComparePathSummary } from '../components/compare/ComparePathSummary';
 import { LeaderboardSkeleton } from '../components/leaderboard/LeaderboardSkeleton';
 import { TimeMachineBanner } from '../components/leaderboard/TimeMachineBanner';
 import styles from './ComparePage.module.css';
@@ -170,7 +172,15 @@ export function ComparePage() {
       ) : sameMember ? (
         <StateMessage title={t('compare_title')} body={t('compare_same_member_error')} />
       ) : (
-        <ComparisonBody dataset={dataset} filters={filters} config={config} result={result} memberA={memberA} memberB={memberB} />
+        <ComparisonBody
+          dataset={dataset}
+          filters={filters}
+          config={config}
+          result={result}
+          memberA={memberA}
+          memberB={memberB}
+          currentSeason={seasonsInfo?.currentSeason ?? null}
+        />
       )}
     </>
   );
@@ -183,9 +193,10 @@ interface ComparisonBodyProps {
   result: LeaderboardResult;
   memberA: Member;
   memberB: Member;
+  currentSeason: Season | null;
 }
 
-function ComparisonBody({ dataset, filters, config, result, memberA, memberB }: ComparisonBodyProps) {
+function ComparisonBody({ dataset, filters, config, result, memberA, memberB, currentSeason }: ComparisonBodyProps) {
   const { t, locale } = useI18n();
 
   const weekIndexes = useMemo(
@@ -265,6 +276,17 @@ function ComparisonBody({ dataset, filters, config, result, memberA, memberB }: 
           ))}
         </div>
       </section>
+
+      <ComparePathSummary
+        dataset={dataset}
+        memberA={memberA}
+        memberB={memberB}
+        currentSeason={currentSeason}
+        nameA={memberA.name}
+        nameB={memberB.name}
+        colorA={COLOR_A}
+        colorB={COLOR_B}
+      />
 
       <div className={styles.twoCol}>
         <section className={styles.panel}>

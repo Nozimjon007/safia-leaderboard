@@ -33,64 +33,75 @@
 }
 
 .starsRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   margin-bottom: 16px;
+  font-size: 13.5px;
 }
 
-.constellation {
-  display: flex;
-  gap: 3px;
-  font-size: 22px;
-  line-height: 1;
-  color: var(--border-strong);
-}
+/* ---- Four paths ---- */
 
-.star[data-complete] {
-  color: var(--medal-gold);
-  text-shadow: 0 0 8px color-mix(in srgb, var(--medal-gold) 55%, transparent);
-}
-
-.newStarBanner {
-  background: var(--medal-gold-bg);
-  border: 1px solid var(--medal-gold);
-  border-radius: var(--radius-md);
-  padding: 10px 14px;
-  margin-bottom: 16px;
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.newStarBanner p + p {
-  margin-top: 4px;
-}
-
-.missions {
+.paths {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
   margin-bottom: 18px;
 }
 
-.mission {
+.pathSection {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 12px 14px;
   background: var(--surface-raised);
 }
 
-.mission[data-complete] {
-  border-color: var(--medal-gold);
-  background: var(--medal-gold-bg);
+.pathHead {
+  margin-bottom: 10px;
 }
 
-/* A one-time entrance glow for a mission whose star was genuinely just earned (see
+.pathHead h3 {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pathDesc {
+  display: block;
+  font-size: 11.5px;
+  color: var(--ink-secondary);
+  margin-top: 1px;
+}
+
+.pathStars {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-strong);
+  margin-top: 4px;
+}
+
+.missionList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mission {
+  border-top: 1px dashed var(--border-strong);
+  padding-top: 10px;
+}
+
+.mission:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+/* A one-time entrance glow for a milestone whose star was genuinely just earned (see
    useNewlyEarnedMissionIds) — never loops, and the global reduced-motion override in base.css
    already neutralizes this for anyone who has that preference set. */
 .mission[data-new] {
   animation: missionNewGlow 1.6s ease-out;
+  border-radius: var(--radius-sm);
 }
 
 @keyframes missionNewGlow {
@@ -99,6 +110,67 @@
   }
   100% {
     box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.missionTrigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0 0 4px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.missionTrigger:disabled {
+  cursor: default;
+}
+
+.missionGlyph {
+  color: var(--border-strong);
+  font-size: 15px;
+  flex: none;
+}
+
+.mission[data-status='complete'] .missionGlyph {
+  color: var(--medal-gold);
+}
+
+.mission[data-status='locked'] .missionGlyph {
+  font-size: 12px;
+  opacity: 0.55;
+}
+
+.missionTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
+}
+
+.mission[data-status='locked'] .missionTitleWrap {
+  color: var(--ink-muted);
+}
+
+.missionChevron {
+  color: var(--ink-muted);
+  transition: transform 0.18s ease;
+  flex: none;
+}
+
+.missionChevron[data-open] {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .missionChevron {
+    transition: none;
   }
 }
 
@@ -112,43 +184,6 @@
   border-radius: var(--radius-full);
   padding: 1px 6px;
   flex: none;
-}
-
-.missionHead {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 4px;
-}
-
-.missionGlyph {
-  color: var(--border-strong);
-  font-size: 15px;
-}
-
-.mission[data-complete] .missionGlyph {
-  color: var(--medal-gold);
-}
-
-.missionHead b {
-  font-size: 13.5px;
-  flex: 1;
-}
-
-.categoryTag {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--ink-muted);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  padding: 1px 6px;
-}
-
-.missionDesc {
-  color: var(--ink-secondary);
-  font-size: 12px;
-  margin-bottom: 8px;
 }
 
 .track {
@@ -183,6 +218,43 @@
   color: var(--accent-strong);
   margin-top: 2px;
 }
+
+.missionLockedNote {
+  font-size: 11.5px;
+  color: var(--ink-muted);
+}
+
+.detail {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detailLabel {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-muted);
+  margin-bottom: 1px;
+}
+
+.detail p {
+  font-size: 12.5px;
+  color: var(--ink-secondary);
+}
+
+.detailClanNote {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-strong) !important;
+}
+
+/* ---- Lifetime mastery ---- */
 
 .mastery {
   border-top: 1px dashed var(--border-strong);

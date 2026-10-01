@@ -45,6 +45,7 @@ import { SeasonHistoryPanel } from '../components/member/SeasonHistoryPanel';
 import { RewardBadge } from '../components/member/RewardBadge';
 import { CareerCard } from '../components/member/CareerCard';
 import { CraftPathPanel } from '../components/member/CraftPathPanel';
+import { LeadershipPassport } from '../components/member/LeadershipPassport';
 import { CraftJournal } from '../components/member/CraftJournal';
 import { PathToPodiumPanel } from '../components/member/PathToPodiumPanel';
 import { ScoreReceiptPanel } from '../components/member/ScoreReceiptPanel';
@@ -357,6 +358,16 @@ function MemberProfileContent({
           currentSeasonRankedCount={currentSeasonEntry?.rankedCount ?? 0}
           earnedAchievements={progress.earnedAchievements}
           rewardCount={progress.myRewards.length}
+        />
+      )}
+
+      {progress && (
+        <LeadershipPassport
+          member={row.member}
+          dataset={dataset}
+          currentSeason={currentSeason}
+          seasons={seasons}
+          earnedAchievements={progress.earnedAchievements}
         />
       )}
 

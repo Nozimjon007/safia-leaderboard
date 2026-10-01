@@ -6,6 +6,7 @@ import { computeSeasonRewards } from '../../lib/rewards';
 import type { Season } from '../../lib/seasons';
 import { isSeasonApproved } from '../../lib/seasons';
 import type { ClanId } from '../../lib/clans';
+import { readSignatureMap } from '../../hooks/useSignatureAchievement';
 import { useI18n } from '../../i18n';
 import { ChampionFeature, type ChampionEmblem } from './ChampionFeature';
 import { ContenderCard } from './ContenderCard';
@@ -81,10 +82,17 @@ export function TopFive({
     }
   }
 
+  // A pinned Signature Achievement is the leader's own explicit choice of how to be shown here —
+  // it wins even over a reward badge, which is really just this same slot's automatic default.
+  const signatureMap = readSignatureMap();
+
   function emblemFor(memberId: string): ChampionEmblem {
+    const memberEarned = achievementsByMember?.[memberId] ?? [];
+    const signatureId = signatureMap[memberId];
+    if (signatureId && memberEarned.some((e) => e.id === signatureId)) return { kind: 'achievement', id: signatureId };
     const rewardId = rewardByMember[memberId];
     if (rewardId) return { kind: 'reward', id: rewardId };
-    const achievement = bestAchievement(achievementsByMember?.[memberId] ?? []);
+    const achievement = bestAchievement(memberEarned);
     return achievement ? { kind: 'achievement', id: achievement.id } : null;
   }
 

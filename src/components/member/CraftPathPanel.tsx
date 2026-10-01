@@ -1,15 +1,19 @@
-import { motion, useReducedMotion } from 'motion/react';
+import { useId, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import type { LeaderboardDataset, Member, ScoringConfig } from '../../data/types';
 import { categoryLabel, craftPathLabel, useI18n } from '../../i18n';
 import type { TranslationKey } from '../../i18n/locales/en';
 import {
   computeCraftMastery,
-  computeCraftPathProgress,
+  computeLeadershipPathsProgress,
   computeRoleRank,
   craftPathForRole,
   CRAFT_CONCEPT_CATEGORY,
-  type CraftConcept,
+  milestoneTier,
+  type CraftMissionProgress,
+  type LeadershipPathProgress,
 } from '../../lib/craftPaths';
+import { CLAN_POINT_VALUES } from '../../lib/clanPoints';
 import type { Season } from '../../lib/seasons';
 import { formatDate, weekStartISO } from '../../lib/dates';
 import { useNewlyEarnedMissionIds } from '../../hooks/useNewlyEarnedStars';
@@ -27,23 +31,144 @@ interface CraftPathPanelProps {
   periodWeekIndexes: readonly number[];
 }
 
+function milestoneTitleKey(m: CraftMissionProgress): TranslationKey {
+  return `leadership_milestone_${m.def.pathId}_${milestoneTier(m.def)}_title` as TranslationKey;
+}
+function milestoneDescKey(m: CraftMissionProgress): TranslationKey {
+  return `leadership_milestone_${m.def.pathId}_${milestoneTier(m.def)}_desc` as TranslationKey;
+}
+
+interface MilestoneRowProps {
+  mission: CraftMissionProgress;
+  locked: boolean;
+  isNew: boolean;
+  dataset: LeaderboardDataset;
+  reduceMotion: boolean;
+}
+
+/** One milestone — earned / in-progress / locked, expandable on click into its full criteria,
+ * progress, what remains, and how it's verified (never just a bare progress bar). */
+function MilestoneRow({ mission: m, locked, isNew, dataset, reduceMotion }: MilestoneRowProps) {
+  const { t, locale } = useI18n();
+  const [open, setOpen] = useState(false);
+  const panelId = useId();
+  const category = categoryLabel(t, CRAFT_CONCEPT_CATEGORY[m.def.concept]);
+  const unit = t(`craft_concept_${m.def.concept}_unit` as TranslationKey);
+  const pct = locked ? 0 : Math.round((m.current / m.def.threshold) * 100);
+  const earnedDate = m.earnedWeekIndex != null ? formatDate(weekStartISO(dataset.firstWeekStart, m.earnedWeekIndex), locale) : null;
+  const status = m.complete ? 'complete' : locked ? 'locked' : 'active';
+
+  return (
+    <li className={styles.mission} data-status={status} data-new={isNew || undefined}>
+      <button type="button" className={styles.missionTrigger} aria-expanded={open} aria-controls={panelId} onClick={() => !locked && setOpen((v) => !v)} disabled={locked}>
+        <span className={styles.missionGlyph} aria-hidden="true">
+          {m.complete ? '★' : locked ? '🔒' : '☆'}
+        </span>
+        <span className={styles.missionTitleWrap}>
+          <b>{t(milestoneTitleKey(m))}</b>
+          {isNew && <span className={styles.newChip}>{t('craft_new_chip')}</span>}
+        </span>
+        {!locked && (
+          <span className={styles.missionChevron} data-open={open || undefined} aria-hidden="true">
+            ▾
+          </span>
+        )}
+      </button>
+
+      {!locked && (
+        <div className={styles.track}>
+          <div className={styles.fill} style={{ width: `${pct}%` }} />
+        </div>
+      )}
+      {locked ? (
+        <p className={styles.missionLockedNote}>{t('leadership_milestone_locked_note')}</p>
+      ) : !m.complete ? (
+        <p className={styles.missionProgress}>{t('craft_mission_progress', { current: m.current, threshold: m.def.threshold, unit })}</p>
+      ) : (
+        earnedDate && <p className={styles.missionEarned}>{t('craft_mission_complete_on', { date: earnedDate })}</p>
+      )}
+
+      <AnimatePresence initial={false}>
+        {open && !locked && (
+          <motion.div
+            id={panelId}
+            initial={reduceMotion ? false : { height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: reduceMotion ? 0.001 : 0.2, ease: [0.16, 1, 0.3, 1] }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div className={styles.detail}>
+              <div>
+                <span className={styles.detailLabel}>{t('leadership_milestone_criteria_label')}</span>
+                <p>{t(milestoneDescKey(m))}</p>
+              </div>
+              <div>
+                <span className={styles.detailLabel}>{t('leadership_milestone_progress_label')}</span>
+                <p>{t('craft_mission_progress', { current: m.current, threshold: m.def.threshold, unit })}</p>
+              </div>
+              <div>
+                <span className={styles.detailLabel}>{t('leadership_milestone_remaining_label')}</span>
+                <p>{m.complete ? t('leadership_milestone_remaining_done') : t('leadership_milestone_remaining_text', { n: m.def.threshold - m.current, unit })}</p>
+              </div>
+              <div>
+                <span className={styles.detailLabel}>{t('leadership_milestone_verified_label')}</span>
+                <p>{t('leadership_milestone_verification', { category })}</p>
+              </div>
+              <p className={styles.detailClanNote}>
+                {t('passport_feeds_clan', { points: m.def.concept === 'kaizen' ? CLAN_POINT_VALUES.process_improvement : CLAN_POINT_VALUES.role_milestone })}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </li>
+  );
+}
+
+function PathSection({ path, dataset, newIds, reduceMotion }: { path: LeadershipPathProgress; dataset: LeaderboardDataset; newIds: ReadonlySet<string>; reduceMotion: boolean }) {
+  const { t } = useI18n();
+  return (
+    <div className={styles.pathSection}>
+      <div className={styles.pathHead}>
+        <h3>{t(`leadership_path_${path.pathId}` as TranslationKey)}</h3>
+        <span className={styles.pathDesc}>{t(`leadership_path_${path.pathId}_desc` as TranslationKey)}</span>
+        <span className={styles.pathStars}>{t('craft_stars_of', { earned: path.starsEarned, possible: path.starsPossible })}</span>
+      </div>
+      <ul className={styles.missionList}>
+        {path.missions.map((m, i) => (
+          <MilestoneRow
+            key={m.def.id}
+            mission={m}
+            locked={i > 0 && !path.missions[i - 1].complete}
+            isNew={newIds.has(m.def.id)}
+            dataset={dataset}
+            reduceMotion={reduceMotion}
+          />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 /**
- * A member's Craft Path — this season's mission progress and stars, plus their lifetime Craft
- * Mastery tier. Every number here traces back to already-published weekly category scores (see
- * lib/craftPaths.ts); nothing is a separate, unverifiable input. Shown as proposed, transparent
- * recognition, never as an official HR assessment (craft_path_disclaimer, always visible).
+ * Four Leadership Paths — this season's milestone progress (earned / in-progress / locked) grouped
+ * by path, plus lifetime Craft Mastery. Every number traces back to already-published weekly
+ * category scores (see lib/craftPaths.ts); nothing here is a separate, unverifiable input. Shown as
+ * proposed, transparent recognition, never as an official HR assessment (craft_path_disclaimer,
+ * always visible).
  */
 export function CraftPathPanel({ member, dataset, config, currentSeason, seasons, periodWeekIndexes }: CraftPathPanelProps) {
-  const { t, locale } = useI18n();
-  const reduceMotion = useReducedMotion();
+  const { t } = useI18n();
+  const reduceMotion = useReducedMotion() ?? false;
   const path = craftPathForRole(member.role);
-  const progress = path && currentSeason ? computeCraftPathProgress(dataset, member, currentSeason) : null;
-  const completedIds = progress ? progress.missions.filter((m) => m.complete).map((m) => m.def.id) : [];
+  const paths = path && currentSeason ? computeLeadershipPathsProgress(dataset, member, currentSeason) : null;
+  const completedIds = paths ? paths.flatMap((p) => p.missions.filter((m) => m.complete).map((m) => m.def.id)) : [];
   // A hook, so it must run unconditionally every render — see the early return just below, which
   // renders before this could otherwise be reached.
   const newIds = useNewlyEarnedMissionIds(member.id, completedIds);
 
-  if (!path || !currentSeason || !progress) {
+  if (!path || !currentSeason || !paths) {
     return (
       <section className={styles.panel} aria-labelledby="craft-path-heading">
         <h2 id="craft-path-heading">{t('craft_path_heading')}</h2>
@@ -55,7 +180,8 @@ export function CraftPathPanel({ member, dataset, config, currentSeason, seasons
   const mastery = seasons ? computeCraftMastery(dataset, member, seasons) : null;
   const roleRank = computeRoleRank(dataset, config, periodWeekIndexes, member.id);
   const pathName = craftPathLabel(t, path.role);
-  const newMissions = progress.missions.filter((m) => newIds.has(m.def.id));
+  const starsEarned = paths.reduce((s, p) => s + p.starsEarned, 0);
+  const starsPossible = paths.reduce((s, p) => s + p.starsPossible, 0);
 
   return (
     <section className={styles.panel} aria-labelledby="craft-path-heading">
@@ -70,67 +196,14 @@ export function CraftPathPanel({ member, dataset, config, currentSeason, seasons
       <p className={styles.sub}>{t('craft_path_disclaimer')}</p>
 
       <div className={styles.starsRow}>
-        <div className={styles.constellation} role="img" aria-label={t('craft_stars_of', { earned: progress.starsEarned, possible: progress.starsPossible })}>
-          {progress.missions.map((m) => {
-            const isNew = newIds.has(m.def.id);
-            return (
-              <motion.span
-                key={m.def.id}
-                className={styles.star}
-                data-complete={m.complete || undefined}
-                aria-hidden="true"
-                initial={isNew && !reduceMotion ? { scale: 0, rotate: -35 } : false}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={isNew && !reduceMotion ? { type: 'spring', stiffness: 300, damping: 11, delay: 0.2 } : { duration: 0 }}
-              >
-                ★
-              </motion.span>
-            );
-          })}
-        </div>
-        <b>{t('craft_stars_of', { earned: progress.starsEarned, possible: progress.starsPossible })}</b>
+        <b>{t('craft_stars_of', { earned: starsEarned, possible: starsPossible })}</b>
       </div>
 
-      {newMissions.length > 0 && (
-        <div className={styles.newStarBanner} role="status">
-          {newMissions.map((m) => (
-            <p key={m.def.id}>
-              <span aria-hidden="true">✨</span> {t('craft_new_star', { title: t(`craft_concept_${m.def.concept}_title` as TranslationKey) })}
-            </p>
-          ))}
-        </div>
-      )}
-
-      <ul className={styles.missions}>
-        {progress.missions.map((m) => {
-          const concept: CraftConcept = m.def.concept;
-          const pct = Math.round((m.current / m.def.threshold) * 100);
-          const earnedDate = m.earnedWeekIndex != null ? formatDate(weekStartISO(dataset.firstWeekStart, m.earnedWeekIndex), locale) : null;
-          const isNew = newIds.has(m.def.id);
-          return (
-            <li key={m.def.id} className={styles.mission} data-complete={m.complete || undefined} data-new={isNew || undefined}>
-              <div className={styles.missionHead}>
-                <span className={styles.missionGlyph} aria-hidden="true">
-                  {m.complete ? '★' : '☆'}
-                </span>
-                <b>{t(`craft_concept_${concept}_title` as TranslationKey)}</b>
-                <span className={styles.categoryTag}>{categoryLabel(t, CRAFT_CONCEPT_CATEGORY[concept])}</span>
-                {isNew && <span className={styles.newChip}>{t('craft_new_chip')}</span>}
-              </div>
-              <p className={styles.missionDesc}>{t(`craft_concept_${concept}_desc` as TranslationKey)}</p>
-              <div className={styles.track}>
-                <div className={styles.fill} style={{ width: `${pct}%` }} />
-              </div>
-              {!m.complete && (
-                <p className={styles.missionProgress}>
-                  {t('craft_mission_progress', { current: m.current, threshold: m.def.threshold, unit: t(`craft_concept_${concept}_unit` as TranslationKey) })}
-                </p>
-              )}
-              {earnedDate && <p className={styles.missionEarned}>{t('craft_mission_complete_on', { date: earnedDate })}</p>}
-            </li>
-          );
-        })}
-      </ul>
+      <div className={styles.paths}>
+        {paths.map((p) => (
+          <PathSection key={p.pathId} path={p} dataset={dataset} newIds={newIds} reduceMotion={reduceMotion} />
+        ))}
+      </div>
 
       {mastery && (
         <div className={styles.mastery} data-tier={mastery.tier}>

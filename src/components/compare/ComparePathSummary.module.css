@@ -1,0 +1,60 @@
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 22px;
+}
+
+.panel h2 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.note {
+  color: var(--ink-muted);
+  font-size: 12px;
+  margin: 3px 0 14px;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.pathName {
+  font-weight: 600;
+}
+
+.stars {
+  font-size: 15px;
+  letter-spacing: 1px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .row {
+    grid-template-columns: 1fr;
+    text-align: left;
+    gap: 2px;
+  }
+  .stars {
+    text-align: left;
+  }
+}

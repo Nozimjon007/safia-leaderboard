@@ -23,7 +23,7 @@
  *                         a season.
  * - `category_leader`  — ranked #1 in a specific category for a season.
  */
-import { CATEGORY_KEYS, type AchievementId, type CategoryKey, type EarnedAchievement, type LeaderboardDataset, type ScoringConfig } from '../data/types';
+import { CATEGORY_KEYS, type AchievementId, type CategoryKey, type EarnedAchievement, type LeaderboardDataset, type ScoringConfig, type XpTier } from '../data/types';
 import type { Season } from './seasons';
 import { isSeasonApproved } from './seasons';
 import { buildLeaderboard, weekOverall } from './scoring';
@@ -46,6 +46,20 @@ export const ACHIEVEMENT_GLYPHS: Record<AchievementId, string> = {
   green_streak: '●', // dot
   full_attendance: '✓', // check
   category_leader: '◆', // diamond
+};
+
+/** A presentational prestige tier for the Leadership Passport's medallion display — reuses the same
+ * bronze/silver/gold/platinum vocabulary as Craft Mastery (lib/craftPaths.ts) for one consistent
+ * "how prestigious" language across the whole passport, not a second competing scale. This is a
+ * demo grouping by ACHIEVEMENT_PRIORITY's own relative-prestige order below, not an official Safia
+ * ranking of one achievement over another. */
+export const ACHIEVEMENT_TIER: Record<AchievementId, XpTier> = {
+  champion: 'platinum',
+  podium: 'gold',
+  most_improved: 'gold',
+  category_leader: 'silver',
+  green_streak: 'silver',
+  full_attendance: 'bronze',
 };
 
 /** Distinct achievement types a member has earned at least once, in the fixed ACHIEVEMENT_IDS order. */
